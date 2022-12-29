@@ -22,7 +22,7 @@
 
 module adder(
 	input wire[31:0] a,b,
-	output wire[31:0] ytest
+	output wire[31:0] ytestJeffrey
     );
 
 	assign y = a + b;
