@@ -23,6 +23,7 @@
 module adder(
 	input wire[31:0] a,b,
 	output wire[31:0] y
+	// 测试冲突
     );
 
 	assign y = a + b;
