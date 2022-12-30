@@ -6,7 +6,7 @@ module alu(
 	input wire [31:0] alu_num1,
 	input wire [31:0] alu_num2,
 	input wire [4:0] sa,
-	input wire [7:0]alucontrol;
+	input wire [7:0]alucontrol,
 
 	output reg [31:0] alu_out,
 	output reg overflow,
@@ -19,7 +19,7 @@ module alu(
 			`EXE_OR_OP	:	alu_out <= alu_num1 | alu_num2;
 			`EXE_XOR_OP	:	alu_out <= alu_num1 ^ alu_num2;
 			`EXE_NOR_OP	:	alu_out <= ~(alu_num1 | alu_num2);
-			// 逻辑立即数运算
+			// 逻辑立即数运�?
 			`EXE_ANDI_OP:	alu_out <= alu_num1 & {{16{1'b0}}, alu_num2[15:0]};
 			`EXE_ORI_OP:	alu_out <= alu_num1 | {{16{1'b0}}, alu_num2[15:0]};
 			`EXE_XORI_OP:	alu_out <= alu_num1 ^ {{16{1'b0}}, alu_num2[15:0]};
@@ -59,8 +59,8 @@ module alu(
 			//b type
             `EXE_BEQ_OP:	alu_out <= alu_num1 - alu_num2;
             `EXE_BNE_OP:	alu_out <= alu_num1 - alu_num2;
-            `EXE_BLTZAL_OP:	alu_out <= pc_add4E + 32'b100  ;   // 需要写pc+8到31号ra寄存器
-            `EXE_BGEZAL_OP:	alu_out <= pc_add4E + 32'b100  ;   // 需要写pc+8到31号ra寄存器
+            // `EXE_BLTZAL_OP:	alu_out <= pc_add4E + 32'b100  ;   // �?要写pc+8�?31号ra寄存�?
+            // `EXE_BGEZAL_OP:	alu_out <= pc_add4E + 32'b100  ;   // �?要写pc+8�?31号ra寄存�?
 
             // 访存指令
             `EXE_LB_OP:		alu_out <= alu_num1 + alu_num2;
@@ -76,8 +76,9 @@ module alu(
 
             // 特权指令
             `EXE_MTC0_OP: alu_out <= alu_num2;
-            `EXE_MFC0_OP: alu_out <= cp0aluin;
+            // `EXE_MFC0_OP: alu_out <= cp0aluin;
             `EXE_ERET_OP: alu_out <= 32'b0;
             default: alu_out <= 32'b0;
+	endcase
 	end
 endmodule

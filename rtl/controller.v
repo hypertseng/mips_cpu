@@ -37,6 +37,7 @@ module controller(
 	// //write back stage
 	// output wire memtoregW,regwriteW
 	//===================下面是新代码====================
+	input wire clk,rst,
 	input wire [5:0] op,funct,
 	input wire [4:0] rs, 
 	input wire [4:0] rt,
