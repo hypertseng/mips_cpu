@@ -1,23 +1,5 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2017/11/02 14:52:16
-// Design Name: 
-// Module Name: alu
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
+
 
 `include "defines.vh"
 module alu(
@@ -73,15 +55,29 @@ module alu(
 			// `EXE_JR_OP:		alu_out <= alu_num1 + alu_num2;
 			// `EXE_JAL_OP:		alu_out <= alu_num1 + alu_num2;
 			// `EXE_JALR_OP:	alu_out <= alu_num1 + alu_num2;
-			
+			 
+			//b type
+            `EXE_BEQ_OP:	alu_out <= alu_num1 - alu_num2;
+            `EXE_BNE_OP:	alu_out <= alu_num1 - alu_num2;
+            `EXE_BLTZAL_OP:	alu_out <= pc_add4E + 32'b100  ;   // 需要写pc+8到31号ra寄存器
+            `EXE_BGEZAL_OP:	alu_out <= pc_add4E + 32'b100  ;   // 需要写pc+8到31号ra寄存器
 
-
-			// 访存指令
+            // 访存指令
+            `EXE_LB_OP:		alu_out <= alu_num1 + alu_num2;
+            `EXE_LBU_OP:	alu_out <= alu_num1 + alu_num2;
+            `EXE_LH_OP:		alu_out <= alu_num1 + alu_num2;
+            `EXE_LHU_OP:	alu_out <= alu_num1 + alu_num2;
+            `EXE_LW_OP:		alu_out <= alu_num1 + alu_num2;
+            `EXE_SB_OP:		alu_out <= alu_num1 + alu_num2;
+            `EXE_SH_OP:		alu_out <= alu_num1 + alu_num2;
+            `EXE_SW_OP:		alu_out <= alu_num1 + alu_num2;
 
 			// 内陷指令
 
-			// 特权指令
-
-
+            // 特权指令
+            `EXE_MTC0_OP: alu_out <= alu_num2;
+            `EXE_MFC0_OP: alu_out <= cp0aluin;
+            `EXE_ERET_OP: alu_out <= 32'b0;
+            default: alu_out <= 32'b0;
 	end
 endmodule

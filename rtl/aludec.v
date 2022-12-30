@@ -1,23 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2017/10/23 15:27:24
-// Design Name: 
-// Module Name: aludec
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 `include "defines.vh"
 module aludec(
@@ -62,7 +43,11 @@ module aludec(
                 // J型跳转指令
                 `EXE_JR     :alucontrol <= `EXE_J_OP;
                 `EXE_JALR   :alucontrol <= `EXE_JALR_OP;
-				default: 
+                // 内陷指令
+                `EXE_BREAK  :alucontrol <= `EXE_BREAK_OP;
+                `EXE_SYSCALL:alucontrol <= `EXE_SYSCALL_OP;
+                default     :alucontrol <= `EXE_NOP_OP;
+				
 			endcase
 			// 立即数逻辑运算指令
             `EXE_ANDI   :alucontrol <= `EXE_ANDI_OP;
@@ -70,14 +55,43 @@ module aludec(
             `EXE_LUI    :alucontrol <= `EXE_LUI_OP;
             `EXE_ORI    :alucontrol <= `EXE_ORI_OP;
 			// 立即数运算指令
-            `EXE_ADDI   :alucontrol <= `EXE_ADDI_OP     ;
-            `EXE_ADDIU  :alucontrol <= `EXE_ADDIU_OP    ;
-            `EXE_SLTI   :alucontrol <= `EXE_SLTI_OP     ;
-            `EXE_SLTIU  :alucontrol <= `EXE_SLTIU_OP    ;
+            `EXE_ADDI   :alucontrol <= `EXE_ADDI_OP;
+            `EXE_ADDIU  :alucontrol <= `EXE_ADDIU_OP;
+            `EXE_SLTI   :alucontrol <= `EXE_SLTI_OP;
+            `EXE_SLTIU  :alucontrol <= `EXE_SLTIU_OP;
 			// J型跳转指令
-            `EXE_J      :alucontrol <= `EXE_J_OP        ;
-            `EXE_JAL    :alucontrol <= `EXE_JAL_OP      ;
-			
+            `EXE_J      :alucontrol <= `EXE_J_OP;
+            `EXE_JAL    :alucontrol <= `EXE_JAL_OP;
+			// 还有两条j指令在rtype里面
+            `EXE_BEQ    :alucontrol <= `EXE_BEQ_OP;
+            `EXE_BGTZ   :alucontrol <= `EXE_BGTZ_OP;
+            `EXE_BLEZ   :alucontrol <= `EXE_BLEZ_OP;
+            `EXE_BNE    :alucontrol <= `EXE_BNE_OP;
+            
+            `EXE_REGIMM_INST: case(rt)
+                `EXE_BLTZ   :alucontrol <= `EXE_BLTZ_OP;
+                `EXE_BLTZAL :alucontrol <= `EXE_BLTZAL_OP;
+                `EXE_BGEZ   :alucontrol <= `EXE_BGEZ_OP;
+                `EXE_BGEZAL :alucontrol <= `EXE_BGEZAL_OP;
+                default     :alucontrol <= `EXE_NOP_OP;
+            endcase
+            // 访存指令
+            `EXE_LB     :alucontrol <= `EXE_LB_OP;
+            `EXE_LBU    :alucontrol <= `EXE_LBU_OP;
+            `EXE_LH     :alucontrol <= `EXE_LH_OP;
+            `EXE_LHU    :alucontrol <= `EXE_LHU_OP;
+            `EXE_LW     :alucontrol <= `EXE_LW_OP;
+            `EXE_SB     :alucontrol <= `EXE_SB_OP;
+            `EXE_SH     :alucontrol <= `EXE_SH_OP;
+            `EXE_SW     :alucontrol <= `EXE_SW_OP;
+            // 特权指令
+            6'b010000 : case (rs)
+                5'b00100 :  alucontrol   <= `EXE_MTC0_OP;
+                5'b00000 :  alucontrol   <= `EXE_MFC0_OP;
+                5'b00001 :  alucontrol   <= `EXE_ERET_OP;
+                default:    alucontrol   <= `EXE_NOP_OP ;
+            endcase
+            default : alucontrol    <= `EXE_NOP_OP;
 		endcase
 	
 	end
