@@ -47,18 +47,19 @@ module datapath(
     );
 	
 	//fetch stage
-	wire stallF;
-	//FD
+ 
+ 	//FD
 	wire [31:0] pcplus4F;
 	wire [31:0] pcnextbrFD,pcbranchD;
 	//decode stage
+	wire [7:0] alucontrolD;
 	wire [31:0] pcplus4D,instrD;
 	wire forwardaD,forwardbD;
 	wire [4:0] rsD,rtD,rdD;
-	wire flushD,stallD; 
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	//execute stage
+	wire [31:0] pcplus4E;
 	wire [1:0] forwardaE,forwardbE;
 	wire [4:0] rsE,rtE,rdE;
 	wire [4:0] writeregE;
@@ -71,9 +72,11 @@ module datapath(
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW;
 
-
-	wire [7:0] alucontrolD;
-
+	
+	//hazard	
+    wire stallF, stallD, stallE, stallW;
+    wire flushF, flushD, flushE, flushW;
+    wire [1:0] forward_aE, forward_bE;
 
 	//hazard detection
 	hazard h(
@@ -99,7 +102,9 @@ module datapath(
 		writeregW,
 		regwriteW
 		);
-	assign pcplus4F = pcF + 4;
+	assign pcplus4F = pcF + 32'h4;
+
+
 
 	//next PC logic (operates in fetch an decode)
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
@@ -111,7 +116,7 @@ module datapath(
 	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
 
 	//fetch stage logic
-	assign pcplus4F = pcF + 4;
+	// assign pcplus4F = pcF + 4;
 	pc #(32) pcreg(clk,rst,~stallF,pcnext,pcF);
 	// adder pcadd1(pcF,32'b100,pcplus4F);
 
@@ -120,7 +125,7 @@ module datapath(
     //                     (sel[1] ? (sel[0] ? pcjumpE : pcjumpD) :
     //                               (sel[0] ? pcbranchD : pcplus4F))
     //             ;
-	assign pcnext = pcplus4F;
+	assign pcnext = pcplus4E;
 
 	//decode stage
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
@@ -139,6 +144,17 @@ module datapath(
 	assign rdD = instrD[15:11];
 
 	//execute stage
+
+	id_ex id_ex0(
+        .clk(clk),
+        .rst(rst),
+        .stallE(stallE),
+        .flushE(flushE),
+
+		.pc_plus4D(pcplus4D),
+		.pc_plus4E(pcplus4E)
+		);
+
 	floprc #(32) r1E(clk,rst,flushE,srcaD,srcaE);
 	floprc #(32) r2E(clk,rst,flushE,srcbD,srcbE);
 	floprc #(32) r3E(clk,rst,flushE,signimmD,signimmE);
