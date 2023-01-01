@@ -39,20 +39,20 @@ module maindec(
     // output reg invalid, // 保留地址异常
     // output reg cp0write // 写入cp0
     );
-	// reg[8:0] controls;
-	// assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,jump,aluop} = controls;
-	// always @(*) begin
-	// 	case (op)
-	// 		6'b000000:controls <= 9'b110000010;//R-TYRE
-	// 		6'b100011:controls <= 9'b101001000;//LW
-	// 		6'b101011:controls <= 9'b001010000;//SW
-	// 		6'b000100:controls <= 9'b000100001;//BEQ
-	// 		6'b001000:controls <= 9'b101000000;//ADDI
+	 reg[8:0] controls;
+	 assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,jump,aluop} = controls;
+	 always @(*) begin
+	 	case (op)
+	 		6'b000000:controls <= 9'b110000010;//R-TYRE
+	 		6'b100011:controls <= 9'b101001000;//LW
+	 		6'b101011:controls <= 9'b001010000;//SW
+	 		6'b000100:controls <= 9'b000100001;//BEQ
+	 		6'b001000:controls <= 9'b101000000;//ADDI
 			
-	// 		6'b000010:controls <= 9'b000000100;//J
-	// 		default:  controls <= 9'b000000000;//illegal op
-	// 	endcase
-	// end
+	 		6'b000010:controls <= 9'b000000100;//J
+	 		default:  controls <= 9'b000000000;//illegal op
+	 	endcase
+	 end
     wire [5:0] op;
 	wire [4:0] rs,rt;
 	wire [5:0] funct;
@@ -127,7 +127,7 @@ module maindec(
                     main_signal <= 6'b000000;
                 end 
                 5'b00000: main_signal <= 6'b100000; // mtfc0
-                5'b10000: main_signal <= 6'b000000; // eret TODO: 参考代码中regwrite为1，这里不为1
+                5'b10000: main_signal <= 6'b000000; // eret TODO: 参�?�代码中regwrite�?1，这里不�?1
                 default: begin
                     // invalid = 1;
                     main_signal <= 6'b000000;  // error op
