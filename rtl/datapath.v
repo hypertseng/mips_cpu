@@ -70,6 +70,10 @@ module datapath(
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW;
 
+
+	wire [7:0] alucontrolD;
+
+
 	//hazard detection
 	hazard h(
 		//fetch stage
@@ -135,14 +139,11 @@ module datapath(
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
 	// alu alu(srca2E,srcb3E,alucontrolE,aluoutE);
-	alu alu(.alu_num1(srca2E),
-	.alu_num2(srcb3E),
-	.sa(instrF[10:6]),
+	alu alu0(.alu_num1(srca2E),
+	.alu_num2(srcb2E),
 	.alucontrol(alucontrolE),
 
-	.alu_out(aluoutM),
-	// .overflow(),
-	// .zero()
+	.alu_out(aluoutE)
 	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 

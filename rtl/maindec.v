@@ -21,7 +21,7 @@
 
 `include "defines.vh"
 module maindec(
-	input wire[5:0] op,
+	input wire[31:0] instrD,
 
 	output wire memtoreg,memwrite,
 	output wire branch,alusrc,
@@ -53,7 +53,16 @@ module maindec(
 	// 		default:  controls <= 9'b000000000;//illegal op
 	// 	endcase
 	// end
+    wire [5:0] op;
+	wire [4:0] rs,rt;
+	wire [5:0] funct;
 	reg [5:0] main_signal;
+
+	assign op = instrD[31:26];
+	assign rs = instrD[25:21];
+	assign rt = instrD[20:16];
+	assign funct = instrD[5:0];
+
     assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg} = main_signal;
     always @(*) begin
 		case(op)

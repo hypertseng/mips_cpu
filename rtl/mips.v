@@ -35,35 +35,36 @@ module mips(
 	wire [2:0] alucontrolE;
 	wire flushE,equalD;
 
-	// controller c(
-	// 	clk,rst,
-	// 	//decode stage
-	// 	opD,functD,
-	// 	pcsrcD,branchD,equalD,jumpD,
+	controller c(
+		clk,rst,
+		//decode stage
+		instrF,
+		opD,functD,
+		pcsrcD,branchD,equalD,jumpD,
 		
-	// 	//execute stage
-	// 	flushE,
-	// 	memtoregE,alusrcE,
-	// 	regdstE,regwriteE,	
-	// 	alucontrolE,
+		//execute stage
+		flushE,
+		memtoregE,alusrcE,
+		regdstE,regwriteE,	
+		alucontrolE,
 
-	// 	//mem stage
-	// 	memtoregM,memwriteM,
-	// 	regwriteM,
-	// 	//write back stage
-	// 	memtoregW,regwriteW
-	// 	);
-	controller c(clk,rst,
-	opD,functD,rs,rt,
-	memtoreg,memwrite,
-    branch,alusrc,
-    regdst,regwrite,
-	write_al,
-	jump,jumpr,
-	alucontrol,
-	invalid, 
-	cp0write 
-);
+		//mem stage
+		memtoregM,memwriteM,
+		regwriteM,
+		//write back stage
+		memtoregW,regwriteW
+		);
+// 	controller c(clk,rst,
+// 	opD,functD,rs,rt,
+// 	memtoreg,memwrite,
+//     branch,alusrc,
+//     regdst,regwrite,
+// 	write_al,
+// 	jump,jumpr,
+// 	alucontrol,
+// 	invalid, 
+// 	cp0write 
+// );
 	datapath dp(
 		clk,rst,
 		//fetch stage

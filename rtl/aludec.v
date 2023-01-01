@@ -9,10 +9,23 @@
 // 	output reg [7:0] alucontrol
 //     );
 module aludec(
-	input wire[5:0] funct,
-	input wire[1:0] aluop,
-	output reg[7:0] alucontrol
+	input wire [31:0] instrD,
+
+	output reg[7:0] alucontrol,
+	// output reg[5:0] alucontrol
+    // output reg [5:0] alu_controlD,
+	output reg [4:0] branch_judge_controlD
     );
+
+    wire [5:0] op;
+	wire [4:0] rs, rt;
+	wire [5:0] funct;
+
+    assign op = instrD[31:26];
+    assign rs = instrD[25:21];
+    assign rt = instrD[20:16];
+    assign funct = instrD[5:0];
+
 	always @(*) begin
 		case (op)
 			// R-type
@@ -45,7 +58,7 @@ module aludec(
                 `EXE_MULTU  :alucontrol <= `EXE_MULTU_OP;
                 `EXE_DIV    :alucontrol <= `EXE_DIV_OP;
                 `EXE_DIVU   :alucontrol <= `EXE_DIVU_OP;
-                // J型跳转指令
+                // J型跳转指�?
                 `EXE_JR     :alucontrol <= `EXE_J_OP;
                 `EXE_JALR   :alucontrol <= `EXE_JALR_OP;
                 // 内陷指令
@@ -54,17 +67,17 @@ module aludec(
                 default     :alucontrol <= `EXE_NOP_OP;
 				
 			endcase
-			// 立即数逻辑运算指令
+			// 立即数�?�辑运算指令
             `EXE_ANDI   :alucontrol <= `EXE_ANDI_OP;
             `EXE_XORI   :alucontrol <= `EXE_XORI_OP;
             `EXE_LUI    :alucontrol <= `EXE_LUI_OP;
             `EXE_ORI    :alucontrol <= `EXE_ORI_OP;
-			// 立即数运算指令
+			// 立即数运算指�?
             `EXE_ADDI   :alucontrol <= `EXE_ADDI_OP;
             `EXE_ADDIU  :alucontrol <= `EXE_ADDIU_OP;
             `EXE_SLTI   :alucontrol <= `EXE_SLTI_OP;
             `EXE_SLTIU  :alucontrol <= `EXE_SLTIU_OP;
-			// J型跳转指令
+			// J型跳转指�?
             `EXE_J      :alucontrol <= `EXE_J_OP;
             `EXE_JAL    :alucontrol <= `EXE_JAL_OP;
 			// 还有两条j指令在rtype里面
@@ -79,7 +92,7 @@ module aludec(
             //     `EXE_BGEZ   :alucontrol <= `EXE_BGEZ_OP;
             //     `EXE_BGEZAL :alucontrol <= `EXE_BGEZAL_OP;
             //     default     :alucontrol <= `EXE_NOP_OP;
-            endcase
+            // endcase
             // 访存指令
             `EXE_LB     :alucontrol <= `EXE_LB_OP;
             `EXE_LBU    :alucontrol <= `EXE_LBU_OP;
@@ -95,9 +108,8 @@ module aludec(
             //     5'b00000 :  alucontrol   <= `EXE_MFC0_OP;
             //     5'b00001 :  alucontrol   <= `EXE_ERET_OP;
             //     default:    alucontrol   <= `EXE_NOP_OP ;
-            endcase
+            // endcase
             default : alucontrol    <= `EXE_NOP_OP;
 		endcase
-	
 	end
 endmodule

@@ -1,10 +1,10 @@
 -- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
--- Date        : Sat Dec 31 23:10:34 2022
+-- Date        : Sat Dec 31 23:10:33 2022
 -- Host        : DESKTOP-9QIC1QG running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode synth_stub
---               I:/cquTermProj/code/hardware_mips/CO-lab-material-CQU/mycpu/rtl/xilinx_ip/data_ram/data_ram_stub.vhdl
+-- Command     : write_vhdl -force -mode synth_stub -rename_top data_ram -prefix
+--               data_ram_ data_ram_stub.vhdl
 -- Design      : data_ram
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a100tcsg324-1
