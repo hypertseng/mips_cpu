@@ -23,7 +23,7 @@
 module datapath(
 	input wire clk,rst,
 	//fetch stage
-	output wire[31:0] pcF,
+	output wire[31:0] pcF,pcnext,
 	input wire[31:0] instrF,
 	//decode stage
 	input wire pcsrcD,branchD,
@@ -49,7 +49,8 @@ module datapath(
 	//fetch stage
 	wire stallF;
 	//FD
-	wire [31:0] pcnextFD,pcnextbrFD,pcplus4F,pcbranchD;
+	wire [31:0] pcplus4F;
+	wire [31:0] pcnextbrFD,pcbranchD;
 	//decode stage
 	wire [31:0] pcplus4D,instrD;
 	wire forwardaD,forwardbD;
@@ -98,19 +99,29 @@ module datapath(
 		writeregW,
 		regwriteW
 		);
+	assign pcplus4F = pcF + 4;
 
 	//next PC logic (operates in fetch an decode)
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
 	mux2 #(32) pcmux(pcnextbrFD,
 		{pcplus4D[31:28],instrD[25:0],2'b00},
-		jumpD,pcnextFD);
+		jumpD,pcnext);
 
 	//regfile (operates in decode and writeback)
 	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
 
 	//fetch stage logic
-	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF);
-	adder pcadd1(pcF,32'b100,pcplus4F);
+	assign pcplus4F = pcF + 4;
+	pc #(32) pcreg(clk,rst,~stallF,pcnext,pcF);
+	// adder pcadd1(pcF,32'b100,pcplus4F);
+
+	// assign pcnext = sel[2] ? (sel[1] ? (sel[0] ? 32'b0 : pcexceptionM):
+    //                               (sel[0] ? pcplus4E : pcbranchM)) :
+    //                     (sel[1] ? (sel[0] ? pcjumpE : pcjumpD) :
+    //                               (sel[0] ? pcbranchD : pcplus4F))
+    //             ;
+	assign pcnext = pcplus4F;
+
 	//decode stage
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
 	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);

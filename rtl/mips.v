@@ -28,7 +28,7 @@ module mips(
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM 
     );
-	
+	wire[31:0] pcnext;
 	wire [5:0] opD,functD;
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW,
 			regwriteE,regwriteM,regwriteW;
@@ -69,6 +69,7 @@ module mips(
 		clk,rst,
 		//fetch stage
 		pcF,
+		pcnext,
 		instrF,
 		//decode stage
 		pcsrcD,branchD,
