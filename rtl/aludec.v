@@ -1,12 +1,17 @@
 `timescale 1ns / 1ps
 
 `include "defines.vh"
+// module aludec(
+// 	input wire [5:0] funct,
+// 	input wire [5:0] op,
+//     input wire [4:0] rs,
+//     input wire [4:0] rt,
+// 	output reg [7:0] alucontrol
+//     );
 module aludec(
-	input wire [5:0] funct,
-	input wire [5:0] op,
-    input wire [4:0] rs,
-    input wire [4:0] rt,
-	output reg [7:0] alucontrol
+	input wire[5:0] funct,
+	input wire[1:0] aluop,
+	output reg[7:0] alucontrol
     );
 	always @(*) begin
 		case (op)
@@ -68,12 +73,12 @@ module aludec(
             `EXE_BLEZ   :alucontrol <= `EXE_BLEZ_OP;
             `EXE_BNE    :alucontrol <= `EXE_BNE_OP;
             
-            `EXE_REGIMM_INST: case(rt)
-                `EXE_BLTZ   :alucontrol <= `EXE_BLTZ_OP;
-                `EXE_BLTZAL :alucontrol <= `EXE_BLTZAL_OP;
-                `EXE_BGEZ   :alucontrol <= `EXE_BGEZ_OP;
-                `EXE_BGEZAL :alucontrol <= `EXE_BGEZAL_OP;
-                default     :alucontrol <= `EXE_NOP_OP;
+            // `EXE_REGIMM_INST: case(rt)
+            //     `EXE_BLTZ   :alucontrol <= `EXE_BLTZ_OP;
+            //     `EXE_BLTZAL :alucontrol <= `EXE_BLTZAL_OP;
+            //     `EXE_BGEZ   :alucontrol <= `EXE_BGEZ_OP;
+            //     `EXE_BGEZAL :alucontrol <= `EXE_BGEZAL_OP;
+            //     default     :alucontrol <= `EXE_NOP_OP;
             endcase
             // 访存指令
             `EXE_LB     :alucontrol <= `EXE_LB_OP;
@@ -85,11 +90,11 @@ module aludec(
             `EXE_SH     :alucontrol <= `EXE_SH_OP;
             `EXE_SW     :alucontrol <= `EXE_SW_OP;
             // 特权指令
-            6'b010000 : case (rs)
-                5'b00100 :  alucontrol   <= `EXE_MTC0_OP;
-                5'b00000 :  alucontrol   <= `EXE_MFC0_OP;
-                5'b00001 :  alucontrol   <= `EXE_ERET_OP;
-                default:    alucontrol   <= `EXE_NOP_OP ;
+            // 6'b010000 : case (rs)
+            //     5'b00100 :  alucontrol   <= `EXE_MTC0_OP;
+            //     5'b00000 :  alucontrol   <= `EXE_MFC0_OP;
+            //     5'b00001 :  alucontrol   <= `EXE_ERET_OP;
+            //     default:    alucontrol   <= `EXE_NOP_OP ;
             endcase
             default : alucontrol    <= `EXE_NOP_OP;
 		endcase

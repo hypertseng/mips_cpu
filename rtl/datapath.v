@@ -134,7 +134,16 @@ module datapath(
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
-	alu alu(srca2E,srcb3E,alucontrolE,aluoutE);
+	// alu alu(srca2E,srcb3E,alucontrolE,aluoutE);
+	alu alu(.alu_num1(srca2E),
+	.alu_num2(srcb3E),
+	.sa(instrF[10:6]),
+	.alucontrol(alucontrolE),
+
+	.alu_out(aluoutM),
+	// .overflow(),
+	// .zero()
+	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 
 	//mem stage
