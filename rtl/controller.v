@@ -22,7 +22,7 @@
 
 module controller(
 	input wire clk,rst,
-	input wire instrF,
+	input wire[31:0] instrD,
 	//decode stage
 	input wire[5:0] opD,functD,
 	output wire pcsrcD,branchD,equalD,jumpD,
@@ -64,7 +64,7 @@ module controller(
 	wire memwriteE;
 
 	maindec md(
-		instrF,
+		instrD,
 		memtoregD,memwriteD,
 		branchD,alusrcD,
 		regdstD,regwriteD,
@@ -75,7 +75,7 @@ module controller(
 	aludec alu_decoder0(
         .instrD(instrD),
 
-        .alucontrol(alucontrolE),
+        .alucontrol(alucontrolD),
         .branch_judge_controlD(branch_judge_controlD)
     );
 
