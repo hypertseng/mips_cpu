@@ -63,7 +63,7 @@ mycpu_top cpu(
 inst_ram inst_ram
 (
     .clka  (clk                ),  
-    .rsta(~resetn            ),
+    .rsta  (~resetn            ),
     .ena   (cpu_inst_en        ),
     .wea   (cpu_inst_wen       ),
     .addra (cpu_inst_addr      ),
@@ -75,7 +75,7 @@ inst_ram inst_ram
 data_ram data_ram
 (
     .clka  (clk                 ),   
-    .rsta(~resetn             ),
+    .rsta  (~resetn             ),
     .ena   (cpu_data_en         ),
     .wea   (cpu_data_wen        ),
     .addra (cpu_data_addr       ),

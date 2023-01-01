@@ -16,12 +16,12 @@ module mycpu_top(
     input  [31:0] data_sram_rdata
 );
 
-// �?个例�?
+// �?个例�?
 	wire [31:0] pc;
 	wire [31:0] instr;
 	wire memwrite;
 	wire [31:0] aluout, writedata, readdata;
-    mips mips(
+    datapath datapath(
         .clk(clk),
         .rst(~resetn),
         //instr
