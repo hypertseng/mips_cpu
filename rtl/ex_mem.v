@@ -8,7 +8,7 @@ module ex_mem (
 	input wire [63:0] aluout64E,
     output reg [63:0] aluout64M,
 	input wire [31:0] srcaE,
-    output reg [31:0] srcaM
+    output reg [31:0] srcaM,
 	input wire [31:0] hi_oE,
     output reg [31:0] hi_oM
 	input wire [31:0] pcbranchE,
