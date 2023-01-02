@@ -16,7 +16,7 @@ module mycpu_top(
     input  [31:0] data_sram_rdata
 );
 
-// �?个例�?
+// 锟�?涓緥锟�?
 	wire [31:0] pc;
 	wire [31:0] instr;
 	wire memwrite;
@@ -36,13 +36,13 @@ module mycpu_top(
         .readdataM(readdata)
     );
 
-    assign inst_sram_en = 1'b1;     //如果有inst_en，就用inst_en
+    assign inst_sram_en = 1'b1;     //濡傛灉鏈塱nst_en锛屽氨鐢╥nst_en
     assign inst_sram_wen = 4'b0;
     assign inst_sram_addr = pc;
     assign inst_sram_wdata = 32'b0;
     assign instr = inst_sram_rdata;
 
-    assign data_sram_en = 1'b1;     //如果有data_en，就用data_en
+    assign data_sram_en = 1'b1;     //濡傛灉鏈塪ata_en锛屽氨鐢╠ata_en
     assign data_sram_wen = {4{memwrite}};
     assign data_sram_addr = aluout;
     assign data_sram_wdata = writedata;
