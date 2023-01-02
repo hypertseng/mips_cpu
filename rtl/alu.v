@@ -13,14 +13,25 @@
 // 	// output wire zero
 //     );
 module alu(
+    input wire clk, rst,
 	input wire[31:0] alu_num1,alu_num2,
 	input wire[7:0] alucontrol,
 	
 	output reg[31:0] alu_out,
 	output reg[63:0] alu_out_64,
 	output reg overflow,
-	output wire zero
+	output wire zero,
+	output wire stall_div  //对除法进行暂停
     );
+    
+    wire [63:0] div_result;
+    wire start_div, signed_div, div_ready;
+    assign start_div  = (alucontrol==`EXE_DIVU_OP | alucontrol==`EXE_DIV_OP) ? 1'b1 : 1'b0;
+    assign signed_div = (alucontrol==`EXE_DIV_OP) ? 1'b1 : 1'b0;
+    assign div_ready  = ~stall_div;
+    div div(~clk, rst, alu_num1, alu_num2, start_div, signed_div, stall_div, div_result); 
+    
+    
 	always @(*) begin
 		case(alucontrol)
 			// 閫昏緫杩愮畻
@@ -60,7 +71,7 @@ module alu(
             `EXE_SLTIU_OP:	alu_out <= alu_num1 < alu_num2;
 			`EXE_MULTU_OP:  alu_out_64 <= {32'b0, alu_num1} * {32'b0, alu_num2};
             `EXE_MULT_OP:   alu_out_64 <= $signed(alu_num1) * $signed(alu_num2);
-            
+            `EXE_DIV_OP,`EXE_DIVU_OP: alu_out_64 <= div_result;
 			// 鍒嗘敮璺宠浆鎸囦护
 			`EXE_J_OP:		alu_out <= alu_num1 + alu_num2;
 			// `EXE_JR_OP:		alu_out <= alu_num1 + alu_num2;
