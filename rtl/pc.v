@@ -21,16 +21,28 @@
 
 
 module pc #(parameter WIDTH = 32)(
-	input wire clk,rst,en,
-	input wire[WIDTH-1:0] d,
-	output reg[WIDTH-1:0] q
+	input wire clk,rst,stallF,
+	input wire[WIDTH-1:0] pcnext,
+	output reg[WIDTH-1:0] pc,
+	output reg ce
     );
+
+
+	always @(posedge clk) begin
+        if(rst) begin
+            ce <= 0;
+        end
+        else begin
+            ce <= 1;
+        end
+    end
 	always @(posedge clk,posedge rst) begin
 		if(rst) begin
-			q <= 0;
-		end else if(en) begin
+			// pc <= 0;
+			pc <= 32'hbfc00000;
+		end else if(~stallF) begin
 			/* code */
-			q <= d;
+			pc <= pcnext;
 		end
 	end
 endmodule
