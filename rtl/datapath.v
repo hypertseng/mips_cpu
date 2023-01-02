@@ -267,7 +267,7 @@ module datapath(
         .branch_takeE()
     );
 	//mem stage
-	// 增加读处理
+	// 增加读处�?
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
@@ -282,7 +282,7 @@ module datapath(
 	flopr #(32) r5M(clk,rst,srcaE,srcaM);
 
 	//writeback stage
-	// 增加写处理
+	// 增加写处�?
  	read_data read_data0(	.alucontrolW(alucontrolW),
 							.readdataW(readdataW),
 							.dataadrW(aluoutW),
@@ -292,7 +292,7 @@ module datapath(
 	flopr #(32) r7M(clk,rst,lo_oE,lo_oM);
 
     // mem锟阶段乘筹拷锟斤拷锟斤拷写锟斤拷hi lo锟侥达拷锟斤�?
-    hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
+    hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0]);
     
 	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
 	flopr #(32) r2W(clk,rst,readdataM,readdataW);
