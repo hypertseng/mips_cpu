@@ -25,24 +25,31 @@ module datapath(
 	output wire[31:0] pcF,
 	input wire[31:0] instrF,
 	output wire memwriteM,
+	output wire[3:0] sig_write,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM 
     );
 	
 
-//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓�?
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓�?
 	wire[31:0] pcnext;
 	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
-	wire [1:0] memtoregE,memtoregM,memtoregW;//��Ϊ��λ
+	wire [1:0] memtoregE,memtoregM,memtoregW;//��Ϊ��λ
 	wire flushE;
 	//decode stage
 	wire [1:0] memtoregD;
 	wire memwriteD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD;
 	//execute stage
+<<<<<<< HEAD
 	wire memwriteE,gprtohiE,gprtoloE;
 	wire gprtohiM,gprtoloM;
 	wire gprtohiW,gprtoloW;
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑�?
+=======
+	wire memwriteE,hilowriteE;
+	wire hilowriteM;
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑�?
+>>>>>>> f5dbda4d5745065da05ab83dae1d1ac6fa7bdd3d
 
  	//FD
 	wire [31:0] pcplus4F;
@@ -70,10 +77,13 @@ module datapath(
 	wire [63:0] aluout64E;
 	wire [31:0] hi_oE,lo_oE;
 	//mem stage
+	wire [7:0] alucontrolM;
+	wire [31:0] WriteDataE_modified
 	wire [4:0] writeregM;
 	wire [31:0] hi_oM,lo_oM;
 	wire [63:0] aluout64M;
 	//writeback stage
+	wire [7:0] alucontrolW;
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW,hi_oW,lo_oW;
 	
@@ -105,6 +115,7 @@ module datapath(
 		);
 	flopr #(32) regM(
 		clk,rst,
+<<<<<<< HEAD
 		{memtoregE,memwriteE,regwriteE,gprtohiE,gprtoloE},
 		{memtoregM,memwriteM,regwriteM,gprtohiM,gprtoloM}
 		);
@@ -112,6 +123,17 @@ module datapath(
 		clk,rst,
 		{memtoregM,regwriteM,gprtohiM,gprtoloM},
 		{memtoregW,regwriteW,gprtohiW,gprtoloW}
+=======
+		// 增加ALU控制信号传递
+		{memtoregE,memwriteE,regwriteE,alucontrolE,hilowriteE},
+		{memtoregM,memwriteM,regwriteM,alucontrolM,hilowriteM}
+ 		);
+	flopr #(32) regW(
+		clk,rst,
+		// 增加ALU控制信号传递
+		{memtoregM,regwriteM,alucontrolM},
+		{memtoregW,regwriteW,alucontrolW}
+>>>>>>> f5dbda4d5745065da05ab83dae1d1ac6fa7bdd3d
 		);
 
 	//hazard detection
@@ -208,23 +230,43 @@ module datapath(
 	alu alu0(.alu_num1(srca2E),
 	         .alu_num2(srcb2E),
 	         .alucontrol(alucontrolE),
-             .alu_out_64(aluout64E), //����64λ�˳����
+             .alu_out_64(aluout64E), //����64λ�˳����
 	         .alu_out(aluoutE)
 	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 
 	//mem stage
+	// 增加写处理模块
+	write_data write_data0(	.alucontrolE(alucontrolE),
+							.aluoutE(aluoutE),
+							.WriteDataE(srcb2E),
+							.sig_write(sig_write),
+							.WriteDataE_modified(WriteDataE_modified)
+	);
+	flopr #(32) r1M(clk,rst,WriteDataE_modified,writedataM);
+	// flopr #(32) r1M(clk,rst,srcb2E,writedataM);
 	flopr #(32) r1M(clk,rst,srcb2E,writedataM);
 	flopr #(32) r5M(clk,rst,srcaE,srcaM);
 	flopr #(32) r2M(clk,rst,aluoutE,aluoutM);
 	flopr #(64) r4M(clk,rst,aluout64E,aluout64M);
 	flopr #(5) r3M(clk,rst,writeregE,writeregM);
+<<<<<<< HEAD
 	flopr #(32) r6M(clk,rst,hi_oE,hi_oM);
 	flopr #(32) r7M(clk,rst,lo_oE,lo_oM);
     // mem�׶γ˳�����д��hi lo�Ĵ���
     hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
+=======
+    // ��дhi lo�Ĵ���
+    hilo_reg hilo_reg(clk,rst,hilowriteM,aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
+>>>>>>> f5dbda4d5745065da05ab83dae1d1ac6fa7bdd3d
     
 	//writeback stage
+	// 增加读处理模块
+	read_data read_data0(	.alucontrolW(alucontrolW),
+							.readdataW(readdataW),
+							.dataadrW(aluoutW),
+							.readdataW_modified(readdataW_modified)
+	);
 	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
 	flopr #(32) r2W(clk,rst,readdataM,readdataW);
 	flopr #(5) r3W(clk,rst,writeregM,writeregW);
@@ -232,7 +274,7 @@ module datapath(
 	flopr #(32) r5W(clk,rst,lo_oM,lo_oW);
 	flopr #(32) r6W(clk,rst,srcaM,srcaW);
 	
-	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
+	mux4 #(32) resmux_new(aluoutW,readdataW_modified,hi_oW,lo_oW,memtoregW,resultW);
 //	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
 
 endmodule
