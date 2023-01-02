@@ -25,12 +25,13 @@ module datapath(
 	output wire[31:0] pcF,
 	input wire[31:0] instrF,
 	output wire memwriteM,
+	output wire[3:0] sig_write,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM 
     );
 	
 
-//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓�?
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓�?
 	wire[31:0] pcnext;
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW,regwriteE,regwriteM,regwriteW;
 	wire flushE;
@@ -38,7 +39,7 @@ module datapath(
 	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD;
 	//execute stage
 	wire memwriteE;
-//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑�?
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑�?
 
  	//FD
 	wire [31:0] pcplus4F;
@@ -64,10 +65,14 @@ module datapath(
 	wire [31:0] aluoutE;
 	wire [63:0] aluout64E;
 	//mem stage
+	wire [7:0] alucontrolM;
+	wire [31:0] WriteDataE_modified
 	wire [4:0] writeregM;
 	//writeback stage
+	wire [7:0] alucontrolW;
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW;
+	wire [31:0] readdataW_modified;
 	
 
 	
@@ -97,13 +102,15 @@ module datapath(
 		);
 	flopr #(32) regM(
 		clk,rst,
-		{memtoregE,memwriteE,regwriteE},
-		{memtoregM,memwriteM,regwriteM}
+		// 增加ALU控制信号传递
+		{memtoregE,memwriteE,regwriteE,alucontrolE},
+		{memtoregM,memwriteM,regwriteM,alucontrolM}
 		);
 	flopr #(32) regW(
 		clk,rst,
-		{memtoregM,regwriteM},
-		{memtoregW,regwriteW}
+		// 增加ALU控制信号传递
+		{memtoregM,regwriteM,alucontrolM},
+		{memtoregW,regwriteW,alucontrolW}
 		);
 
 	//hazard detection
@@ -196,19 +203,35 @@ module datapath(
 	alu alu0(.alu_num1(srca2E),
 	         .alu_num2(srcb2E),
 	         .alucontrol(alucontrolE),
-             .alu_out_64(aluout64E), //����64λ�˳����
+             .alu_out_64(aluout64E), //����64λ�˳����
 	         .alu_out(aluoutE)
 	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 
 	//mem stage
+	// 增加写处理模块
+	write_data write_data0(	.alucontrolE(alucontrolE),
+							.aluoutE(aluoutE),
+							.WriteDataE(srcb2E),
+							.sig_write(sig_write),
+							.WriteDataE_modified(WriteDataE_modified)
+	);
+	flopr #(32) r1M(clk,rst,WriteDataE_modified,writedataM);
+	// flopr #(32) r1M(clk,rst,srcb2E,writedataM);
 	flopr #(32) r1M(clk,rst,srcb2E,writedataM);
 	flopr #(32) r2M(clk,rst,aluoutE,aluoutM);
 	flopr #(5) r3M(clk,rst,writeregE,writeregM);
 
 	//writeback stage
+	// 增加读处理模块
+	read_data read_data0(	.alucontrolW(alucontrolW),
+							.readdataW(readdataW),
+							.dataadrW(aluoutW),
+							.readdataW_modified(readdataW_modified)
+	);
 	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
 	flopr #(32) r2W(clk,rst,readdataM,readdataW);
 	flopr #(5) r3W(clk,rst,writeregM,writeregW);
-	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+	// mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+	mux2 #(32) resmux(aluoutW,readdataW_modified,memtoregW,resultW);
 endmodule

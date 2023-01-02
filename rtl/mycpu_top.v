@@ -20,6 +20,10 @@ module mycpu_top(
 	wire [31:0] pc;
 	wire [31:0] instr;
 	wire memwrite;
+
+    // 增加写使能信号
+    wire [3:0] sig_write;
+
 	wire [31:0] aluout, writedata, readdata;
     datapath datapath(
         .clk(clk),
@@ -31,6 +35,8 @@ module mycpu_top(
         //data
         // .data_en(data_en),
         .memwriteM(memwrite),
+        // 增加写使能信号
+        .sig_write(sig_write),
         .aluoutM(aluout),
         .writedataM(writedata),
         .readdataM(readdata)
@@ -43,7 +49,10 @@ module mycpu_top(
     assign instr = inst_sram_rdata;
 
     assign data_sram_en = 1'b1;     //如果有data_en，就用data_en
-    assign data_sram_wen = {4{memwrite}};
+    // assign data_sram_wen = {4{memwrite}};
+    // 改写使能信号
+    assign data_sram_wen = sig_write;
+
     assign data_sram_addr = aluout;
     assign data_sram_wdata = writedata;
     assign readdata = data_sram_rdata;
