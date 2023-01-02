@@ -35,9 +35,10 @@ module datapath(
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW,regwriteE,regwriteM,regwriteW;
 	wire flushE;
 	//decode stage
-	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD;
+	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD,hilowriteD;
 	//execute stage
-	wire memwriteE;
+	wire memwriteE,hilowriteE;
+	wire hilowriteM;
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑�?
 
  	//FD
@@ -63,11 +64,14 @@ module datapath(
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E;
 	wire [31:0] aluoutE;
 	wire [63:0] aluout64E;
+	
 	//mem stage
 	wire [4:0] writeregM;
+	wire [31:0] hi_oM,lo_oM;
+	wire [63:0] aluout64M;
 	//writeback stage
 	wire [4:0] writeregW;
-	wire [31:0] aluoutW,readdataW,resultW;
+	wire [31:0] aluoutW,readdataW,resultW,hi_oW,lo_oW;
 	
 
 	
@@ -79,7 +83,7 @@ module datapath(
 	// decoder
 	maindec md(
 		opD,rsD,rtD,functD,
-		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,jumpD
+		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,jumpD,hilowriteD
 		);
 	aludec alu_decoder0(
 		opD,rsD,rtD,functD,
@@ -92,13 +96,13 @@ module datapath(
 	floprc #(32) regE(
 		clk,rst,
 		flushE,
-		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD},
-		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE}
+		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,hilowriteD},
+		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,hilowriteE}
 		);
 	flopr #(32) regM(
 		clk,rst,
-		{memtoregE,memwriteE,regwriteE},
-		{memtoregM,memwriteM,regwriteM}
+		{memtoregE,memwriteE,regwriteE,hilowriteE},
+		{memtoregM,memwriteM,regwriteM,hilowriteM}
 		);
 	flopr #(32) regW(
 		clk,rst,
@@ -204,11 +208,16 @@ module datapath(
 	//mem stage
 	flopr #(32) r1M(clk,rst,srcb2E,writedataM);
 	flopr #(32) r2M(clk,rst,aluoutE,aluoutM);
+	flopr #(64) r4M(clk,rst,aluout64E,aluout64M);
 	flopr #(5) r3M(clk,rst,writeregE,writeregM);
-
+    // ��дhi lo�Ĵ���
+    hilo_reg hilo_reg(clk,rst,hilowriteM,aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
+    
 	//writeback stage
 	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
 	flopr #(32) r2W(clk,rst,readdataM,readdataW);
 	flopr #(5) r3W(clk,rst,writeregM,writeregW);
+	flopr #(32) r4W(clk,rst,hi_oM,hi_oW);
+	flopr #(32) r5W(clk,rst,lo_oM,lo_oW);
 	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
 endmodule
