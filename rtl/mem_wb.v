@@ -11,7 +11,7 @@ module mem_wb (
 	input wire [31:0] lo_oM,
     output reg [31:0] lo_oW,
 	input wire [31:0] srcaM,
-    output reg [31:0] srcaW,
+    output reg [31:0] srcaW
     );
 		always @(posedge clk,posedge rst) begin
 		if(rst) begin

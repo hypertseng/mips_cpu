@@ -10,7 +10,7 @@ module ex_mem (
 	input wire [31:0] srcaE,
     output reg [31:0] srcaM,
 	input wire [31:0] hi_oE,
-    output reg [31:0] hi_oM
+    output reg [31:0] hi_oM,
 	input wire [31:0] pcbranchE,
     output reg [31:0] pcbranchM
     

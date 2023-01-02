@@ -10,7 +10,7 @@ module id_ex (
     input wire jump_conflictD,
     output reg jump_conflictE,
     input wire [31:0] pcbranchD,
-    output reg [31:0] pcbranchE
+    output reg [31:0] pcbranchE,
     input wire [31:0] srcaD,
     output reg [31:0] srcaE,
     input wire [31:0] srcbD,
@@ -35,28 +35,28 @@ module id_ex (
             branch_judge_controlE <=0;   
             jump_conflictE <=0;   
             pcbranchE <= 0;
-            srcaD <= 32'b0;
-			srcbD <= 32'b0;
-			signimmD <= 32'b0;
-			rsD <= 5'b0;
-			rtD <= 5'b0;
-			rdD <= 5'b0;
-			hi_oD <= 32'b0;
-			lo_oD <= 32'b0;
+            srcaE <= 32'b0;
+			srcbE <= 32'b0;
+			signimmE <= 32'b0;
+			rsE <= 5'b0;
+			rtE <= 5'b0;
+			rdE <= 5'b0;
+			hi_oE <= 32'b0;
+			lo_oE <= 32'b0;
         end 
         else if(~stallE) begin      
             pc_plus4E <= pc_plus4D;
             branch_judge_controlE <= branch_judge_controlD;
             jump_conflictE <=jump_conflictD;
             pcbranchE <= pcbranchD;
-            srcaD <= srcaE;
-			srcbD <= srcbE;
-			signimmD <= signimmE;
-			rsD <= rsE;
-			rtD <= rtE;
-			rdD <= rdE;
-			hi_oD <= hi_oE;
-			lo_oD <= lo_oE;
+            srcaE <= srcaD;
+			srcbE <= srcbD;
+			signimmE <= signimmD;
+			rsE <= rsD;
+			rtE <= rtD;
+			rdE <= rdD;
+			hi_oE <= hi_oD;
+			lo_oE <= lo_oD;
         end
     end
 endmodule
