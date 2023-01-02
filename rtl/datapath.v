@@ -31,17 +31,17 @@ module datapath(
     );
 	
 
-//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓�?
+//鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鍚堝苟鍚巆ontroller閮ㄥ垎鐨勮繛绾库啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌锟??
 	wire[31:0] pcnext;
 	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
-	wire [1:0] memtoregE,memtoregM,memtoregW;//��Ϊ��λ
+	wire [1:0] memtoregE,memtoregM,memtoregW;//锟斤拷为锟斤拷位
 	wire flushE;
 	//decode stage
 	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD,hilowriteD;
 	//execute stage
 	wire memwriteE,hilowriteE;
 	wire hilowriteM;
-//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑�?
+//鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈鈫戔啈锟??
 
  	//FD
 	wire [31:0] pcplus4F;
@@ -69,7 +69,7 @@ module datapath(
 	
 	//mem stage
 	wire [7:0] alucontrolM;
-	wire [31:0] WriteDataE_modified
+	wire [31:0] WriteDataE_modified;
 	wire [4:0] writeregM;
 	wire [31:0] hi_oM,lo_oM;
 	wire [63:0] aluout64M;
@@ -106,13 +106,13 @@ module datapath(
 		);
 	flopr #(32) regM(
 		clk,rst,
-		// 增加ALU控制信号传递
+		// 澧炲姞ALU鎺у埗淇″彿浼犻??
 		{memtoregE,memwriteE,regwriteE,alucontrolE,hilowriteE},
 		{memtoregM,memwriteM,regwriteM,alucontrolM,hilowriteM}
  		);
 	flopr #(32) regW(
 		clk,rst,
-		// 增加ALU控制信号传递
+		// 澧炲姞ALU鎺у埗淇″彿浼犻??
 		{memtoregM,regwriteM,alucontrolM},
 		{memtoregW,regwriteW,alucontrolW}
 		);
@@ -207,13 +207,13 @@ module datapath(
 	alu alu0(.alu_num1(srca2E),
 	         .alu_num2(srcb2E),
 	         .alucontrol(alucontrolE),
-             .alu_out_64(aluout64E), //����64λ�˳����
+             .alu_out_64(aluout64E), //锟斤拷锟斤拷64位锟剿筹拷锟斤拷锟?
 	         .alu_out(aluoutE)
 	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 
 	//mem stage
-	// 增加写处理模块
+	// 澧炲姞鍐欏鐞嗘ā鍧?
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
@@ -226,11 +226,11 @@ module datapath(
 	flopr #(32) r2M(clk,rst,aluoutE,aluoutM);
 	flopr #(64) r4M(clk,rst,aluout64E,aluout64M);
 	flopr #(5) r3M(clk,rst,writeregE,writeregM);
-    // ��дhi lo�Ĵ���
+    // 锟斤拷写hi lo锟侥达拷锟斤拷
     hilo_reg hilo_reg(clk,rst,hilowriteM,aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
     
 	//writeback stage
-	// 增加读处理模块
+	// 澧炲姞璇诲鐞嗘ā鍧?
 	read_data read_data0(	.alucontrolW(alucontrolW),
 							.readdataW(readdataW),
 							.dataadrW(aluoutW),
