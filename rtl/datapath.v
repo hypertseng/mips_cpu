@@ -30,7 +30,7 @@ module datapath(
     );
 	
 
-//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓�?
 	wire[31:0] pcnext;
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW,regwriteE,regwriteM,regwriteW;
 	wire flushE;
@@ -38,7 +38,7 @@ module datapath(
 	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD;
 	//execute stage
 	wire memwriteE;
-//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+//↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑�?
 
  	//FD
 	wire [31:0] pcplus4F;
@@ -62,11 +62,13 @@ module datapath(
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E;
 	wire [31:0] aluoutE;
+	wire [63:0] aluout64E;
 	//mem stage
 	wire [4:0] writeregM;
 	//writeback stage
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW;
+	
 
 	
 	//hazard	
@@ -192,10 +194,10 @@ module datapath(
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
 	// alu alu(srca2E,srcb3E,alucontrolE,aluoutE);
 	alu alu0(.alu_num1(srca2E),
-	.alu_num2(srcb2E),
-	.alucontrol(alucontrolE),
-
-	.alu_out(aluoutE)
+	         .alu_num2(srcb2E),
+	         .alucontrol(alucontrolE),
+             .alu_out_64(aluout64E), //����64λ�˳����
+	         .alu_out(aluoutE)
 	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 

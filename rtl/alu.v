@@ -17,6 +17,7 @@ module alu(
 	input wire[7:0] alucontrol,
 	
 	output reg[31:0] alu_out,
+	output reg[63:0] alu_out_64,
 	output reg overflow,
 	output wire zero
     );
@@ -57,7 +58,9 @@ module alu(
             `EXE_ADDIU_OP:	alu_out <= alu_num1 + alu_num2;
             `EXE_SLTI_OP:	alu_out <= $signed(alu_num1) < $signed(alu_num2);
             `EXE_SLTIU_OP:	alu_out <= alu_num1 < alu_num2;
-			
+			`EXE_MULTU_OP:  alu_out_64 <= {32'b0, alu_num1} * {32'b0, alu_num2};
+            `EXE_MULT_OP:   alu_out_64 <= $signed(alu_num1) * $signed(alu_num2);
+            
 			// 分支跳转指令
 			`EXE_J_OP:		alu_out <= alu_num1 + alu_num2;
 			// `EXE_JR_OP:		alu_out <= alu_num1 + alu_num2;
@@ -86,7 +89,11 @@ module alu(
             `EXE_MTC0_OP: alu_out <= alu_num2;
             // `EXE_MFC0_OP: alu_out <= ;
             `EXE_ERET_OP: alu_out <= 32'b0;
-            default: alu_out <= 32'b0;
+            
+         default: begin
+            alu_out <= 32'b0;
+            alu_out_64 <= 64'b0;
+         end
 	endcase
 	end
 endmodule
