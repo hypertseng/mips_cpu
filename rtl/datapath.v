@@ -346,12 +346,18 @@ module datapath(
     // merge flopr in WriteBack stage
 	mem_wb mem_wb0(
 		.clk(clk), .rst(rst),
-		.aluoutM(aluoutM), .aluoutW(aluoutW),
-		.readdataM(readdataM), .readdataW(readdataW),
-		.writeregM(writeregM), .writeregW(writeregW),
-		.hi_oM(hi_oM), .hi_oW(hi_oW),
-		.lo_oM(lo_oM), .lo_oW(lo_oW),
-		.srcaM(srcaM), .srcaW(srcaW),
+		.aluoutM(aluoutM), 
+		.aluoutW(aluoutW),
+		.readdataM(readdataM), 
+		.readdataW(readdataW),
+		.writeregM(writeregM), 
+		.writeregW(writeregW),
+		.hi_oM(hi_oM), 
+		.hi_oW(hi_oW),
+		.lo_oM(lo_oM), 
+		.lo_oW(lo_oW),
+		.srcaM(srcaM), 
+		.srcaW(srcaW),
 	);
 
 	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
