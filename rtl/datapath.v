@@ -202,12 +202,13 @@ module datapath(
 //                    (branchD & ~branchM & pred_takeD ||
 //                     branchD & branchM & succM & pred_takeD) ? 2'b01:
 //                     2'b00;
-	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
-	mux2 #(32) pcmux(pcnextbrFD,
-		pcjumpD,
-		jumpD,pcnextFD);
 
-	assign pcnextFD = pcplus4E;
+	//  you can't delete the next line  
+	assign pcsrcD = branchD & (srca2D == srcb2D);
+	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
+	mux2 #(32) pcmux(pcnextbrFD,pcjumpD,jumpD,pcnextFD);
+
+	// assign pcnextFD = pcplus4E;
 		
 
 	//regfile (operates in decode and writeback)
@@ -224,6 +225,7 @@ module datapath(
 	signext se(instrD[15:0],signimmD);
 	sl2 immsh(signimmD,signimmshD);
 	adder pcadd2(pcplus4D,signimmshD,pcbranchD);
+	mux2 #(32) forwardamux(srcaD,aluoutM,forwardaD,srca2D);
 	mux2 #(32) forwardbmux(srcbD,aluoutM,forwardbD,srcb2D);
 
 	assign opD = instrD[31:26];
