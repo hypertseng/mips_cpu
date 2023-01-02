@@ -2,6 +2,7 @@ module id_ex (
     input wire clk, rst,
     input wire stallE,
     input wire flushE,
+    
     input wire[4:0] branch_judge_controlD,
     output reg[4:0] branch_judge_controlE,
     input wire [31:0] pc_plus4D,

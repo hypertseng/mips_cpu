@@ -8,19 +8,26 @@ module pc #(parameter WIDTH = 32)(
     );
 
 
-	always @(posedge clk) begin
-        if(rst) begin
-            ce <= 0;
-        end
-        else begin
-            ce <= 1;
-        end
-    end
-	always @(posedge clk) begin
-		if(!ce) 
-			pc <= 32'hbfc00000;
-		else if(~stallF) 
-			pc <= pcnext;
+	// always @(posedge clk) begin
+    //     if(rst) begin
+    //         ce <= 0;
+    //     end
+    //     else begin
+    //         ce <= 1;
+    //     end
+    // end
+	// always @(posedge clk) begin
+	// 	if(!ce) 
+	// 		pc <= 32'hbfc00000;
+	// 	else if(~stallF) 
+	// 		pc <= pcnext;
 		
+	// end
+	always @(posedge clk, posedge rst) begin
+		if(rst)begin
+			pc <= 0;
+		end
+		else if(~stallF)
+			pc <= pcnext;
 	end
 endmodule

@@ -86,11 +86,19 @@ module hazard(
 				(writeregE == rsD | writeregE == rtD) |
 				memtoregM &
 				(writeregM == rsD | writeregM == rtD));
-	assign #1 stallD = lwstallD | branchstallD | stall_divE;
-	assign #1 stallF = stallD | stall_divE;
+// stall by div
+	// assign #1 stallD = lwstallD | branchstallD | stall_divE;
+	// assign #1 stallF = stallD | stall_divE;
+	// 	//stalling D stalls all previous stages
+	// assign #1 flushE = stallD;
+	// assign #1 stallE = stall_divE;
+// test if stall is correct without div
+	assign #1 stallD = lwstallD | branchstallD;
+	assign #1 stallF = stallD;
 		//stalling D stalls all previous stages
 	assign #1 flushE = stallD;
-	assign #1 stallE = stall_divE;
+
+
 		//stalling D flushes next stage
 	// Note: not necessary to stall D stage on store
   	//       if source comes from load;
