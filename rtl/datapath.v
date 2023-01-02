@@ -34,7 +34,6 @@ module datapath(
 	wire[31:0] pcnext;
 	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
 	wire [1:0] memtoregE,memtoregM,memtoregW;
-	wire flushE;
 	//decode stage
 	wire [1:0] memtoregD;
 	wire memwriteD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD;
