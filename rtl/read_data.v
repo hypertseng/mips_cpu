@@ -6,12 +6,16 @@ module read_data(
 	output reg[31:0] readdataW_modified
     );
     
+	// 根据指令读取对应数据
     always @ (*)
 	begin
 		case (alucontrolW)
 			`EXE_LW_OP:
+			// LW指令无需修改
                 readdataW_modified <= readdataW;
+
 			`EXE_LH_OP:
+			// LH根据地址低两位判断
 			begin 
 				case (dataadrW[1:0])
 					2'b10: readdataW_modified <= {{16{readdataW[31]}},readdataW[31:16]};
@@ -19,7 +23,9 @@ module read_data(
 					default: readdataW_modified <= readdataW;
 				endcase
 			end
+
 			`EXE_LHU_OP:
+			// LHU根据地址低两位判断
 			begin 
 				case (dataadrW[1:0])
 					2'b10: readdataW_modified <= {{16{1'b0}},readdataW[31:16]};
@@ -27,7 +33,9 @@ module read_data(
 					default: readdataW_modified <= readdataW;
 				endcase
 			end
+
 			`EXE_LB_OP:
+			// LB根据地址低两位判断
 			begin 
 				case (dataadrW[1:0])
 					2'b11: readdataW_modified <= {{24{readdataW[31]}},readdataW[31:24]};
@@ -37,7 +45,9 @@ module read_data(
                     default: readdataW_modified <= readdataW;	        
 				endcase
 			end
+
 			`EXE_LBU_OP:
+			// LBU根据地址低两位判断
 			begin 
 				case (dataadrW[1:0])
 					2'b11: readdataW_modified <= {{24{1'b0}},readdataW[31:24]};
