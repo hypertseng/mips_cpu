@@ -12,13 +12,13 @@ module alu(
 	output wire[31:0] alu_out,
 	output reg[63:0] alu_out_64,
 	output wire overflowE,
-	output wire jumpE,
+	output wire zeroE,
 	output wire stall_div 
     );
 	reg [31:0] alu_ans;
     reg [31:0] num2_reg;
 	// branch :  jump check
-    assign jumpE = (alucontrol == `EXE_BEQ_OP) ? (alu_num1 == alu_num2):                       // == 0
+    assign zeroE = (alucontrol == `EXE_BEQ_OP) ? (alu_num1 == alu_num2):                       // == 0
                   (alucontrol == `EXE_BNE_OP) ? (alu_num1 != alu_num2):                       // != 0
                   (alucontrol == `EXE_BGTZ_OP) ? ((alu_num1[31]==1'b0) && (alu_num1!=32'b0)): // > 0 
                   (alucontrol == `EXE_BLEZ_OP) ? ((alu_num1[31]==1'b1) || (alu_num1==32'b0)): // <= 0
