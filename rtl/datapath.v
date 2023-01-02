@@ -57,6 +57,7 @@ module datapath(
 	wire [31:0] pcnextbrFD,pcbranchD;
 	wire pc_ce_reg;
 	//decode stage
+	wire jumpD,jumprD;
 	wire [7:0] alucontrolD;
     wire [4:0] branch_judge_controlD;
 	wire [31:0] instrD;
@@ -106,7 +107,7 @@ module datapath(
 	// decoder
 	maindec md(
 		opD,rsD,rtD,functD,
-		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,jumpD,gprtohiD,gprtoloD
+		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD,jumpD,jumprD
 		);
 	aludec alu_decoder0(
 		opD,rsD,rtD,functD,
@@ -144,7 +145,7 @@ module datapath(
 		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,gprtohiD,gprtoloD},
 		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,gprtohiE,gprtoloE}
 		);
-	flopr #(32) regM(
+	flopr #(7) regM(
 		clk,rst,
 		// 澧炲姞ALU鎺у埗淇�?�彿浼狅�???
 		// 澧炲姞ALU鎺у埗淇�?�彿浼犻€�

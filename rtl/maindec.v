@@ -29,7 +29,6 @@ module maindec(
 	output wire memwrite,
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
-	output wire jump,
 	output wire gprtohi,  //����gprtohi������GPRд��hi
 	output wire gprtolo,   //����gprtolo������GPRд��lo
     
