@@ -25,13 +25,13 @@ module maindec(
 	input wire [4:0] rs,rt,
 	input wire [5:0] funct,
 
+	output wire [1:0] memtoreg, //00Îªaluresultï¿½ï¿½01Îªreaddataï¿½ï¿½10Îªhiï¿½ï¿½11Îªloï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½hilotogprï¿½ï¿½ï¿½Åºï¿½
 	output wire memwrite,
-	output wire [1:0] memtoreg, //00Îªaluresult£¬01Îªreaddata£¬10Îªhi£¬11Îªlo£¬ÕâÀïÒÑ¾­°üº¬ÁËhilotogprµÄÐÅºÅ
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
 	output wire jump,
-	output wire gprtohi,  //ÐÂÔögprtohi£¬´ú±íGPRÐ´Èëhi
-	output wire gprtolo   //ÐÂÔögprtolo£¬´ú±íGPRÐ´Èëlo
+	output wire gprtohi,  //ï¿½ï¿½ï¿½ï¿½gprtohiï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GPRÐ´ï¿½ï¿½hi
+	output wire gprtolo   //ï¿½ï¿½ï¿½ï¿½gprtoloï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GPRÐ´ï¿½ï¿½lo
     
 	// input wire [5:0] op,
     // input wire[5:0] funct,
@@ -46,7 +46,7 @@ module maindec(
     );
 
 	reg [8:0] main_signal;
-    //ÐÂÔöhilowriteÐÅºÅ
+    //ï¿½ï¿½ï¿½ï¿½hilowriteï¿½Åºï¿½
     assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,gprtohi,gprtolo} = main_signal;
     always @(*) begin
 		case(op)
@@ -115,7 +115,7 @@ module maindec(
                     main_signal <= 9'b00000_00_00;
                 end 
                 5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
-                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: å‚ï¿½?ï¿½ä»£ç ä¸­regwriteï¿???1ï¼Œè¿™é‡Œä¸ï¿???1
+                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: å‚ï¿½?ï¿½ä»£ç ä¸­regwriteï¿½???1ï¼Œè¿™é‡Œä¸ï¿½???1
                 default: begin
                     // invalid = 1;
                     main_signal <= 9'b00000_00_00;  // error op

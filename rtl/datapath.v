@@ -57,7 +57,7 @@ module datapath(
 	wire pc_reg_cef;
 	//decode stage
 	wire [7:0] alucontrolD;
-	wire [31:0] pcplus4D,instrD;
+	wire [31:0] pcplus4D;
     
 	wire [31:0] instrD;
 	wire [31:0] pcnextFD,pcplus4D;

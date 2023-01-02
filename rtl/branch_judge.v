@@ -23,10 +23,10 @@
 module branch_judge(
     input wire[7:0]branch_judge_controlE,
     input wire[31:0]srcaE,srcbE,
-    output reg branch_takeE     // 是否跳转
+    output wire branch_takeE     // 是否跳转
     );
     
-    assign branch_takeE = (branch_judge_controlE == `EXE_BEQ_OP) ? (srcaE == srcbE):                       // == 0
+    assign branch_takeE = (branch_judge_controlE == `EXE_BEQ_OP) ? (srcaE == srcbE):               // == 0
                   (branch_judge_controlE == `EXE_BNE_OP) ? (srcaE != srcbE):                       // != 0
                   (branch_judge_controlE == `EXE_BGTZ_OP) ? ((srcaE[31]==1'b0) && (srcaE!=32'b0)): // > 0 
                   (branch_judge_controlE == `EXE_BLEZ_OP) ? ((srcaE[31]==1'b1) || (srcaE==32'b0)): // <= 0
