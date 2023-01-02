@@ -31,7 +31,7 @@ module maindec(
 	output wire regdst,regwrite,
 	output wire jump,
 	output wire gprtohi,  //����gprtohi������GPRд��hi
-	output wire gprtolo   //����gprtolo������GPRд��lo
+	output wire gprtolo,   //����gprtolo������GPRд��lo
     
 	// input wire [5:0] op,
     // input wire[5:0] funct,
@@ -40,7 +40,7 @@ module maindec(
     // output wire regwrite,regdst,alusrc,branch,
     // output wire memwrite,memtoreg,
     // output wire al_regdst,
-	// output wire jump,jumpr,     // 地址jump和寄存器值jump
+	 output wire jump,jumpr     // 地址jump和寄存器值jump
     // output reg invalid, // 保留地址异常
     // output reg cp0write // 写入cp0
     );
@@ -48,6 +48,14 @@ module maindec(
 	reg [8:0] main_signal;
     //����hilowrite�ź�
     assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,gprtohi,gprtolo} = main_signal;
+    // ����jump�ź�
+    assign jump = ((op == `EXE_J) || (op == `EXE_JAL)) ? 1 : 0;
+    assign jumpr = ((op == `EXE_NOP) && ((funct == `EXE_JR) || (funct == `EXE_JALR))) ? 1 : 0;
+
+    assign al_regdst = (((op == `EXE_REGIMM_INST) && (rt == `EXE_BLTZAL || rt == `EXE_BGEZAL)) // ����bzalָ��
+                        || (op == `EXE_JAL)) ? 1 : 0;  // jalָ��
+    
+    
     always @(*) begin
 		case(op)
 			`EXE_NOP:
@@ -115,7 +123,7 @@ module maindec(
                     main_signal <= 9'b00000_00_00;
                 end 
                 5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
-                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 参�?�代码中regwrite�???1，这里不�???1
+                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 参�?�代码中regwrite�????1，这里不�????1
                 default: begin
                     // invalid = 1;
                     main_signal <= 9'b00000_00_00;  // error op
