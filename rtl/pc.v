@@ -21,7 +21,7 @@
 
 
 module pc #(parameter WIDTH = 32)(
-	input wire clk,rst,stallF,
+	input wire clk,rst,en,
 	input wire[WIDTH-1:0] pcnext,
 	output reg[WIDTH-1:0] pc,
 	output reg ce
@@ -40,7 +40,7 @@ module pc #(parameter WIDTH = 32)(
 		if(rst) begin
 			// pc <= 0;
 			pc <= 32'hbfc00000;
-		end else if(~stallF) begin
+		end else if(en) begin
 			/* code */
 			pc <= pcnext;
 		end

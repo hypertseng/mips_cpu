@@ -1,13 +1,7 @@
 `timescale 1ns / 1ps
 
 `include "defines.vh"
-// module aludec(
-// 	input wire [5:0] funct,
-// 	input wire [5:0] op,
-//     input wire [4:0] rs,
-//     input wire [4:0] rt,
-// 	output reg [7:0] alucontrol
-//     );
+
 module aludec(
     input wire [5:0] op,
 	input wire [4:0] rs, rt,
@@ -50,7 +44,7 @@ module aludec(
                 `EXE_MULTU  :alucontrol <= `EXE_MULTU_OP;
                 `EXE_DIV    :alucontrol <= `EXE_DIV_OP;
                 `EXE_DIVU   :alucontrol <= `EXE_DIVU_OP;
-                // J型跳转指�??
+                // J型跳转指�??
                 `EXE_JR     :alucontrol <= `EXE_J_OP;
                 `EXE_JALR   :alucontrol <= `EXE_JALR_OP;
                 // 内陷指令
@@ -64,12 +58,12 @@ module aludec(
             `EXE_XORI   :alucontrol <= `EXE_XORI_OP;
             `EXE_LUI    :alucontrol <= `EXE_LUI_OP;
             `EXE_ORI    :alucontrol <= `EXE_ORI_OP;
-			// 立即数运算指�??
+			// 立即数运算指�??
             `EXE_ADDI   :alucontrol <= `EXE_ADDI_OP;
             `EXE_ADDIU  :alucontrol <= `EXE_ADDIU_OP;
             `EXE_SLTI   :alucontrol <= `EXE_SLTI_OP;
             `EXE_SLTIU  :alucontrol <= `EXE_SLTIU_OP;
-			// J型跳转指�??
+			// J型跳转指�??
             `EXE_J      :alucontrol <= `EXE_J_OP;
             `EXE_JAL    :alucontrol <= `EXE_JAL_OP;
 			// 还有两条j指令在rtype里面

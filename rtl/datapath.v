@@ -31,7 +31,7 @@ module datapath(
 	
 
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	wire[31:0] pcnext;
+
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW,regwriteE,regwriteM,regwriteW;
 	wire flushE;
 	//decode stage
@@ -39,15 +39,15 @@ module datapath(
 	//execute stage
 	wire memwriteE;
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
+	wire [63:0] hilo;
  	//FD
 	wire [31:0] pcplus4F;
 	wire [31:0] pcnextbrFD,pcbranchD;
 	wire pc_reg_cef;
 	//decode stage
 	wire [7:0] alucontrolD;
-	wire [31:0] pcplus4D,instrD;
-
+	wire [31:0] instrD;
+	wire [31:0] pcnextFD,pcplus4D;
 	wire forwardaD,forwardbD;
 	wire [5:0] opD,functD;
 	wire [4:0] rsD,rtD,rdD;
@@ -128,7 +128,7 @@ module datapath(
 		writeregW,
 		regwriteW
 		);
-	assign pcplus4F = pcF + 32'h4;
+	
 
 
 
@@ -136,21 +136,16 @@ module datapath(
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
 	mux2 #(32) pcmux(pcnextbrFD,
 		{pcplus4D[31:28],instrD[25:0],2'b00},
-		jumpD,pcnext);
+		jumpD,pcnextFD);
 
 	//regfile (operates in decode and writeback)
 	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
 
 	//fetch stage logic
-	pc #(32) pcreg(clk,rst,stallF,pcnext,pcF,pc_reg_ceF);
-	// adder pcadd1(pcF,32'b100,pcplus4F);
+	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_reg_ceF);
+	adder pcadd1(pcF,32'b100,pcplus4F);
 
-	// assign pcnext = sel[2] ? (sel[1] ? (sel[0] ? 32'b0 : pcexceptionM):
-    //                               (sel[0] ? pcplus4E : pcbranchM)) :
-    //                     (sel[1] ? (sel[0] ? pcjumpE : pcjumpD) :
-    //                               (sel[0] ? pcbranchD : pcplus4F))
-    //             ;
-	assign pcnext = pcplus4E;
+
 
 	//decode stage
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
@@ -170,15 +165,15 @@ module datapath(
 
 	//execute stage
 
-	id_ex id_ex0(
-        .clk(clk),
-        .rst(rst),
-        .stallE(stallE),
-        .flushE(flushE),
+	// id_ex id_ex0(
+    //     .clk(clk),
+    //     .rst(rst),
+    //     .stallE(stallE),
+    //     .flushE(flushE),
 
-		.pc_plus4D(pcplus4D),
-		.pc_plus4E(pcplus4E)
-		);
+	// 	.pc_plus4D(pcplus4D),
+	// 	.pc_plus4E(pcplus4E)
+	// 	);
 
 	floprc #(32) r1E(clk,rst,flushE,srcaD,srcaE);
 	floprc #(32) r2E(clk,rst,flushE,srcbD,srcbE);
@@ -190,13 +185,8 @@ module datapath(
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
-	// alu alu(srca2E,srcb3E,alucontrolE,aluoutE);
-	alu alu0(.alu_num1(srca2E),
-	.alu_num2(srcb2E),
-	.alucontrol(alucontrolE),
+	alu alu(srca2E,srcb3E,alucontrolE,hilo,aluoutE);
 
-	.alu_out(aluoutE)
-	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 
 	//mem stage
