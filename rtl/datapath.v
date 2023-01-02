@@ -205,14 +205,15 @@ module datapath(
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
-	alu alu(srca2E,srcb3E,alucontrolE,hilo,aluoutE);
-	alu alu0(.clk(clk),
-	         .rst(rst),
-	         .alu_num1(srca2E),
+	// alu alu(srca2E,srcb3E,alucontrolE,hilo,aluoutE);
+	alu alu0(.alu_num1(srca2E),
 	         .alu_num2(srcb2E),
 	         .alucontrol(alucontrolE),
-             .alu_out_64(aluout64E), 
+			 .hilo(hilo),
+			 .sa(sa),
+
 	         .alu_out(aluoutE),
+             .alu_out_64(aluout64E), 
 	         .stall_div(stall_divE)
 	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
