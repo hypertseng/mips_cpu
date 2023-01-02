@@ -265,23 +265,25 @@ module datapath(
 		.jump_conflictD(jump_conflictD),
 		.jump_conflictE(jump_conflictE),
 		.pcbranchD(pcbranchD),
-		.pcbranchE(pcbranchE)
+		.pcbranchE(pcbranchE),
+		.srcaD(srcaD), 
+		.srcaE(srcaE),
+		.srcaD(srcbD), 
+		.srcaE(srcbE),
+		.signimmD(signimmD), 
+		.signimmE(signimmE),
+		.rsD(rsD), 
+		.rsE(rsE),
+		.rtD(rtD), 
+		.rtE(rtE),
+		.rdD(rdD), 
+		.rdE(rdE),
+		.hi_oD(hi_oD), 
+		.hi_oE(hi_oE),
+		.lo_oD(lo_oD), 
+		.lo_oE(lo_oE)
 		);
 
-	// merge floprc
-	id_ex2 id_ex02(
-		.clk(clk), .rst(rst), .flushE(flushE),
-		
-		.srcaD(srcaD), .srcaE(srcaE),
-		.srcaD(srcbD), .srcaE(srcbE),
-		.signimmD(signimmD), .signimmE(signimmE),
-		.rsD(rsD), .rsE(rsE),
-		.rtD(rtD), .rtE(rtE),
-		.rdD(rdD), .rdE(rdE),
-		.hi_oD(hi_oD), .hi_oE(hi_oE),
-		.lo_oD(lo_oD), .lo_oE(lo_oE)
-
-	);
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
