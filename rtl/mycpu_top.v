@@ -49,7 +49,7 @@ module mycpu_top(
     assign instr = inst_sram_rdata;
 
     assign data_sram_en = 1'b1;     //婵″倹鐏夐張濉猘ta_en閿涘苯姘ㄩ悽鈺燼ta_en
-    assign data_sram_wen = {4{memwrite}};
+    assign data_sram_wen = sig_write;
     assign data_sram_addr = aluout;
     assign data_sram_wdata = writedata;
     assign readdata = data_sram_rdata;
