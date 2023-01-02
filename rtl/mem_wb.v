@@ -16,11 +16,11 @@ module mem_wb (
 		always @(posedge clk,posedge rst) begin
 		if(rst) begin
 			aluoutW <= 0;
-			aluoutW <= 0;
-			aluoutW <= 0;
-			aluoutW <= 0;
-			aluoutW <= 0;
-			aluoutW <= 0;
+			readdataW <= 0;
+			writeregW <= 0;
+			hi_oW <= 0;
+			lo_oW <= 0;
+			srcaW <= 0;
 			
 		end else begin
 			aluoutW <= aluoutM;
