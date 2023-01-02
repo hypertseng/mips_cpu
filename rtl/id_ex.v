@@ -10,7 +10,7 @@ module id_ex (
     input wire jump_conflictD,
     output reg jump_conflictE,
     input wire [31:0] pcbranchD,
-    output reg [31:0] pcbranchE
+    output reg [31:0] pcbranchE£¬
     input wire [31:0] srcaD,
     output reg [31:0] srcaE,
     input wire [31:0] srcbD,
