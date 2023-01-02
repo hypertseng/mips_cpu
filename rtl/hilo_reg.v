@@ -22,6 +22,7 @@
 
 module hilo_reg(
 	input  wire clk,rst,we,
+	input  wire [1:0] wconfig,
 	input  wire [31:0] hi_i,lo_i,
 	output wire [31:0] hi_o,lo_o
     );
@@ -31,10 +32,16 @@ module hilo_reg(
 		if(rst) begin
 			hi <= 0;
 			lo <= 0;
-		end else if (we) begin
-			hi <= hi_i;
-			lo <= lo_i;
-		end
+		end else begin
+            if(wconfig[1])
+                hi <= hi_i;
+            else
+                hi <= hi;
+            if(wconfig[0])
+                lo <= lo_i;
+            else
+                lo <= lo;
+        end
 	end
 
 	assign hi_o = hi;

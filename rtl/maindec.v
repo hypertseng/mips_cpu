@@ -25,10 +25,13 @@ module maindec(
 	input wire [4:0] rs,rt,
 	input wire [5:0] funct,
 
-	output wire memtoreg,memwrite,
+	output wire memwrite,
+	output wire [1:0] memtoreg, //00Îªaluresult£¬01Îªreaddata£¬10Îªhi£¬11Îªlo£¬ÕâÀïÒÑ¾­°üº¬ÁËhilotogprµÄĞÅºÅ
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
-	output wire jump
+	output wire jump,
+	output wire gprtohi,  //ĞÂÔögprtohi£¬´ú±íGPRĞ´Èëhi
+	output wire gprtolo   //ĞÂÔögprtolo£¬´ú±íGPRĞ´Èëlo
     
 	// input wire [5:0] op,
     // input wire[5:0] funct,
@@ -42,82 +45,86 @@ module maindec(
     // output reg cp0write // å†™å…¥cp0
     );
 
-	reg [5:0] main_signal;
-
-    assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg} = main_signal;
+	reg [8:0] main_signal;
+    //ĞÂÔöhilowriteĞÅºÅ
+    assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,gprtohi,gprtolo} = main_signal;
     always @(*) begin
 		case(op)
 			`EXE_NOP:
 			case(funct)
 				// é€»è¾‘æŒ‡ä»¤
-				`EXE_AND, `EXE_OR, `EXE_XOR, `EXE_NOR: main_signal <= 6'b110000; // R-type
+				`EXE_AND, `EXE_OR, `EXE_XOR, `EXE_NOR: main_signal <= 9'b11000_00_00; // R-type
 				// ç§»ä½æŒ‡ä»¤
-			    `EXE_SLL, `EXE_SRL, `EXE_SRA, `EXE_SLLV, `EXE_SRLV, `EXE_SRAV: main_signal <= 6'b110000; // R-type
+			    `EXE_SLL, `EXE_SRL, `EXE_SRA, `EXE_SLLV, `EXE_SRLV, `EXE_SRAV: main_signal <= 9'b11000_00_00; // R-type
 				//TODO `EXE_MFHI `EXE_MTHI `EXE_MFLO `EXE_MTLO
                 // Arithmetic inst
-                `EXE_ADD, `EXE_ADDU, `EXE_SUB, `EXE_SUBU, `EXE_SLT, `EXE_SLTU, `EXE_MULT, `EXE_MULTU, `EXE_DIV, `EXE_DIVU: main_signal <= 6'b110000; // R-type
+                `EXE_ADD, `EXE_ADDU, `EXE_SUB, `EXE_SUBU, `EXE_SLT, `EXE_SLTU: main_signal <= 9'b11000_00_00; // R-type
+                `EXE_MULT, `EXE_MULTU, `EXE_DIV, `EXE_DIVU: main_signal <= 9'b11000_00_11;
                 
-                `EXE_MFHI, `EXE_MFLO: main_signal <= 6'b110000;
-                `EXE_MTHI, `EXE_MTLO: main_signal <= 6'b000000;
-                `EXE_SYSCALL,`EXE_BREAK : main_signal <= 6'b000000;
+                `EXE_MFHI: main_signal <= 9'b11000_10_00;//  hi -> gpr
+                `EXE_MFLO: main_signal <= 9'b11000_11_00;//  lo -> gpr
+                `EXE_MTHI: main_signal <= 9'b00000_00_10;
+                `EXE_MTLO: main_signal <= 9'b00000_00_01;
+                
+                `EXE_SYSCALL,`EXE_BREAK : main_signal <= 9'b00000_00_00;
                 
 
                 // j inst
-                `EXE_JR:  main_signal <= 6'b000000;
-                `EXE_JALR:main_signal <= 6'b110000;  // é€‰æ‹©rdä½œä¸ºå†™å¯„å­˜å™¨ä½ç½®
+                `EXE_JR:  main_signal <= 9'b00000_00_00;
+                `EXE_JALR:main_signal <= 9'b11000_00_00;  // é€‰æ‹©rdä½œä¸ºå†™å¯„å­˜å™¨ä½ç½®
 
                 default:begin
-                    main_signal <= 6'b000000;
+                    main_signal <= 9'b00000_00_00;
                     // invalid = 1;
                 end 
 			endcase
 			// logic inst
-            `EXE_ANDI ,`EXE_XORI, `EXE_LUI, `EXE_ORI: main_signal <= 6'b101000; // Immediate
+            `EXE_ANDI ,`EXE_XORI, `EXE_LUI, `EXE_ORI: main_signal <= 9'b10100_00_00; // Immediate
             
-            `EXE_ADDI, `EXE_ADDIU ,`EXE_SLTI, `EXE_SLTIU: main_signal <= 6'b101000; // Immediate
+            `EXE_ADDI, `EXE_ADDIU ,`EXE_SLTI, `EXE_SLTIU: main_signal <= 9'b10100_00_00; // Immediate
             
             // branch inst
-            `EXE_BEQ, `EXE_BGTZ, `EXE_BLEZ, `EXE_BNE    :main_signal <= 6'b000100    ;
+            `EXE_BEQ, `EXE_BGTZ, `EXE_BLEZ, `EXE_BNE    :main_signal <= 9'b00010_00_00    ;
             
             `EXE_REGIMM_INST: case(rt)
-                `EXE_BLTZ   :main_signal <= 6'b000100      ;
-                `EXE_BLTZAL :main_signal <= 6'b100100      ;
-                `EXE_BGEZ   :main_signal <= 6'b000100      ;
-                `EXE_BGEZAL :main_signal <= 6'b100100      ;
+                `EXE_BLTZ   :main_signal <= 9'b00010_00_00      ;
+                `EXE_BLTZAL :main_signal <= 9'b10010_00_00      ;
+                `EXE_BGEZ   :main_signal <= 9'b00010_00_00      ;
+                `EXE_BGEZAL :main_signal <= 9'b10010_00_00      ;
                 // default: invalid = 1;
             endcase
             
             // j inst
-            `EXE_J  : main_signal <= 6'b000000;
-            `EXE_JAL: main_signal <= 6'b100000;
+            `EXE_J  : main_signal <= 9'b0000_00_00;
+            `EXE_JAL: main_signal <= 9'b1000_00_00;
 
             // memory insts
-            `EXE_LB : main_signal <= 6'b101011;
-            `EXE_LBU: main_signal <= 6'b101011;
-            `EXE_LH : main_signal <= 6'b101011;
-            `EXE_LHU: main_signal <= 6'b101011;
-            `EXE_LW : main_signal <= 6'b101011;  // lab4 lw
-            `EXE_SB : main_signal <= 6'b001010;  
-            `EXE_SH : main_signal <= 6'b001010;  
-            `EXE_SW : main_signal <= 6'b001010;  // lab4 sw
+            `EXE_LB : main_signal <= 9'b10101_01_00;
+            `EXE_LBU: main_signal <= 9'b10101_01_00;
+            `EXE_LH : main_signal <= 9'b10101_01_00;
+            `EXE_LHU: main_signal <= 9'b10101_01_00;
+            `EXE_LW : main_signal <= 9'b10101_01_00;  // lab4 lw
+            `EXE_SB : main_signal <= 9'b00101_01_00;  
+            `EXE_SH : main_signal <= 9'b00101_01_00;  
+            `EXE_SW : main_signal <= 9'b00101_01_00;  // lab4 sw
 
             // ç‰¹æƒæŒ‡ä»¤
             6'b010000 : case(rs)
                 5'b00100:begin  // mtc0
                     // cp0write = 1;
-                    main_signal <= 6'b000000;
+                    main_signal <= 9'b00000_00_00;
                 end 
-                5'b00000: main_signal <= 6'b100000; // mtfc0
-                5'b10000: main_signal <= 6'b000000; // eret TODO: å‚ï¿½?ï¿½ä»£ç ä¸­regwriteï¿½??1ï¼Œè¿™é‡Œä¸ï¿½??1
+                5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
+                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: å‚ï¿½?ï¿½ä»£ç ä¸­regwriteï¿???1ï¼Œè¿™é‡Œä¸ï¿???1
                 default: begin
                     // invalid = 1;
-                    main_signal <= 6'b000000;  // error op
+                    main_signal <= 9'b00000_00_00;  // error op
                 end 
             endcase
 
             default:begin
                 // invalid = 1;
-                main_signal <= 6'b000000;  // error op
+                main_signal <= 9'b00000_00_00;  // error op
             end 
 		endcase
 	end

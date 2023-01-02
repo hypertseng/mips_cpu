@@ -35,10 +35,19 @@ module datapath(
 	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW,regwriteE,regwriteM,regwriteW;
 	wire flushE;
 	//decode stage
-	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD;
+	wire [1:0] memtoregD;
+	wire memwriteD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD;
 	//execute stage
-	wire memwriteE;
+	wire memwriteE,gprtohiE,gprtoloE;
+	wire gprtohiM,gprtoloM;
+	wire gprtohiW,gprtoloW;
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+	// 同步新增代码
+	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
+	wire [1:0] memtoregE,memtoregM,memtoregW;
+
+
 	wire [63:0] hilo;
  	//FD
 	wire [31:0] pcplus4F;
@@ -53,20 +62,27 @@ module datapath(
 	wire [4:0] rsD,rtD,rdD;
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
+	wire [31:0] hi_oD,lo_oD;
 	//execute stage
+	wire stall_divE;
 	wire [7:0] alucontrolE;
 	wire [31:0] pcplus4E;
 	wire [1:0] forwardaE,forwardbE;
 	wire [4:0] rsE,rtE,rdE;
 	wire [4:0] writeregE;
 	wire [31:0] signimmE;
-	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E;
+	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E,srcaM,srcaW;
 	wire [31:0] aluoutE;
+	wire [63:0] aluout64E;
+	wire [31:0] hi_oE,lo_oE;
 	//mem stage
 	wire [4:0] writeregM;
+	wire [31:0] hi_oM,lo_oM;
+	wire [63:0] aluout64M;
 	//writeback stage
 	wire [4:0] writeregW;
-	wire [31:0] aluoutW,readdataW,resultW;
+	wire [31:0] aluoutW,readdataW,resultW,hi_oW,lo_oW;
+	wire [31:0] readdataW_modified;
 
 	
 	//hazard	
@@ -77,7 +93,7 @@ module datapath(
 	// decoder
 	maindec md(
 		opD,rsD,rtD,functD,
-		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,jumpD
+		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,jumpD,gprtohiD,gprtoloD
 		);
 	aludec alu_decoder0(
 		opD,rsD,rtD,functD,
@@ -90,18 +106,20 @@ module datapath(
 	floprc #(32) regE(
 		clk,rst,
 		flushE,
-		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD},
-		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE}
+		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,gprtohiD,gprtoloD},
+		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,gprtohiE,gprtoloE}
 		);
 	flopr #(32) regM(
 		clk,rst,
-		{memtoregE,memwriteE,regwriteE},
-		{memtoregM,memwriteM,regwriteM}
-		);
+		// 增加ALU控制信号传递
+		{memtoregE,memwriteE,regwriteE,alucontrolE,gprtohiE,gprtoloE},
+		{memtoregM,memwriteM,regwriteM,alucontrolM,gprtohiM,gprtoloM}
+ 		);
 	flopr #(32) regW(
 		clk,rst,
-		{memtoregM,regwriteM},
-		{memtoregW,regwriteW}
+		// 增加ALU控制信号传递
+		{memtoregM,regwriteM,alucontrolM,gprtohiM,gprtoloM},
+		{memtoregW,regwriteW,alucontrolW,gprtohiW,gprtoloW}
 		);
 
 	//hazard detection
@@ -144,7 +162,7 @@ module datapath(
 	//fetch stage logic
 	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_reg_ceF);
 	adder pcadd1(pcF,32'b100,pcplus4F);
-
+	hilo_reg hilo_regD(clk,rst,gprtohiW,gprtoloW,srcaW,srcaW,hi_oD,lo_oD);
 
 
 	//decode stage
@@ -181,12 +199,22 @@ module datapath(
 	floprc #(5) r4E(clk,rst,flushE,rsD,rsE);
 	floprc #(5) r5E(clk,rst,flushE,rtD,rtE);
 	floprc #(5) r6E(clk,rst,flushE,rdD,rdE);
+	floprc #(32) r7E(clk,rst,flushE,hi_oD,hi_oE);
+    floprc #(32) r8E(clk,rst,flushE,lo_oD,lo_oE);
 
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
 	alu alu(srca2E,srcb3E,alucontrolE,hilo,aluoutE);
-
+	alu alu0(.clk(clk),
+	         .rst(rst),
+	         .alu_num1(srca2E),
+	         .alu_num2(srcb2E),
+	         .alucontrol(alucontrolE),
+             .alu_out_64(aluout64E), 
+	         .alu_out(aluoutE),
+	         .stall_div(stall_divE)
+	);
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 
 	//mem stage
@@ -195,8 +223,24 @@ module datapath(
 	flopr #(5) r3M(clk,rst,writeregE,writeregM);
 
 	//writeback stage
+	// 增加读处理
+ 	read_data read_data0(	.alucontrolW(alucontrolW),
+							.readdataW(readdataW),
+							.dataadrW(aluoutW),
+							.readdataW_modified(readdataW_modified)
+	);
+	flopr #(32) r6M(clk,rst,hi_oE,hi_oM);
+	flopr #(32) r7M(clk,rst,lo_oE,lo_oM);
+
+    hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
+    
 	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
 	flopr #(32) r2W(clk,rst,readdataM,readdataW);
 	flopr #(5) r3W(clk,rst,writeregM,writeregW);
-	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+	flopr #(32) r4W(clk,rst,hi_oM,hi_oW);
+	flopr #(32) r5W(clk,rst,lo_oM,lo_oW);
+	flopr #(32) r6W(clk,rst,srcaM,srcaW);
+	
+	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
+//	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
 endmodule
