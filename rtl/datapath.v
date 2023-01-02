@@ -32,7 +32,8 @@ module datapath(
 
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓合并后controller部分的连线↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓�?
 	wire[31:0] pcnext;
-	wire regdstE,alusrcE,pcsrcD,memtoregE,memtoregM,memtoregW,regwriteE,regwriteM,regwriteW;
+	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
+	wire [1:0] memtoregE,memtoregM,memtoregW;//��Ϊ��λ
 	wire flushE;
 	//decode stage
 	wire memtoregD,memwriteD,alusrcD,regdstD,regwriteD,hilowriteD;
@@ -219,5 +220,7 @@ module datapath(
 	flopr #(5) r3W(clk,rst,writeregM,writeregW);
 	flopr #(32) r4W(clk,rst,hi_oM,hi_oW);
 	flopr #(32) r5W(clk,rst,lo_oM,lo_oW);
-	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+	
+	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
+//	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
 endmodule
