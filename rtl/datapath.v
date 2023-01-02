@@ -54,7 +54,7 @@ module datapath(
  	//FD
 	wire [31:0] pcplus4F;
 	wire [31:0] pcnextbrFD,pcbranchD;
-	wire pc_reg_cef;
+	wire pc_ce_reg;
 	//decode stage
 	wire [7:0] alucontrolD;
 	wire [31:0] pcplus4D;
@@ -200,7 +200,7 @@ module datapath(
 	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
 
 	//fetch stage logic
-	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_reg_ceF);
+	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_ce_reg);
 	adder pcadd1(pcF,32'b100,pcplus4F);
 	hilo_reg hilo_regD(clk,rst,gprtohiW,gprtoloW,srcaW,srcaW,hi_oD,lo_oD);
 
