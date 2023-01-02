@@ -25,6 +25,7 @@ module datapath(
 	output wire[31:0] pcF,
 	input wire[31:0] instrF,
 	output wire memwriteM,
+	output wire[3:0] sig_write,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
 	output wire [31:0]  debug_wb_pc,      
@@ -80,6 +81,7 @@ module datapath(
 	wire [63:0] aluout64E;
 	wire [31:0] hi_oE,lo_oE;
 	//mem stage
+	wire [3:0] sig_write;
 	wire [4:0] writeregM;
 	wire [31:0] hi_oM,lo_oM;
 	wire [63:0] aluout64M;
@@ -266,6 +268,7 @@ module datapath(
         .branch_takeE()
     );
 	//mem stage
+	// 增加读处理
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
@@ -280,7 +283,7 @@ module datapath(
 	flopr #(32) r5M(clk,rst,srcaE,srcaM);
 
 	//writeback stage
-	// 澧炲姞璇诲鐞�
+	// 增加写处理
  	read_data read_data0(	.alucontrolW(alucontrolW),
 							.readdataW(readdataW),
 							.dataadrW(aluoutW),
