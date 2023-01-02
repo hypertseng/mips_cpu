@@ -29,7 +29,6 @@ module maindec(
 	output wire memwrite,
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
-	output wire jump,
 	output wire gprtohi,  //ï¿½ï¿½ï¿½ï¿½gprtohiï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GPRÐ´ï¿½ï¿½hi
 	output wire gprtolo,   //ï¿½ï¿½ï¿½ï¿½gprtoloï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GPRÐ´ï¿½ï¿½lo
     
@@ -48,12 +47,12 @@ module maindec(
 	reg [8:0] main_signal;
     //ï¿½ï¿½ï¿½ï¿½hilowriteï¿½Åºï¿½
     assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,gprtohi,gprtolo} = main_signal;
-    // ·ÖÀëjumpÐÅºÅ
+    // ï¿½ï¿½ï¿½ï¿½jumpï¿½Åºï¿½
     assign jump = ((op == `EXE_J) || (op == `EXE_JAL)) ? 1 : 0;
     assign jumpr = ((op == `EXE_NOP) && ((funct == `EXE_JR) || (funct == `EXE_JALR))) ? 1 : 0;
 
-    assign al_regdst = (((op == `EXE_REGIMM_INST) && (rt == `EXE_BLTZAL || rt == `EXE_BGEZAL)) // Á½ÌõbzalÖ¸Áî
-                        || (op == `EXE_JAL)) ? 1 : 0;  // jalÖ¸Áî
+    assign al_regdst = (((op == `EXE_REGIMM_INST) && (rt == `EXE_BLTZAL || rt == `EXE_BGEZAL)) // ï¿½ï¿½ï¿½ï¿½bzalÖ¸ï¿½ï¿½
+                        || (op == `EXE_JAL)) ? 1 : 0;  // jalÖ¸ï¿½ï¿½
     
     
     always @(*) begin
@@ -123,7 +122,7 @@ module maindec(
                     main_signal <= 9'b00000_00_00;
                 end 
                 5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
-                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: å‚ï¿½?ï¿½ä»£ç ä¸­regwriteï¿????1ï¼Œè¿™é‡Œä¸ï¿????1
+                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: å‚ï¿½?ï¿½ä»£ç ä¸­regwriteï¿½????1ï¼Œè¿™é‡Œä¸ï¿½????1
                 default: begin
                     // invalid = 1;
                     main_signal <= 9'b00000_00_00;  // error op

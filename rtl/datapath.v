@@ -108,7 +108,7 @@ module datapath(
 	// decoder
 	maindec md(
 		opD,rsD,rtD,functD,
-		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,jumpD,gprtohiD,gprtoloD
+		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD,jumpD,
 		);
 	aludec alu_decoder0(
 		opD,rsD,rtD,functD,
@@ -252,7 +252,7 @@ module datapath(
 	assign pcplus4E =pcplus4D;
 	//mux write reg
     mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, reg_writeE);
-
+	// merge flopenrc
 	id_ex id_ex0(
         .clk(clk),
         .rst(rst),
@@ -268,17 +268,20 @@ module datapath(
 		.pcbranchE(pcbranchE)
 		);
 
+	// merge floprc
+	id_ex2 id_ex02(
+		.clk(clk), .rst(rst), .flushE(flushE),
+		
+		.srcaD(srcaD), .srcaE(srcaE),
+		.srcaD(srcbD), .srcaE(srcbE),
+		.signimmD(signimmD), .signimmE(signimmE),
+		.rsD(rsD), .rsE(rsE),
+		.rtD(rtD), .rtE(rtE),
+		.rdD(rdD), .rdE(rdE),
+		.hi_oD(hi_oD), .hi_oE(hi_oE),
+		.lo_oD(lo_oD), .lo_oE(lo_oE)
 
-	floprc #(32) r1E(clk,rst,flushE,srcaD,srcaE);
-	floprc #(32) r2E(clk,rst,flushE,srcbD,srcbE);
-	floprc #(32) r3E(clk,rst,flushE,signimmD,signimmE);
-	floprc #(5) r4E(clk,rst,flushE,rsD,rsE);
-	floprc #(5) r5E(clk,rst,flushE,rtD,rtE);
-	floprc #(5) r6E(clk,rst,flushE,rdD,rdE);
-	floprc #(32) r7E(clk,rst,flushE,hi_oD,hi_oE);
-    floprc #(32) r8E(clk,rst,flushE,lo_oD,lo_oE);
-    
-
+	);
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
@@ -306,7 +309,7 @@ module datapath(
     
     assign branch_takeE = zeroE;
     //jump
-//    assign pc_jumpE = srcaE;
+	//    assign pc_jumpE = srcaE;
 	//mem stage
 	// 增加读处�?
 	write_data write_data0(	.alucontrolE(alucontrolE),
@@ -316,13 +319,17 @@ module datapath(
 							.WriteDataE_modified(WriteDataE_modified)
 	);
 	//ȫ����stall
-	flopr #(32) r1M(clk,rst,WriteDataE_modified,writedataM);
-	// flopr #(32) r1M(clk,rst,srcb2E,writedataM);
-	flopr #(32) r2M(clk,rst,aluoutE,aluoutM);
-	flopr #(5) r3M(clk,rst,writeregE,writeregM);
-	flopr #(64) r4M(clk,rst,aluout64E,aluout64M);
-	flopr #(32) r5M(clk,rst,srcaE,srcaM);
 
+	// merge flopr in mem stage
+	ex_mem ex_mem0(
+		.clk(clk), .rst(rst),
+		.aluoutE(aluoutE), .aluoutM(aluoutM),
+		.writeregE(writeregE), .writeregM(writeregM),
+		.aluout64E(aluout64E), .aluout64M(aluout64M),
+		.srcaE(srcaE), .srcaM(srcaM),
+		.hi_oE(hi_oE),.hi_oM(hi_oM),
+		.pcbranchE(pcbranchE),.pcbranchM(pcbranchM)
+	);
 	//writeback stage
 	// 增加写处�?
  	read_data read_data0(	.alucontrolW(alucontrolW),
@@ -330,20 +337,21 @@ module datapath(
 							.dataadrW(aluoutW),
 							.readdataW_modified(readdataW_modified)
 	);
-	flopr #(32) r6M(clk,rst,hi_oE,hi_oM);
-	flopr #(32) r7M(clk,rst,lo_oE,lo_oM);
-    flopr #(32) r8M(clk,rst,pcbranchE,pcbranchM);
+
 
     // mem锟阶段乘筹拷锟斤拷锟斤拷写锟斤拷hi lo锟侥达拷锟斤�?
     hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0]);
-    
-	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
-	flopr #(32) r2W(clk,rst,readdataM,readdataW);
-	flopr #(5) r3W(clk,rst,writeregM,writeregW);
-	flopr #(32) r4W(clk,rst,hi_oM,hi_oW);
-	flopr #(32) r5W(clk,rst,lo_oM,lo_oW);
-	flopr #(32) r6W(clk,rst,srcaM,srcaW);
-	
+    // merge flopr in WriteBack stage
+	mem_wb mem_wb0(
+		.clk(clk), .rst(rst),
+		.aluoutM(aluoutM), .aluoutW(aluoutW),
+		.readdataM(readdataM), .readdataW(readdataW),
+		.writeregM(writeregM), .writeregW(writeregW),
+		.hi_oM(hi_oM), .hi_oW(hi_oW),
+		.lo_oM(lo_oM), .lo_oW(lo_oW),
+		.srcaM(srcaM), .srcaW(srcaW),
+	);
+
 	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
 //	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
     
