@@ -59,7 +59,6 @@ module datapath(
 	//decode stage
 	wire [7:0] alucontrolD;
 	wire [31:0] pcplus4D;
-    
 	wire [31:0] instrD;
 	wire [31:0] pcnextFD,pcplus4D;
 	wire forwardaD,forwardbD;
@@ -222,16 +221,16 @@ module datapath(
 	assign functD = instrD[5:0];
 
 	//execute stage
+	assign pcplus4E =pcplus4D;
+	// id_ex id_ex0(
+    //     .clk(clk),
+    //     .rst(rst),
+    //     .stallE(stallE),
+    //     .flushE(flushE),
 
-	id_ex id_ex0(
-        .clk(clk),
-        .rst(rst),
-        .stallE(stallE),
-        .flushE(flushE),
-
-		.pc_plus4D(pcplus4D),
-		.pc_plus4E(pcplus4E)
-		);
+	// 	.pc_plus4D(pcplus4D),
+	// 	.pc_plus4E(pcplus4E)
+	// 	);
 
 
 	floprc #(32) r1E(clk,rst,flushE,srcaD,srcaE);
