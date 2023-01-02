@@ -155,7 +155,7 @@ module datapath(
 
 	//regfile (operates in decode and writeback)
 	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
-	//decode�׶ζ�����wb�׶�д��hilo��gpr -> hilo)
+
     hilo_reg hilo_regD(clk,rst,gprtohiW,gprtoloW,srcaW,srcaW,hi_oD,lo_oD);
     
 	//fetch stage logic
@@ -215,7 +215,7 @@ module datapath(
 	         .alu_num1(srca2E),
 	         .alu_num2(srcb2E),
 	         .alucontrol(alucontrolE),
-             .alu_out_64(aluout64E), //����64λ�˳����
+             .alu_out_64(aluout64E), 
 	         .alu_out(aluoutE),
 	         .stall_div(stall_divE)
 	);
@@ -245,7 +245,7 @@ module datapath(
 	);
 	flopr #(32) r6M(clk,rst,hi_oE,hi_oM);
 	flopr #(32) r7M(clk,rst,lo_oE,lo_oM);
-    // mem�׶γ˳�����д��hi lo�Ĵ���
+
     hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
     
 	flopr #(32) r1W(clk,rst,aluoutM,aluoutW);
