@@ -355,7 +355,7 @@ module datapath(
 		.lo_oM(lo_oM), 
 		.lo_oW(lo_oW),
 		.srcaM(srcaM), 
-		.srcaW(srcaW),
+		.srcaW(srcaW)
 	);
 
 	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
