@@ -62,7 +62,7 @@ module datapath(
 
     wire [7:0] branch_judge_controlD;
 	wire [31:0] instrD;
-	wire [31:0] pcnextFD,pcplus4D;
+	wire [31:0] pcnextFD,pcplus4D,pcjumpD;
 	wire forwardaD,forwardbD;
 	wire [5:0] opD,functD;
 	wire [4:0] rsD,rtD,rdD;
@@ -140,28 +140,6 @@ module datapath(
 //    mux4 #(32) mux4_rt_valueE(rd2E, resultM_without_rdata, resultW, 32'b0, forward_bE, rt_valueE); //閿熸枻鎷烽敓鏂ゆ嫹鍓嶉敓鐙＄尨鎷烽敓绲﹖閿熶茎杈炬嫹閿熸枻鎷烽敓鏂ゆ嫹锟�???
 
 
-	//pipeline registers
-	floprc #(16) regE(
-		clk,rst,
-		flushE,
-		{memtoregD,memwriteD,alusrcD,regdstD,regwriteD,alucontrolD,gprtohiD,gprtoloD},
-		{memtoregE,memwriteE,alusrcE,regdstE,regwriteE,alucontrolE,gprtohiE,gprtoloE}
-		);
-	flopr #(7) regM(
-		clk,rst,
-		// 婢х偛濮濧LU閹貉冨煑娣囷�???锟藉娇娴肩媴锟�???
-		// 婢х偛濮濧LU閹貉冨煑娣囷�???锟藉娇娴肩娀鈧�??
-		{memtoregE,memwriteE,regwriteE,alucontrolE,gprtohiE,gprtoloE},
-		{memtoregM,memwriteM,regwriteM,alucontrolM,gprtohiM,gprtoloM}
- 		);
-	flopr #(32) regW(
-		clk,rst,
-		// 婢х偛濮濧LU閹貉冨煑娣囷�???锟藉娇娴肩媴锟�???
-		// 婢х偛濮濧LU閹貉冨煑娣囷�???锟藉娇娴肩娀鈧�??
-		{memtoregM,regwriteM,alucontrolM,gprtohiM,gprtoloM},
-		{memtoregW,regwriteW,alucontrolW,gprtohiW,gprtoloW}
-		);
-
 	//hazard detection
 	hazard h(
 		//fetch stage
@@ -208,8 +186,8 @@ module datapath(
 	assign pcsrcD = branchD & (srca2D == srcb2D);
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
 	// you can't delete the next code
-	// mux2 #(32) pcmux(pcnextbrFD,pcjumpD,jumpD,pcnextFD);
-	mux2 #(32) pcmux(pcnextbrFD,{pcplus4D[31:28], instrD[25:0], 2'b00},jumpD,pcnextFD);
+	mux2 #(32) pcmux(pcnextbrFD,pcjumpD,jumpD,pcnextFD);
+	// mux2 #(32) pcmux(pcnextbrFD,{pcplus4D[31:28], instrD[25:0], 2'b00},jumpD,pcnextFD);
 
 	// assign pcnextFD = pcplus4E;
 		
@@ -254,7 +232,7 @@ module datapath(
 	
 	
 	//execute stage
-	assign pcplus4E =pcplus4D;
+	// assign pcplus4E =pcplus4D;
 	//mux write reg
     mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, reg_writeE);
 	// merge flopenrc
@@ -284,7 +262,26 @@ module datapath(
 		.hi_oD(hi_oD), 
 		.hi_oE(hi_oE),
 		.lo_oD(lo_oD), 
-		.lo_oE(lo_oE)
+		.lo_oE(lo_oE),
+
+		.memtoregD(memtoregD),
+		.memtoregE(memtoregE),
+		.memwriteD(memwriteD),
+		.memwriteE(memwriteE),
+		.alusrcD(alusrcD),
+		.alusrcE(alusrcE),
+		.regdstD(regdstD),
+		.regdstE(regdstE),
+		.regwriteD(regwriteD),
+		.regwriteE(regwriteE),
+		.alucontrolD(alucontrolD),
+		.alucontrolE(alucontrolE),
+		.gprtohiD(gprtohiD),
+		.gprtohiE(gprtohiE),
+		.gprtoloD(gprtoloD),
+		.gprtoloE(gprtoloE)
+				
+
 		);
 
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
@@ -330,14 +327,35 @@ module datapath(
 
 	// merge flopr in mem stage
 	ex_mem ex_mem0(
-		.clk(clk), .rst(rst),
-		.aluoutE(aluoutE), .aluoutM(aluoutM),
-		.writeregE(writeregE), .writeregM(writeregM),
-		.aluout64E(aluout64E), .aluout64M(aluout64M),
-		.srcaE(srcaE), .srcaM(srcaM),
-		.hi_oE(hi_oE),.hi_oM(hi_oM),
-		.pcbranchE(pcbranchE),.pcbranchM(pcbranchM),
-		.branch_takeE(branch_takeE),.branch_takeM(branch_takeM)
+		.clk(clk), 
+		.rst(rst),
+		.aluoutE(aluoutE), 
+		.aluoutM(aluoutM),
+		.writeregE(writeregE), 
+		.writeregM(writeregM),
+		.aluout64E(aluout64E), 
+		.aluout64M(aluout64M),
+		.srcaE(srcaE), 
+		.srcaM(srcaM),
+		.hi_oE(hi_oE),
+		.hi_oM(hi_oM),
+		.pcbranchE(pcbranchE),
+		.pcbranchM(pcbranchM),
+		.branch_takeE(branch_takeE),
+		.branch_takeM(branch_takeM),
+
+		.memtoregE(memtoregE),
+		.memtoregM(memtoregM),
+		.memwriteE(memwriteE),
+		.memwriteM(memwriteM),
+		.regwriteE(regwriteE),
+		.regwriteM(regwriteM),
+		.alucontrolE(alucontrolE),
+		.alucontrolM(alucontrolM),
+		.gprtohiE(gprtohiE),
+		.gprtohiM(gprtohiM),
+		.gprtoloE(gprtoloE),
+		.gprtoloM(gprtoloM)
 	);
 	//writeback stage
 	// 澧炲姞鍐欏锟�?
@@ -352,13 +370,31 @@ module datapath(
     hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0]);
     // merge flopr in WriteBack stage
 	mem_wb mem_wb0(
-		.clk(clk), .rst(rst),
-		.aluoutM(aluoutM), .aluoutW(aluoutW),
-		.readdataM(readdataM), .readdataW(readdataW),
-		.writeregM(writeregM), .writeregW(writeregW),
-		.hi_oM(hi_oM), .hi_oW(hi_oW),
-		.lo_oM(lo_oM), .lo_oW(lo_oW),
-		.srcaM(srcaM), .srcaW(srcaW)
+		.clk(clk), 
+		.rst(rst),
+		.aluoutM(aluoutM), 
+		.aluoutW(aluoutW),
+		.readdataM(readdataM), 
+		.readdataW(readdataW),
+		.writeregM(writeregM), 
+		.writeregW(writeregW),
+		.hi_oM(hi_oM), 
+		.hi_oW(hi_oW),
+		.lo_oM(lo_oM), 
+		.lo_oW(lo_oW),
+		.srcaM(srcaM), 
+		.srcaW(srcaW), 
+
+		.memtoregM(memtoregM),
+		.memtoregW(memtoregW),
+		.regwriteM(regwriteM),
+		.regwriteW(regwriteW),
+		.alucontrolM(alucontrolM),
+		.alucontrolW(alucontrolW),
+		.gprtohiM(gprtohiM),
+		.gprtohiW(gprtohiW),
+		.gprtoloM(gprtoloM),
+		.gprtoloW(gprtoloW)
 	);
 
 	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
