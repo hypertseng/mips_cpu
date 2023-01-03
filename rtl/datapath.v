@@ -349,7 +349,7 @@ module datapath(
 
 
     // mem閿熼樁娈典箻绛规嫹閿熸枻鎷烽敓鏂ゆ嫹鍐欓敓鏂ゆ嫹hi lo閿熶茎杈炬嫹閿熸枻锟�???
-    hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0]);
+    hilo_reg hilo_reg_alu(clk,rst,{gprtohiM,gprtoloM},aluout64M[63:32],aluout64M[31:0]);
     // merge flopr in WriteBack stage
 	mem_wb mem_wb0(
 		.clk(clk), .rst(rst),

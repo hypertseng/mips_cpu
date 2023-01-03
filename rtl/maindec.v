@@ -25,12 +25,12 @@ module maindec(
 	input wire [4:0] rs,rt,
 	input wire [5:0] funct,
 
-	output wire [1:0] memtoreg, //00Ϊaluresult��01Ϊreaddata��10Ϊhi��11Ϊlo�������Ѿ�������hilotogpr���ź�
+	output wire [1:0] memtoreg, //00->aluresult 01->readdata 10->hi 11->lo
 	output wire memwrite,
 	output wire branch,alusrc,
 	output wire regdst,regwrite,
-	output wire gprtohi,  //����gprtohi������GPRд��hi
-	output wire gprtolo,   //����gprtolo������GPRд��lo
+	output wire gprtohi,   //gprtohi GPR->hi
+	output wire gprtolo,   //gprtolo GPR->lo
     
 	// input wire [5:0] op,
     // input wire[5:0] funct,

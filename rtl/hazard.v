@@ -33,13 +33,13 @@ module hazard(
 	input wire[4:0] rsE,rtE,
 	input wire[4:0] writeregE,
 	input wire regwriteE,
-	input wire memtoregE,
+	input wire[1:0] memtoregE,
 	output reg[1:0] forwardaE,forwardbE,
 	output wire flushE,stallE,
 	//mem stage
 	input wire[4:0] writeregM,
 	input wire regwriteM,
-	input wire memtoregM,
+	input wire[1:0] memtoregM,
 
 	//write back stage
 	input wire[4:0] writeregW,
@@ -80,11 +80,11 @@ module hazard(
 	end
 
 	//stalls
-	assign #1 lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
+	assign #1 lwstallD = (memtoregE == 2'b01) & (rtE == rsD | rtE == rtD);
 	assign #1 branchstallD = branchD &
 				(regwriteE & 
 				(writeregE == rsD | writeregE == rtD) |
-				memtoregM &
+				(memtoregM == 2'b01) &
 				(writeregM == rsD | writeregM == rtD));
 // stall by div
 	// assign #1 stallD = lwstallD | branchstallD | stall_divE;
