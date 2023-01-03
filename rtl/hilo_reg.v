@@ -21,7 +21,7 @@
 
 
 module hilo_reg(
-	input  wire clk,rst,we,
+	input  wire clk,rst,
 	input  wire [1:0] wconfig,
 	input  wire [31:0] hi_i,lo_i,
 	output wire [31:0] hi_o,lo_o

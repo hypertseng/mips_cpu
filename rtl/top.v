@@ -25,7 +25,12 @@
 
 //SoC top
 module top(
-	input clk,resetn
+	input clk,resetn,
+    //debug signals
+	output wire [31:0] debug_wb_pc,
+	output wire [3 :0] debug_wb_rf_wen,
+	output wire [4 :0] debug_wb_rf_wnum,
+	output wire [31:0] debug_wb_rf_wdata
 );
 
 //cpu inst sram
@@ -56,7 +61,12 @@ mycpu_top cpu(
     .data_sram_wen    (cpu_data_wen  ),
     .data_sram_addr   (cpu_data_addr ),
     .data_sram_wdata  (cpu_data_wdata),
-    .data_sram_rdata  (cpu_data_rdata)
+    .data_sram_rdata  (cpu_data_rdata),
+    
+    .debug_wb_pc       (debug_wb_pc       ),  
+    .debug_wb_rf_wen   (debug_wb_rf_wen   ),  
+    .debug_wb_rf_wnum  (debug_wb_rf_wnum  ),  
+    .debug_wb_rf_wdata (debug_wb_rf_wdata )  
 );
 
 //inst ram

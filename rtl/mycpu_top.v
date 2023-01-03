@@ -13,12 +13,19 @@ module mycpu_top(
     output [3 :0] data_sram_wen  ,
     output [31:0] data_sram_addr ,
     output [31:0] data_sram_wdata,
-    input  [31:0] data_sram_rdata
+    input  [31:0] data_sram_rdata,
+    
+    //debug signals
+	output wire [31:0] debug_wb_pc,
+	output wire [3 :0] debug_wb_rf_wen,
+	output wire [4 :0] debug_wb_rf_wnum,
+	output wire [31:0] debug_wb_rf_wdata
 );
 
 // 閿燂�??娑擃亙绶ラ敓锟�?
 	wire [31:0] pc;
 	wire [31:0] instr;
+	wire [39:0] ascii;
 	wire memwrite;
 
     // 澧炲姞鍐欎娇鑳戒俊鍙�?
@@ -39,7 +46,12 @@ module mycpu_top(
         .sig_write(sig_write),
         .aluoutM(aluout),
         .writedataM(writedata),
-        .readdataM(readdata)
+        .readdataM(readdata),
+
+        .debug_wb_pc       (debug_wb_pc       ),  
+        .debug_wb_rf_wen   (debug_wb_rf_wen   ),  
+        .debug_wb_rf_wnum  (debug_wb_rf_wnum  ),  
+        .debug_wb_rf_wdata (debug_wb_rf_wdata )        
     );
 
     assign inst_sram_en = 1'b1;     //婵�?��?�鐏夐張濉眓st_en閿涘苯姘ㄩ悽鈺st_en
@@ -56,7 +68,8 @@ module mycpu_top(
 
     //ascii for debug
     instdec instdec(
-        .instr(instr)
+        .instr(instr),
+        .ascii(ascii)
     );
 
 endmodule

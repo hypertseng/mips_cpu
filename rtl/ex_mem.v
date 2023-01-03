@@ -9,12 +9,12 @@ module ex_mem (
     output reg [63:0] aluout64M,
 	input wire [31:0] srcaE,
     output reg [31:0] srcaM,
-	// input wire [31:0] hi_oE,
-    // output reg [31:0] hi_oM,
+	input wire [31:0] hi_oE,
+    output reg [31:0] hi_oM,
 	input wire [31:0] pcbranchE,
     output reg [31:0] pcbranchM,
-    input wire [31:0] branch_takeE,
-    output reg [31:0] branch_takeM,
+    input wire branch_takeE,
+    output reg branch_takeM,
     
 	input wire [1:0] memtoregE,
     output reg [1:0] memtoregM,
@@ -29,7 +29,9 @@ module ex_mem (
 	input wire gprtoloE,
     output reg gprtoloM,
 	input wire [31:0] WriteDataE_modified,
-	output reg [31:0] writedataM
+	output reg [31:0] writedataM,
+	input wire [31:0] pcE,
+	output reg [31:0] pcM
     );
 	always @(posedge clk,posedge rst) begin
 		if(rst) begin
@@ -47,6 +49,7 @@ module ex_mem (
 			gprtohiM <= 0;
 			gprtoloM <= 0;
 			writedataM <= 0;
+			pcM <= 0;
 		end else begin
 			aluoutM <= aluoutE;
 			writeregM <= writeregE;
@@ -62,6 +65,7 @@ module ex_mem (
 			gprtohiM <= gprtohiE;
 			gprtoloM <= gprtoloE;
 			writedataM <= WriteDataE_modified;
+			pcM <= pcE;
 		end
 	end
 endmodule
