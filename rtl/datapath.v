@@ -68,7 +68,6 @@ module datapath(
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	wire [31:0] pcD;
-	// wire [31:0] hi_oD,lo_oD;
 	//execute stage
 	wire stall_divE;
 	wire [7:0] alucontrolE;
@@ -83,7 +82,6 @@ module datapath(
 	wire zeroE;
 	wire [63:0] aluout64E;
 	wire [7:0] branch_judge_controlE;
-	wire [31:0] hi_oE,lo_oE;
 	wire [31:0] WriteDataE_modified;
 	wire [31:0] pcE;
 	//mem stage
@@ -276,8 +274,6 @@ module datapath(
 		.rtE(rtE),
 		.rdD(rdD), 
 		.rdE(rdE),
-		.hi_oD(hi_oD), 
-		.hi_oE(hi_oE),
 		.lo_oD(lo_oD), 
 		.lo_oE(lo_oE),
 		.memtoregD(memtoregD),
@@ -353,8 +349,6 @@ module datapath(
 		.aluout64M(aluout64M),
 		.srcaE(srcaE), 
 		.srcaM(srcaM),
-		.hi_oE(hi_oE),
-		.hi_oM(hi_oM),
 		.pcbranchE(pcbranchE),
 		.pcbranchM(pcbranchM),
 		.branch_takeE(branch_takeE),

@@ -23,10 +23,7 @@ module id_ex (
     output reg [4:0] rtE,
     input wire [4:0] rdD,
     output reg [4:0] rdE,
-    input wire [31:0] hi_oD,
-    output reg [31:0] hi_oE,
-    input wire [31:0] lo_oD,
-    output reg [31:0] lo_oE,
+
 
     input wire [1:0] memtoregD,
     output reg [1:0] memtoregE,
