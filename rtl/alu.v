@@ -27,12 +27,12 @@ module alu(
                   (alucontrol == `EXE_BLEZ_OP) ? ((alu_num1[31]==1'b1) || (alu_num1==32'b0)): // <= 0
                   (alucontrol == `EXE_BLTZ_OP) ? (alu_num1[31] == 1'b1):                  // < 0
                   (alucontrol == `EXE_BGEZ_OP) ? (alu_num1[31] == 1'b0):                  // >= 0
-                  // 下面两条是特殊指�?? 无论是否跳转 必须写GHR[31]
+                  // 下面两条是特殊指�?? 无论是否跳转 必须写GHR[31]
                   (alucontrol == `EXE_BLTZAL_OP) ? (alu_num1[31] == 1'b1):                // < 0
                   (alucontrol == `EXE_BGEZAL_OP) ? (alu_num1[31] == 1'b0):                // >= 0
                   (alu_ans == 32'b0);
 	// overflow check
-    wire overflow_add; // 用于�??测溢出位
+    wire overflow_add; // 用于�??测溢出位
     wire overflow_sub;
     assign overflow_add = ( (alu_ans[31] & (~alu_num1[31] & ~alu_num2[31])) 
                 || (~alu_ans[31] & (alu_num1[31] & alu_num2[31]))) &&(alucontrol == `EXE_ADD_OP || alucontrol == `EXE_ADDI_OP );
@@ -44,8 +44,7 @@ module alu(
 
     // div 
     wire [63:0] div_result;
-	// assign div_sign  = (alu_controlE == `ALU_SIGNED_DIV);
-	// assign div_vaild = (alu_controlE == `ALU_SIGNED_DIV || alu_controlE == `ALU_UNSIGNED_DIV);
+    wire div_sign,div_valid;
 	assign div_sign  = (alucontrol == `EXE_DIV_OP);
 	assign div_vaild = (alucontrol == `EXE_DIV_OP || alucontrol == `EXE_DIVU_OP);
 	div div(clk,rst,flushE,alu_num1,alu_num2,div_vaild,div_sign,stall_div,div_result);
@@ -57,7 +56,7 @@ module alu(
 			`EXE_OR_OP	:	alu_ans <= alu_num1 | alu_num2;
 			`EXE_XOR_OP	:	alu_ans <= alu_num1 ^ alu_num2;
 			`EXE_NOR_OP	:	alu_ans <= ~(alu_num1 | alu_num2);
-			// 逻辑立即数运�????
+			// 逻辑立即数运�????
 			`EXE_ANDI_OP:	alu_ans <= alu_num1 & {{16{1'b0}}, alu_num2[15:0]};
 			`EXE_ORI_OP:	alu_ans <= alu_num1 | {{16{1'b0}}, alu_num2[15:0]};
 			`EXE_XORI_OP:	alu_ans <= alu_num1 ^ {{16{1'b0}}, alu_num2[15:0]};
@@ -73,8 +72,8 @@ module alu(
 			// 数据移动指令
 			`EXE_MFHI_OP:	alu_ans <= hilo[63:32];
 			`EXE_MFLO_OP:	alu_ans <= hilo[31:0];
-			`EXE_MTHI_OP:	alu_ans <= alu_num1;
-			`EXE_MTLO_OP:	alu_ans <= alu_num1;
+			`EXE_MTHI_OP:	alu_out_64 <= {alu_num1,alu_num1};
+			`EXE_MTLO_OP:	alu_out_64 <= {alu_num1,alu_num1};
 
 			// 算术运算指令
 			`EXE_ADD_OP:	alu_ans <= alu_num1 + alu_num2;
@@ -94,14 +93,14 @@ module alu(
 			// 分支跳转指令
 			`EXE_J_OP:		alu_ans <= alu_num1 + alu_num2;
 			// `EXE_JR_OP:		alu_ans <= alu_num1 + alu_num2;
-//			`EXE_JAL_OP:	alu_ans <= pc_add4E + 32'b100;// �??要写pc+8�??31号ra寄存�??
-//			`EXE_JALR_OP:	alu_ans <= pc_add4E + 32'b100;// �??要写pc+8�??31号rd寄存�??
+//			`EXE_JAL_OP:	alu_ans <= pc_add4E + 32'b100;// �??要写pc+8�??31号ra寄存�??
+//			`EXE_JALR_OP:	alu_ans <= pc_add4E + 32'b100;// �??要写pc+8�??31号rd寄存�??
 			 
 			//b type
             `EXE_BEQ_OP:	alu_ans <= alu_num1 - alu_num2;
             `EXE_BNE_OP:	alu_ans <= alu_num1 - alu_num2;
-//            `EXE_BLTZAL_OP:	alu_ans <= pc_add4E + 32'b100  ;   // �??要写pc+8�??31号ra寄存�??
-//            `EXE_BGEZAL_OP:	alu_ans <= pc_add4E + 32'b100  ;   // �??要写pc+8�??31号ra寄存�??
+//            `EXE_BLTZAL_OP:	alu_ans <= pc_add4E + 32'b100  ;   // �??要写pc+8�??31号ra寄存�??
+//            `EXE_BGEZAL_OP:	alu_ans <= pc_add4E + 32'b100  ;   // �??要写pc+8�??31号ra寄存�??
 
             // 访存指令
             `EXE_LB_OP:		alu_ans <= alu_num1 + alu_num2;
