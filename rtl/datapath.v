@@ -153,6 +153,14 @@ module datapath(
 		{memtoregE,memwriteE,regwriteE,alucontrolE,gprtohiE,gprtoloE},
 		{memtoregM,memwriteM,regwriteM,alucontrolM,gprtohiM,gprtoloM}
  		);
+
+	flopr #(32) writedataE2M(
+		clk,rst,
+		// 传递待写入数据
+		{WriteDataE_modified},
+		{writedataM}
+ 		);
+
 	flopr #(32) regW(
 		clk,rst,
 		// 婢х偛濮濧LU閹貉冨煑娣囷�??锟藉娇娴肩媴锟�???
@@ -315,7 +323,7 @@ module datapath(
     //jump
 	//    assign pc_jumpE = srcaE;
 	//mem stage
-	// 澧炲姞璇诲锟�?
+	// 增加写处理
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
@@ -335,7 +343,7 @@ module datapath(
 		.pcbranchE(pcbranchE),.pcbranchM(pcbranchM)
 	);
 	//writeback stage
-	// 澧炲姞鍐欏锟�?
+	// 增加读处理
  	read_data read_data0(	.alucontrolW(alucontrolW),
 							.readdataW(readdataW),
 							.dataadrW(aluoutW),
@@ -356,7 +364,7 @@ module datapath(
 		.srcaM(srcaM), .srcaW(srcaW)
 	);
 
-	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
+	mux4 #(32) resmux_new(aluoutW,readdataW_modified,hi_oW,lo_oW,memtoregW,resultW);
 //	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
     
     // DEBUG OUTPUT
