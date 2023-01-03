@@ -35,7 +35,7 @@ module datapath(
     );
 	
 
-//閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄崥鍫濊嫙閸氬穯ontroller闁劌鍨庨惃鍕箾缁惧簱鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄敓锟????
+//鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鍚堝苟鍚巆ontroller閮ㄥ垎鐨勮繛绾库啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌鈫撯啌锟�????
 
 	//decode stage
 	wire [1:0] memtoregD;
@@ -49,7 +49,7 @@ module datapath(
 	// 閸氬本顒為弬鏉款杻娴狅絿锟???
 	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
 	wire [1:0] memtoregE,memtoregM,memtoregW;
-
+	wire [1:0] pcsrcD;
 	wire [63:0] hilo;
  	//FD
 	wire [31:0] pcplus4F;
@@ -179,9 +179,7 @@ module datapath(
 //	wire [31:0] pc_next_tmp;
 //    mux4 #(32) mux4_pc(pcplus4F, pcbranchD, pcbranchM, pcplus4E, pc_sel, pc_next_tmp); 
 //    // pc_jumpD <- jumpD & ~jump_conflictD
-//    // pc_jumpE <- jump_conflictE
-//    assign pc_next = jumpD & ~jump_conflictD ? pc_jumpD : 
-//                        jump_conflictE ? pc_jumpE : pc_next_tmp;
+
                         
 //    assign pc_sel = (branchM & ~succM & branch_takeM) ? 2'b10:
 //                    (branchM & ~succM & ~branch_takeM) ? 2'b11:
@@ -190,17 +188,27 @@ module datapath(
 //                     2'b00;
 
 	//  you can't delete the next line  
-	assign pcsrcD = branchD & (srca2D == srcb2D);
+	assign pcsrcD = {jumpD,branchD & (srca2D == srcb2D)};
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
 	// you can't delete the next code
 	mux2 #(32) pcmux(pcnextbrFD,pcjumpD,jumpD,pcnextFD);
 	// mux2 #(32) pcmux(pcnextbrFD,{pcplus4D[31:28], instrD[25:0], 2'b00},jumpD,pcnextFD);
 
-	// assign pcnextFD = pcplus4E;
 		
 
 	//regfile (operates in decode and writeback)
-	regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
+	// regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
+	regfile regfile0(
+	.clk(clk),
+	.we3(regwriteM),
+	.ra1(rsD), 
+	.ra2(rtD), 
+	.wa3(writeregM), 
+	.wd3(resultM),
+
+	.rd1(srcaD), 
+	.rd2(srcbD)
+    );
 
 	//fetch stage logic
 	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_ce_reg);
@@ -300,7 +308,7 @@ module datapath(
 	alu alu0(.clk(clk),
 			 .rst(rst),
 			 .alu_num1(srca2E),
-	         .alu_num2(srcb2E),
+	         .alu_num2(srcb3E),
 	         .alucontrol(alucontrolE),
 			 .hilo(hilo),
 			 .sa(sa),
@@ -322,8 +330,7 @@ module datapath(
     );
     
     assign branch_takeE = zeroE;
-    //jump
-	//    assign pc_jumpE = srcaE;
+    
 	//mem stage
 	// 婢х偛濮炵拠璇差槱閿燂拷?
 	write_data write_data0(	.alucontrolE(alucontrolE),
