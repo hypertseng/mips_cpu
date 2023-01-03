@@ -4,6 +4,8 @@
 `include "defines.vh"
 
 module alu(
+	input  wire			clk,
+	input  wire			rst,
 	input  wire [31:0] 	alu_num1,alu_num2,
 	input  wire [7:0] 	alucontrol,
 	input  wire [63:0] 	hilo,

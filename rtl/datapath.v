@@ -291,13 +291,16 @@ module datapath(
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
 	// alu alu(srca2E,srcb3E,alucontrolE,hilo,aluoutE);
-	alu alu0(.alu_num1(srca2E),
+	alu alu0(.clk(clk),
+			 .rst(rst),
+			 .alu_num1(srca2E),
 	         .alu_num2(srcb2E),
 	         .alucontrol(alucontrolE),
 			 .hilo(hilo),
 			 .sa(sa),
+			 .flushE(flushE),
 	         .alu_out(aluoutE),
-	         .alu_out_64(aluout64E), //閿熸枻鎷烽敓鏂ゆ�??64浣嶉敓鍓跨鎷烽敓鏂ゆ嫹閿燂�???
+	         .alu_out_64(aluout64E), 
 	         .overflowE(),
 	         .zeroE(),
 	         .stall_div(stall_divE)
