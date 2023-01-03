@@ -12,8 +12,9 @@ module ex_mem (
 	input wire [31:0] hi_oE,
     output reg [31:0] hi_oM,
 	input wire [31:0] pcbranchE,
-    output reg [31:0] pcbranchM
-    
+    output reg [31:0] pcbranchM,
+    input wire [31:0] branch_takeE,
+    output reg [31:0] branch_takeM    
     );
 	always @(posedge clk,posedge rst) begin
 		if(rst) begin
@@ -23,6 +24,7 @@ module ex_mem (
 			srcaM <= 0;
 			hi_oM <= 0;
 			pcbranchM <= 0;
+			branch_takeM <= 0;
 		end else begin
 			aluoutM <= aluoutE;
 			writeregM <= writeregE;
@@ -30,6 +32,7 @@ module ex_mem (
 			srcaM <= srcaE;
 			hi_oM <= hi_oE;
 			pcbranchM <= pcbranchE;
+			branch_takeM <= branch_takeE;
 		end
 	end
 endmodule
