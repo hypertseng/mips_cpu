@@ -423,7 +423,4 @@ module datapath(
     assign debug_wb_rf_wen      = {4{regwriteW & ~stallW}};
     assign debug_wb_rf_wnum     = writeregW;
     assign debug_wb_rf_wdata    = resultW;
-endmodule    assign debug_wb_rf_wen      = {4{regwriteW & ~stallW}};
-    assign debug_wb_rf_wnum     = writeregW;
-    assign debug_wb_rf_wdata    = resultW;
-endmoduleendmodule
+endmodule
