@@ -3,8 +3,8 @@ module id_ex (
     input wire stallE,
     input wire flushE,
     
-    input wire [4:0] branch_judge_controlD,
-    output reg [4:0] branch_judge_controlE,
+    input wire [7:0] branch_judge_controlD,
+    output reg [7:0] branch_judge_controlE,
     input wire [31:0] pc_plus4D,
     output reg [31:0] pc_plus4E,
     input wire jump_conflictD,
@@ -43,8 +43,9 @@ module id_ex (
     input wire gprtohiD,
     output reg gprtohiE,
     input wire gprtoloD,
-    output reg gprtoloE
-				
+    output reg gprtoloE,
+    input wire [31:0] pcD,
+	output reg [31:0] pcE
     
 );
     always @(posedge clk) begin
@@ -69,6 +70,7 @@ module id_ex (
             alucontrolE <= 0;
             gprtohiE <= 0;
             gprtoloE <= 0;
+            pcE <= 0;
         end 
         else if(~stallE) begin      
             pc_plus4E <= pc_plus4D;
@@ -91,6 +93,7 @@ module id_ex (
             alucontrolE <= alucontrolD;
             gprtohiE <= gprtohiD;
             gprtoloE <= gprtoloD;
+            pcE <= pcD;
         end
     end
 endmodule
