@@ -261,7 +261,7 @@ module datapath(
 	
 	
 	//execute stage
-	assign pcplus4E =pcplus4D;
+	// assign pcplus4E =pcplus4D;
 	//mux write reg
     mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, reg_writeE);
 	// merge flopenrc
