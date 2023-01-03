@@ -35,7 +35,7 @@ module datapath(
     );
 	
 
-//閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄崥鍫濊嫙閸氬穯ontroller闁劌鍨庨惃鍕箾缁惧簱鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄埆鎾晫閳挴鍟岄敓锟???
+//闁愁偅鎸撮崯宀勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯宀勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯宀勫焼閹绢垰鏅柍顐ｆ尨閸熷矂宕ラ崼婵婂珯闁告艾绌痮ntroller闂侇喓鍔岄崹搴ㄦ儍閸曨喚绠剧紒鎯х氨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯宀勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯宀勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯宀勬晸閿�???
 
 	//decode stage
 	wire [1:0] memtoregD;
@@ -44,9 +44,9 @@ module datapath(
 	wire memwriteE,gprtohiE,gprtoloE;
 	wire gprtohiM,gprtoloM;
 	wire gprtohiW,gprtoloW;
-//閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥埆鎴斿晥閳垟鍟堥敓锟???
+//闁愁偅鍨熼崯鍫ュ焼閹存柨鏅ラ柍顐ｅ灍閸熷牓鍩嗛幋鏂挎櫏闁愁偅鍨熼崯鍫ュ焼閹存柨鏅ラ柍顐ｅ灍閸熷牓鍩嗛幋鏂挎櫏闁愁偅鍨熼崯鍫ュ焼閹存柨鏅ラ柍顐ｅ灍閸熷牓鍩嗛幋鏂挎櫏闁愁偅鍨熼崯鍫ュ焼閹存柨鏅ラ柍顐ｅ灍閸熷牓鍩嗛幋鏂挎櫏闁愁偅鍨熼崯鍫ュ焼閹存柨鏅ラ柍顐ｅ灍閸熷牓鍩嗛幋鏂挎櫏闁愁偅鍨熼崯鍫ュ焼閹存柨鏅ラ柍顐ｅ灍閸熷牓鍩嗛幋鏂挎櫏闁愁偅鍨熼崯鍫ュ焼閹存柨鏅ラ柍顐ｅ灍閸熷牓鍩嗛幋鏂挎櫏闁愁偅鍨熼崯鍫ユ晸閿�???
 
-	// 閸氬本顒為弬鏉款杻娴狅絿锟??
+	// 闁告艾鏈鐐哄棘閺夋鏉诲ù鐙呯悼閿�??
 	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
 	wire [1:0] memtoregE,memtoregM,memtoregW;
 
@@ -115,13 +115,13 @@ module datapath(
 		alucontrolD,branch_judge_controlD
     );
     
-//    //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归崜宥夋晸閺傘倖锟??(bypass)
+//    //闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氬綊宕滃澶嬫櫢闁哄倶鍊栭敓??(bypass)
 //    mux4 #(32) mux4_forward_aE(
 //        rd1E,                       
 //        resultM_without_rdata,
 //        resultW,
-//        pc_plus4D,                          // 閹笛囨晸閺傘倖瀚筳alr闁跨喐鏋婚幏绌揳l閹稿洭鏁撶粵瀣剁幢閸愭瑩鏁撶拠顐㈠煂$ra闁跨喍鑼庢潏鐐闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻幑鍑ょ秶閹风兘鏁撻弬銈嗗鏉烆剚瀵氶柨鐔告灮閹风兘鏁撻幒銉閹烽攱妲ф穱銊╂晸鐞涙娼婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹疯渹绔撮柨鐔告灮閹烽攱瀵氶柨鐔告灮閹烽澧堕柨鐔活敎閸戙倖瀚归柨鐔虹グC+8闁跨喐鏋婚敓锟??? //闁跨喐鏋婚幏鐑芥晸閻ㄥ棙鍞婚幏鐤槈闁跨喐甯存潻鐔活嚋閹烽攱瀵氶柨鐔虹摂娑撳秹鏁撶紒鎾诡潶flush闁跨喐鏋婚幏鐑芥晸閺傘倖瀚筽lush_4D闁跨喐鏋婚幏鐑芥晸閺傘倖锟??
-//        {2{jumpE | branchE}} | forward_aE,  // 闁跨喐鏋婚幏绌峹e闁跨喖妯佺拋瑙勫闁跨喐鏋婚幏绌揳l闁跨喐鏋婚幏鐑芥晸閺傘倖瀚筳alr閹稿洭鏁撶粵瀣剁礉闁跨喐鏋婚幏鐑芥晸閺傘倖瀚筨xxzal閺冨爼鏁撻弬銈嗗jumpE | branchE== 1闁跨喐鏋婚幏鍑ゆ嫹?閿熶粙鏁撻弬銈嗗pc_plus4D闁跨喐鏋婚敓锟???
+//        pc_plus4D,                          // 闁圭瑳鍥ㄦ櫢闁哄倶鍊栫€氱alr闂佽法鍠愰弸濠氬箯缁屾彸l闁圭ǹ娲弫鎾剁驳鐎ｅ墎骞㈤柛鎰懇閺佹挾鎷犻銏犵厒$ra闂佽法鍠嶉懠搴㈡綇閻愵剙顏堕梺璺ㄥ枑閺嬪骞忛悜鑺ユ櫢闁哄倶鍊栫€氬綊鏌ㄩ悢鍛婄伄闁归鍏橀弫鎾诲箲閸戙倗绉堕柟椋庡厴閺佹捇寮妶鍡楊伓閺夌儐鍓氱€垫岸鏌ㄩ悢鍛婄伄闁归鍏橀弫鎾诲箳閵夘垵顓洪柟鐑芥敱濡惭勭┍閵娾晜鏅搁悶娑欘殜濞煎骞忛悜鑺ユ櫢闁哄倶鍊栫€氬綊鏌ㄩ悢鍛婄伄闁圭柉娓圭粩鎾煥閻斿憡鐏柟鐑芥敱鐎垫岸鏌ㄩ悢鍛婄伄闁圭兘顥撴晶鍫曟煥閻旀椿鏁庨柛鎴欏€栫€氬綊鏌ㄩ悢铏广偘C+8闂佽法鍠愰弸濠氭晸閿�??? //闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柣銊ユ閸炲骞忛悿顖滄闂佽法鍠愮敮瀛樻交閻旀椿鍤嬮柟鐑芥敱鐎垫岸鏌ㄩ悢铏规憘濞戞挸绉归弫鎾剁磼閹捐娼秄lush闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氱lush_4D闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栭敓??
+//        {2{jumpE | branchE}} | forward_aE,  // 闂佽法鍠愰弸濠氬箯缁屽彻e闂佽法鍠栧Ο浣烘媼鐟欏嫬顏堕梺璺ㄥ枑閺嬪骞忕粚鎻砽闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氱alr闁圭ǹ娲弫鎾剁驳鐎ｅ墎绀夐梺璺ㄥ枑閺嬪骞忛悜鑺ユ櫢闁哄倶鍊栫€氱xxzal闁哄啫鐖奸弫鎾诲棘閵堝棗顏秊umpE | branchE== 1闂佽法鍠愰弸濠氬箯閸戙倖瀚�?闁跨喍绮欓弫鎾诲棘閵堝棗顏秔c_plus4D闂佽法鍠愰弸濠氭晸閿�???
 
 //        src_aE
 //    );
@@ -129,14 +129,14 @@ module datapath(
 //        rd2E,                               //
 //        resultM_without_rdata,                            //
 //        resultW,                            // 
-//        immE,                               //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閿燂拷?
-//        {2{alu_imm_selE}} | forward_bE,     //main_decoder闁跨喐鏋婚幏鐑芥晸閺傘倖瀚筧lu_imm_selE闁跨喕鍓奸崣鍑ょ秶閹风兘鏁撻弬銈嗗锟??绡磍u闁跨喕濡拋瑙勫闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归柨鐔告灮閹风兘鏁撻弬銈嗗娑撴椽鏁撻弬銈嗗闁跨喐鏋婚幏鐑芥晸閺傘倖锟??
+//        immE,                               //闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氬綊鏌ㄩ悢鍛婄伄闁跨噦鎷�?
+//        {2{alu_imm_selE}} | forward_bE,     //main_decoder闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氱lu_imm_selE闂佽法鍠曢崜濂稿矗閸戙倗绉堕柟椋庡厴閺佹捇寮妶鍡楊伓閿�??缁＄u闂佽法鍠曟俊顓犳媼鐟欏嫬顏堕梺璺ㄥ枑閺嬪骞忛悜鑺ユ櫢闁哄倶鍊栫€氬綊鏌ㄩ悢鍛婄伄闁归鍏橀弫鎾诲棘閵堝棗顏跺☉鎾存そ閺佹捇寮妶鍡楊伓闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栭敓??
 
 //        src_bE
 //    );
     
-//    mux4 #(32) mux4_rs_valueE(rd1E, resultM_without_rdata, resultW, 32'b0, forward_aE, rs_valueE); //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归崜宥夋晸閻欙紕灏ㄩ幏鐑芥晸缁诧箷闁跨喍鑼庢潏鐐闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归敓锟???
-//    mux4 #(32) mux4_rt_valueE(rd2E, resultM_without_rdata, resultW, 32'b0, forward_bE, rt_valueE); //闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归崜宥夋晸閻欙紕灏ㄩ幏鐑芥晸缁诧箹闁跨喍鑼庢潏鐐闁跨喐鏋婚幏鐑芥晸閺傘倖瀚归敓锟???
+//    mux4 #(32) mux4_rs_valueE(rd1E, resultM_without_rdata, resultW, 32'b0, forward_aE, rs_valueE); //闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氬綊宕滃澶嬫櫢闁绘瑱绱曠亸銊╁箯閻戣姤鏅哥紒璇х闂佽法鍠嶉懠搴㈡綇閻愵剙顏堕梺璺ㄥ枑閺嬪骞忛悜鑺ユ櫢闁哄倶鍊栫€氬綊鏁撻敓???
+//    mux4 #(32) mux4_rt_valueE(rd2E, resultM_without_rdata, resultW, 32'b0, forward_bE, rt_valueE); //闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氬綊宕滃澶嬫櫢闁绘瑱绱曠亸銊╁箯閻戣姤鏅哥紒璇х闂佽法鍠嶉懠搴㈡綇閻愵剙顏堕梺璺ㄥ枑閺嬪骞忛悜鑺ユ櫢闁哄倶鍊栫€氬綊鏁撻敓???
 
 
 	//pipeline registers
@@ -148,15 +148,23 @@ module datapath(
 		);
 	flopr #(7) regM(
 		clk,rst,
-		// 濠⒀呭仜婵咖LU闁硅矇鍐ㄧ厬濞ｅ浄锟???閿熻棄濞囧ù鑲╁閿燂拷???
-		// 濠⒀呭仜婵咖LU闁硅矇鍐ㄧ厬濞ｅ浄锟???閿熻棄濞囧ù鑲╁█閳ь剨锟??
+		// 婵犫拃鍛粶濠殿喗鍜朙U闂佺鐭囬崘銊у幀婵烇絽娴勯敓???闁跨喕妫勬繛鍥归懖鈺侇€撻柨鐕傛嫹???
+		// 婵犫拃鍛粶濠殿喗鍜朙U闂佺鐭囬崘銊у幀婵烇絽娴勯敓???闁跨喕妫勬繛鍥归懖鈺佲枅闁逞屽墾閿�??
 		{memtoregE,memwriteE,regwriteE,alucontrolE,gprtohiE,gprtoloE},
 		{memtoregM,memwriteM,regwriteM,alucontrolM,gprtohiM,gprtoloM}
  		);
+
+	flopr #(32) writedataE2M(
+		clk,rst,
+		// 浼犻€掑緟鍐欏叆鏁版嵁
+		{WriteDataE_modified},
+		{writedataM}
+ 		);
+
 	flopr #(32) regW(
 		clk,rst,
-		// 濠⒀呭仜婵咖LU闁硅矇鍐ㄧ厬濞ｅ浄锟???閿熻棄濞囧ù鑲╁閿燂拷???
-		// 濠⒀呭仜婵咖LU闁硅矇鍐ㄧ厬濞ｅ浄锟???閿熻棄濞囧ù鑲╁█閳ь剨锟??
+		// 婵犫拃鍛粶濠殿喗鍜朙U闂佺鐭囬崘銊у幀婵烇絽娴勯敓???闁跨喕妫勬繛鍥归懖鈺侇€撻柨鐕傛嫹???
+		// 婵犫拃鍛粶濠殿喗鍜朙U闂佺鐭囬崘銊у幀婵烇絽娴勯敓???闁跨喕妫勬繛鍥归懖鈺佲枅闁逞屽墾閿�??
 		{memtoregM,regwriteM,alucontrolM,gprtohiM,gprtoloM},
 		{memtoregW,regwriteW,alucontrolW,gprtohiW,gprtoloW}
 		);
@@ -296,14 +304,14 @@ module datapath(
 			 .hilo(hilo),
 			 .sa(sa),
 	         .alu_out(aluoutE),
-	         .alu_out_64(aluout64E), //闁跨喐鏋婚幏鐑芥晸閺傘倖锟??64娴ｅ秹鏁撻崜璺劜閹风兘鏁撻弬銈嗗闁跨噦锟???
+	         .alu_out_64(aluout64E), //闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栭敓??64濞达絽绉归弫鎾诲礈鐠侯煈鍔滈柟椋庡厴閺佹捇寮妶鍡楊伓闂佽法鍣﹂敓???
 	         .overflowE(),
 	         .zeroE(),
 	         .stall_div(stall_divE)
 	);
 	
 	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
-	//闁跨喐鏋婚幏鐑芥晸閺傘倖瀚筨ranch闁跨喐鏋婚幏鐑芥晸閿燂拷?
+	//闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柡鍌樺€栫€氱ranch闂佽法鍠愰弸濠氬箯閻戣姤鏅搁柨鐕傛嫹?
     branch_judge branch_judge0(
         .branch_judge_controlE(branch_judge_controlE),
         .srcaE(srca2E),
@@ -315,14 +323,14 @@ module datapath(
     //jump
 	//    assign pc_jumpE = srcaE;
 	//mem stage
-	// 婢х偛濮炵拠璇差槱閿燂拷?
+	// 增加写处理
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
 							.sig_write(sig_write),
 							.WriteDataE_modified(WriteDataE_modified)
 	);
-	//鍏ㄩ敓鏂ゆ嫹閿熸枻鎷穝tall
+	//閸忋劑鏁撻弬銈嗗闁跨喐鏋婚幏绌漷all
 
 	// merge flopr in mem stage
 	ex_mem ex_mem0(
@@ -336,7 +344,7 @@ module datapath(
 		.branch_takeE(branch_takeE),.branch_takeM(branch_takeM)
 	);
 	//writeback stage
-	// 婢х偛濮為崘娆忣槱閿燂拷?
+	// 增加读处理
  	read_data read_data0(	.alucontrolW(alucontrolW),
 							.readdataW(readdataW),
 							.dataadrW(aluoutW),
@@ -344,7 +352,7 @@ module datapath(
 	);
 
 
-    // mem闁跨喖妯佸▓鍏哥缁涜瀚归柨鐔告灮閹风兘鏁撻弬銈嗗閸愭瑩鏁撻弬銈嗗hi lo闁跨喍鑼庢潏鐐闁跨喐鏋婚敓锟???
+    // mem闂佽法鍠栧Ο浣糕枔閸忓摜顔掔紒娑滎潐鐎氬綊鏌ㄩ悢鍛婄伄闁归鍏橀弫鎾诲棘閵堝棗顏堕柛鎰懇閺佹捇寮妶鍡楊伓hi lo闂佽法鍠嶉懠搴㈡綇閻愵剙顏堕梺璺ㄥ枑閺嬪鏁撻敓???
     hilo_reg hilo_reg_alu(clk,rst,gprtohiM,gprtoloM,aluout64M[63:32],aluout64M[31:0]);
     // merge flopr in WriteBack stage
 	mem_wb mem_wb0(
@@ -357,7 +365,23 @@ module datapath(
 		.srcaM(srcaM), .srcaW(srcaW)
 	);
 
-	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
+	mux4 #(32) resmux_new(aluoutW,readdataW_modified,hi_oW,lo_oW,memtoregW,resultW);
+//	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+    
+    // DEBUG OUTPUT
+//    assign debug_wb_pc          = pcW;
+//    assign debug_wb_rf_wen      = {4{regwriteW & ~stallW}};
+//    assign debug_wb_rf_wnum     = WriteRegW;
+//    assign debug_wb_rf_wdata    = ResultW;
+endmodule
+//	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
+    
+    // DEBUG OUTPUT
+//    assign debug_wb_pc          = pcW;
+//    assign debug_wb_rf_wen      = {4{regwriteW & ~stallW}};
+//    assign debug_wb_rf_wnum     = WriteRegW;
+//    assign debug_wb_rf_wdata    = ResultW;
+endmodule
 //	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
     
     // DEBUG OUTPUT
