@@ -82,6 +82,7 @@ module datapath(
 	wire zeroE;
 	wire [63:0] aluout64E;
 	wire [31:0] hi_oE,lo_oE;
+	wire [31:0] WriteDataE_modified;
 	//mem stage
 	wire [4:0] writeregM;
 	wire [31:0] hi_oM,lo_oM;
