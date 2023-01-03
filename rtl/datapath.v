@@ -154,6 +154,12 @@ module datapath(
 		{memtoregE,memwriteE,regwriteE,alucontrolE,gprtohiE,gprtoloE},
 		{memtoregM,memwriteM,regwriteM,alucontrolM,gprtohiM,gprtoloM}
  		);
+	flopr #(32) writedataE2M(
+		clk,rst,
+		// 传递待写入数据
+		{WriteDataE_modified},
+		{writedataM}
+		);
 	flopr #(32) regW(
 		clk,rst,
 		// 婢х偛濮濧LU閹貉冨煑娣囷�???锟藉娇娴肩媴锟�???
