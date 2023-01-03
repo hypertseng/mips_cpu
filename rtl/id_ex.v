@@ -57,8 +57,6 @@ module id_ex (
 			rsE <= 5'b0;
 			rtE <= 5'b0;
 			rdE <= 5'b0;
-			hi_oE <= 32'b0;
-			lo_oE <= 32'b0;
             memtoregE <= 0;
             memwriteE <= 0;
             alusrcE <= 0;
@@ -80,8 +78,6 @@ module id_ex (
 			rsE <= rsD;
 			rtE <= rtD;
 			rdE <= rdD;
-			hi_oE <= hi_oD;
-			lo_oE <= lo_oD;
             memtoregE <= memtoregD;
             memwriteE <= memwriteD;
             alusrcE <= alusrcD;

@@ -49,7 +49,7 @@ module datapath(
 	// 闂佸憡鑹鹃張顒勵敆閻愬搫妫橀柡澶嬵儥閺夎霉閻欏懐鎮奸柨????
 	wire regdstE,alusrcE,pcsrcD;
 	wire [1:0] memtoregE,memtoregM,memtoregW;
-	wire [1:0] pcsrcD;
+//	wire [1:0] pcsrcD;
 	wire [63:0] hilo;
  	//FD
 	wire [31:0] pcplus4F;
@@ -277,8 +277,6 @@ module datapath(
 		.rtE(rtE),
 		.rdD(rdD), 
 		.rdE(rdE),
-		.lo_oD(lo_oD), 
-		.lo_oE(lo_oE),
 		.memtoregD(memtoregD),
 		.memtoregE(memtoregE),
 		.memwriteD(memwriteD),
