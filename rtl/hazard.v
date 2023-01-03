@@ -92,11 +92,19 @@ module hazard(
 	// 	//stalling D stalls all previous stages
 	// assign #1 flushE = stallD;
 	// assign #1 stallE = stall_divE;
+
+	//////// new add by stall_divE, see if can merge ///////
+	assign stallF = stall_divE;
+	assign stallD = stall_divE;
+	assign stallE = stall_divE;
+	assign stallM = 1'b0;
+	assign stallW = 1'b0;
 // test if stall is correct without div
 	assign #1 stallD = lwstallD | branchstallD;
 	assign #1 stallF = stallD;
 		//stalling D stalls all previous stages
-	assign #1 flushE = stallD;
+	assign flushE = ~stall_divE;
+	// assign #1 flushE = stallD;
 	assign #1 stallE = 0;
 
 		//stalling D flushes next stage

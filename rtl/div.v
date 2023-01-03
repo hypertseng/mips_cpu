@@ -1,90 +1,82 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2022/01/05 22:35:14
-// Design Name: 
-// Module Name: divide_v1
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 module div(
     input               clk,
     input               rst,
-    input [31:0]        a,
-    input [31:0]        b,
-    input               start,
-    input               sign,
-    output wire         stall_div,
+    input               flush,
+    input [31:0]        a,  //divident
+    input [31:0]        b,  //divisor
+    input               valid,
+    input               sign,   //1:signed
+
+    // output reg          ready,
+    output wire         div_stall,
     output [63:0]       result
     );
-
-    reg [31:0] a_tmp,b_tmp;
-    reg [63:0] SR;              //shift register
-    reg [32:0] NEG_DIVISOR;    //³ıÊı 2's complement
+    /*
+    1. å…ˆå–ç»å¯¹å€¼ï¼Œè®¡ç®—å‡ºä½™æ•°å’Œå•†ã€‚å†æ ¹æ®è¢«é™¤æ•°ã€é™¤æ•°ç¬¦å·å¯¹ç»“æœè°ƒæ•´
+    2. è®¡ç®—è¿‡ç¨‹ä¸­ï¼Œç”±äºä¿è¯äº†remainerä¸ºæ­£ï¼Œå› æ­¤æœ€é«˜ä½ä¸º0ï¼Œå¯ä»¥ç”¨32ä½å­˜å‚¨ã€‚è€Œé™¤æ•°éœ€ç”¨33ä½
+    */
+    reg [31:0] a_save, b_save;
+    reg [63:0] SR; //shift register
+    reg [32 :0] NEG_DIVISOR;  //divisor 2's complement
     wire [31:0] REMAINER, QUOTIENT;
-    assign REMAINER = SR[63:32];    //ÓàÊı
-    assign QUOTIENT = SR[31: 0];    //ÉÌ
+    assign REMAINER = SR[63:32];
+    assign QUOTIENT = SR[31: 0];
 
     wire [31:0] divident_abs;
     wire [32:0] divisor_abs;
     wire [31:0] remainer, quotient;
 
     assign divident_abs = (sign & a[31]) ? ~a + 1'b1 : a;
-    //ÓàÊı·ûºÅÓë±»³ıÊıÏàÍ¬
-    assign remainer = (sign & a_tmp[31]) ? ~REMAINER + 1'b1 : REMAINER;
-    assign quotient = sign & (a_tmp[31] ^ b_tmp[31]) ? ~QUOTIENT + 1'b1 : QUOTIENT;
+    //ä½™æ•°ç¬¦å·ä¸è¢«é™¤æ•°ç›¸åŒ
+    assign remainer = (sign & a_save[31]) ? ~REMAINER + 1'b1 : REMAINER;
+    assign quotient = sign & (a_save[31] ^ b_save[31]) ? ~QUOTIENT + 1'b1 : QUOTIENT;
     assign result = {remainer,quotient};
 
     wire CO;
     wire [32:0] sub_result;
     wire [32:0] mux_result;
-    
-    assign {CO,sub_result} = {1'b0,REMAINER} + NEG_DIVISOR;//sub
-    assign mux_result = CO ? sub_result : {1'b0,REMAINER};//mux
+    //sub
+    assign {CO,sub_result} = {1'b0,REMAINER} + NEG_DIVISOR;
+    //mux
+    assign mux_result = CO ? sub_result : {1'b0,REMAINER};
 
-    //×´Ì¬»ú
+    //state machine
     reg [5:0] cnt;
     reg start_cnt;
-    always @(posedge clk, posedge rst) begin
-        if(rst) begin
+    always @(posedge clk) begin
+        if(rst | flush) begin
             cnt <= 0;
             start_cnt <= 0;
         end
-        else if(!start_cnt & start) begin
+        else if(!start_cnt & valid) begin
             cnt <= 1;
             start_cnt <= 1;
+            //save a,b
+            a_save <= a;
+            b_save <= b;
+
             //Register init
-            a_tmp<=a;
-            b_tmp<=b;
-            SR[63:0] <= {31'b0,divident_abs,1'b0}; //×óÒÆ1bit
-            NEG_DIVISOR <= (sign & b[31]) ? {1'b1,b} : ~{1'b0,b} + 1'b1; 
+            SR[63:0] <= {31'b0,divident_abs,1'b0}; //left shift one bit initially
+            NEG_DIVISOR <= (sign & b[31]) ? {1'b1,b} : ~{1'b0,b} + 1'b1; //divisor_absçš„è¡¥ç 
         end
         else if(start_cnt) begin
             if(cnt==32) begin
                 cnt <= 0;
                 start_cnt <= 0;
-                //Êä³ö½á¹û
+                
+                //Output result
                 SR[63:32] <= mux_result[31:0];
-                SR[31:0] <= {SR[30:0],CO};
+                SR[0] <= CO;
             end
             else begin
                 cnt <= cnt + 1;
-                SR[63:0] <= {mux_result[30:0],SR[31:0],CO}; // Ğ´£¬×óÒÆ
+
+                SR[63:0] <= {mux_result[30:0],SR[31:1],CO,1'b0}; //wsl: write and shift left
             end
         end
     end
     
-    assign stall_div = |cnt; //Ö»ÓĞµ±cnt=0Ê±²»ÔİÍ£
+    assign div_stall = |cnt; //åªæœ‰å½“cnt=0æ—¶ä¸æš‚åœ
 endmodule
