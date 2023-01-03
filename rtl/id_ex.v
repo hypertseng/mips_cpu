@@ -22,11 +22,11 @@ module id_ex (
     input wire [4:0] rtD,
     output reg [4:0] rtE,
     input wire [4:0] rdD,
-    output reg [4:0] rdE,
-    input wire [31:0] hi_oD,
-    output reg [31:0] hi_oE,
-    input wire [31:0] lo_oD,
-    output reg [31:0] lo_oE
+    output reg [4:0] rdE
+    // input wire [31:0] hi_oD,
+    // output reg [31:0] hi_oE,
+    // input wire [31:0] lo_oD,
+    // output reg [31:0] lo_oE
     
 );
     always @(posedge clk) begin
@@ -41,8 +41,8 @@ module id_ex (
 			rsE <= 5'b0;
 			rtE <= 5'b0;
 			rdE <= 5'b0;
-			hi_oE <= 32'b0;
-			lo_oE <= 32'b0;
+			// hi_oE <= 32'b0;
+			// lo_oE <= 32'b0;
         end 
         else if(~stallE) begin      
             pc_plus4E <= pc_plus4D;
@@ -55,8 +55,8 @@ module id_ex (
 			rsE <= rsD;
 			rtE <= rtD;
 			rdE <= rdD;
-			hi_oE <= hi_oD;
-			lo_oE <= lo_oD;
+			// hi_oE <= hi_oD;
+			// lo_oE <= lo_oD;
         end
     end
 endmodule

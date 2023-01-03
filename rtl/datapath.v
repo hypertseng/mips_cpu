@@ -68,7 +68,7 @@ module datapath(
 	wire [4:0] rsD,rtD,rdD;
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
-	wire [31:0] hi_oD,lo_oD;
+	// wire [31:0] hi_oD,lo_oD;
 	//execute stage
 	wire stall_divE;
 	wire [7:0] alucontrolE;
@@ -81,7 +81,7 @@ module datapath(
 	wire [31:0] aluoutE;
 	wire zeroE;
 	wire [63:0] aluout64E;
-	wire [31:0] hi_oE,lo_oE;
+	// wire [31:0] hi_oE,lo_oE;
 	wire [31:0] WriteDataE_modified;
 	//mem stage
 	wire [4:0] writeregM;
@@ -226,7 +226,7 @@ module datapath(
 	//fetch stage logic
 	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_ce_reg);
 	adder pcadd1(pcF,32'b100,pcplus4F);
-	hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
+	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
 	//decode stage
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
@@ -286,11 +286,11 @@ module datapath(
 		.rtD(rtD), 
 		.rtE(rtE),
 		.rdD(rdD), 
-		.rdE(rdE),
-		.hi_oD(hi_oD), 
-		.hi_oE(hi_oE),
-		.lo_oD(lo_oD), 
-		.lo_oE(lo_oE)
+		.rdE(rdE)
+		// .hi_oD(hi_oD), 
+		// .hi_oE(hi_oE),
+		// .lo_oD(lo_oD), 
+		// .lo_oE(lo_oE)
 		);
 
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
@@ -341,7 +341,7 @@ module datapath(
 		.writeregE(writeregE), .writeregM(writeregM),
 		.aluout64E(aluout64E), .aluout64M(aluout64M),
 		.srcaE(srcaE), .srcaM(srcaM),
-		.hi_oE(hi_oE),.hi_oM(hi_oM),
+		// .hi_oE(hi_oE),.hi_oM(hi_oM),
 		.pcbranchE(pcbranchE),.pcbranchM(pcbranchM),
 		.branch_takeE(branch_takeE),.branch_takeM(branch_takeM)
 	);
@@ -355,7 +355,8 @@ module datapath(
 
 
     // mem閿熼樁娈典箻绛规嫹閿熸枻鎷烽敓鏂ゆ嫹鍐欓敓鏂ゆ嫹hi lo閿熶茎杈炬嫹閿熸枻锟�???
-    hilo_reg hilo_reg_alu(clk,rst,{gprtohiM,gprtoloM},aluout64M[63:32],aluout64M[31:0]);
+    hilo_reg hilo_reg(clk,rst,{gprtohiM,gprtoloM},aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
+	assign hilo = {hi_oM, lo_oM};
     // merge flopr in WriteBack stage
 	mem_wb mem_wb0(
 		.clk(clk), .rst(rst),
