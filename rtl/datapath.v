@@ -50,7 +50,7 @@ module datapath(
 	wire regdstE,alusrcE,pcsrcD,regwriteE,regwriteM,regwriteW;
 	wire [1:0] memtoregE,memtoregM,memtoregW;
 
-
+	wire [31:0] WriteDataE_modified;
 	wire [63:0] hilo;
  	//FD
 	wire [31:0] pcplus4F;
