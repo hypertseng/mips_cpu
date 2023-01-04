@@ -38,8 +38,8 @@ module datapath(
 //闁愁偅鎸撮崯�?勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯�?勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯�?勫焼閹绢垰鏅柍顐ｆ尨閸熷矂宕ラ崼婵婂珯闁告艾绌痮ntroller闂侇喓鍔岄崹搴ㄦ儍閸曨喚绠剧紒鎯х氨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯�?勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯�?勫焼閹绢垰鏅柍顐ｆ尨閸熷矂鍩嗛幘顖氭櫕闁愁偅鎸撮崯�?勬晸閿�?????
 
 	//decode stage
-	wire [1:0] memtoregD;
-	wire memwriteD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD;
+	wire [1:0] memtoregD,regdstD;
+	wire memwriteD,alusrcD,regwriteD,gprtohiD,gprtoloD;
 	//execute stage
 	wire memwriteE,gprtohiE,gprtoloE;
 	wire gprtohiM,gprtoloM;
@@ -47,7 +47,8 @@ module datapath(
 //闂佹剚鍋呴崹鐔煎疮閸儱鐒奸柟�?�樻煥閺呫儵鏌嶉锝呯亶闁哥喎鐗撻崺鍡涘箣閺傛寧娅忛梺鎰佸亝閸ㄧ喖宕崼銉ョ劶闁瑰瓨鏌ㄩ弲銉╂煃椤愶絽鐏嶉柛鐔风墦閸╁棝骞嬮弬鎸庢珡闂佹剚鍋呴崹鐔煎疮閸儱鐒奸柟�?�樻煥閺呫儵鏌嶉锝呯亶闁哥喎鐗撻崺鍡涘箣閺傛寧娅忛梺鎰佸亝閸ㄧ喖宕崼銉ョ劶闁瑰瓨鏌ㄩ弲銉╂煃椤愶絽鐏嶉柛鐔风墦閸╁棝骞嬮弬鎸庢珡闂佹剚鍋呴崹鐔煎疮閸儱鐒奸柟�?�樻煥閺呫儵鏌嶉锝呯亶闁哥喎鐗撻崺鍡涘箣閺傛寧娅忛梺鎰佸亝閸ㄧ喖宕崼銉ョ劶闁瑰瓨鏌ㄩ弲銉╂煃椤愶絽鐏嶉柛鐔风墦閸╁棝骞嬮弬鎸庢珡闂佹剚鍋呴崹鐔煎疮閸儱鐒奸柟�?�樻煥閺呫儵鏌嶉锝呯亶闁哥喎鐗撻崺鍡涘箣閺傛寧娅忛梺鎰佸亝閸ㄧ喖宕崼銉︽櫢闁�??????
 
 	// 闂佸憡鑹鹃張顒勵敆閻愬搫妫橀柡澶嬵儥閺夎霉閻欏懐鎮奸柨????
-	wire regdstE,alusrcE,pcsrcD;
+	wire [1:0] regdstE;
+	wire alusrcE,pcsrcD;
 	wire [1:0] memtoregE,memtoregM,memtoregW;
 //	wire [1:0] pcsrcD;
 	wire [63:0] hilo;
@@ -219,10 +220,10 @@ module datapath(
 	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
 	//decode stage
-	// ��ǰһ��Ϊbranch��Ԥ���������ҪflushD
-    // ����ǰԤ��Ҫ��, ��flushD
+	// ��ǰһ��Ϊbranch��Ԥ���������ҪflushD
+    // ����ǰԤ��Ҫ��, ��flushD
     // assign flushD = (branchE & predict_wrong);// | (predictD & branchD);
-    // TODO: �����ӳٲۣ������ﲻ��flush
+    // TODO: �����ӳٲۣ������ﲻ��flush
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
 	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);
 	signext se(instrD[15:0],signimmD);
@@ -256,7 +257,8 @@ module datapath(
 	//execute stage
 	// assign pcplus4E =pcplus4D;
 	//mux write reg
-    mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, writeregM);
+    // mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, writeregM);
+    mux4 #(5) mux4_reg_dst(rdE, rtE, 5'b11111, 5'b0, regdstE, writeregE);
 	// merge flopenrc
 	id_ex id_ex0(
         .clk(clk),
@@ -317,15 +319,15 @@ module datapath(
 			 .hilo(hilo),
 			 .sa(sa),
 			 .flushE(flushE),
-			 
+
 	         .alu_out(aluoutE),
 	         .alu_out_64(aluout64E), 
 	         .overflowE(),
 	         .zeroE(),
 	         .stall_div(stall_divE)
 	);
-	
-	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
+	// The following line conflicts in ：ex_mem
+	// mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 	//闂備浇娉曢崰鎰板几婵犳艾绠柣鎴ｅГ閺呮悂鏌￠崒妯�??鏍�?姘鳖劇ranch闂備浇娉曢崰鎰板几婵犳艾绠柣鎴ｅГ閺呮悂鏌ㄩ悤鍌涘?
     branch_judge branch_judge0(
         .branch_judge_controlE(branch_judge_controlE),

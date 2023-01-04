@@ -36,7 +36,7 @@ module hazard(
 	input wire[4:0] writeregE,
 	input wire regwriteE,
 	input wire[1:0] memtoregE,
-	output reg[1:0] forwardaE,forwardbE,
+	output wire[1:0] forwardaE,forwardbE,
 	output wire flushE,stallE,
 	//mem stage
 	input wire[4:0] writeregM,
@@ -55,31 +55,36 @@ module hazard(
 	assign forwardbD = (rtD != 0 & rtD == writeregM & regwriteM);
 	
 	//forwarding sources to E stage (ALU)
+	assign forwardaE = rsE !=0 && regwriteM && (rsE == writeregM) ? 2'b01 :
+					   rsE !=0 && regwriteW && (rsE == writeregW) ? 2'b10 : 2'b00;
+					   
+	assign forwardbE = rtE !=0 && regwriteM && (rtE == writeregM) ? 2'b01 :
+					   rtE !=0 && regwriteW && (rtE == writeregW) ? 2'b10 : 2'b00;
 
-	always @(*) begin
-		forwardaE = 2'b00;
-		forwardbE = 2'b00;
-		if(rsE != 0) begin
-			/* code */
-			if(rsE == writeregM & regwriteM) begin
-				/* code */
-				forwardaE = 2'b10;
-			end else if(rsE == writeregW & regwriteW) begin
-				/* code */
-				forwardaE = 2'b01;
-			end
-		end
-		if(rtE != 0) begin
-			/* code */
-			if(rtE == writeregM & regwriteM) begin
-				/* code */
-				forwardbE = 2'b10;
-			end else if(rtE == writeregW & regwriteW) begin
-				/* code */
-				forwardbE = 2'b01;
-			end
-		end
-	end
+	// always @(*) begin
+	// 	forwardaE = 2'b00;
+	// 	forwardbE = 2'b00;
+	// 	if(rsE != 0) begin
+	// 		/* code */
+	// 		if(rsE == writeregM & regwriteM) begin
+	// 			/* code */
+	// 			forwardaE = 2'b10;
+	// 		end else if(rsE == writeregW & regwriteW) begin
+	// 			/* code */
+	// 			forwardaE = 2'b01;
+	// 		end
+	// 	end
+	// 	if(rtE != 0) begin
+	// 		/* code */
+	// 		if(rtE == writeregM & regwriteM) begin
+	// 			/* code */
+	// 			forwardbE = 2'b10;
+	// 		end else if(rtE == writeregW & regwriteW) begin
+	// 			/* code */
+	// 			forwardbE = 2'b01;
+	// 		end
+	// 	end
+	// end
 
 	//stalls
 	assign #1 lwstallD = (memtoregE == 2'b01) & (rtE == rsD | rtE == rtD);
