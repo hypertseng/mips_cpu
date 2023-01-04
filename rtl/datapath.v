@@ -151,27 +151,29 @@ module datapath(
 	//hazard detection
 	hazard h(
 		//fetch stage
-		stallF,
+		.stallF(stallF),
+		.flushF(flushF),
 		//decode stage
-		rsD,rtD,
-		branchD,
-		forwardaD,forwardbD,
-		stallD,
+		.rsD(rsD),.rtD(rtD),
+		.branchD(branchD),
+		.forwardaD(forwardaD),.forwardbD(forwardbD),
+		.stallD(stallD),
+		.flushD(flushD),
 		//execute stage
-		stall_divE,
-		rsE,rtE,
-		writeregE,
-		regwriteE,
-		memtoregE,
-		forwardaE,forwardbE,
-		flushE,stallE,
+		.stall_divE(stall_divE),
+		.rsE(rsE),.rtE(rtE),
+		.writeregE(writeregE),
+		.regwriteE(regwriteE),
+		.memtoregE(memtoregE),
+		.forwardaE(forwardaE),.forwardbE(forwardbE),
+		.flushE(flushE),.stallE(stallE),
 		//mem stage
-		writeregM,
-		regwriteM,
-		memtoregM,
+		.writeregM(writeregM),
+		.regwriteM(regwriteM),
+		.memtoregM(memtoregM),
 		//write back stage
-		writeregW,
-		regwriteW
+		.writeregW(writeregW),
+		.regwriteW(regwriteW)
 		);
 
 
@@ -217,6 +219,10 @@ module datapath(
 	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
 	//decode stage
+	// 若前一条为branch且预测错误，则需要flushD
+    // 若当前预测要跳, 则flushD
+    // assign flushD = (branchE & predict_wrong);// | (predictD & branchD);
+    // TODO: 若有延迟槽，则这里不能flush
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
 	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);
 	signext se(instrD[15:0],signimmD);

@@ -23,11 +23,13 @@
 module hazard(
 	//fetch stage
 	output wire stallF,
+	output wire flushF,
 	//decode stage
 	input wire[4:0] rsD,rtD,
 	input wire branchD,
 	output wire forwardaD,forwardbD,
 	output wire stallD,
+	output wire flushD,
 	//execute stage
 	input wire stall_divE,
 	input wire[4:0] rsE,rtE,
@@ -113,4 +115,7 @@ module hazard(
   	//       if source comes from load;
   	//       instead, another bypass network could
   	//       be added from W to M
+  	assign flushF = 1'b0;
+//    assign flushD = ((branchE & predict_wrong) | exceptionoccur) & (~longest_stall);
+    assign flushD = 1'b0;
 endmodule
