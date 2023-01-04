@@ -55,6 +55,7 @@ module datapath(
 	wire [31:0] pcplus4F;
 	wire [31:0] pcnextbrFD,pcbranchD;
 	wire pc_ce_reg;
+	
 	//decode stage
 	wire jumpD,jumprD;
 	wire [7:0] alucontrolD;
@@ -68,13 +69,15 @@ module datapath(
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	wire [31:0] pcD;
+	wire [4:0] saD;
+	
 	//execute stage
 	wire stall_divE;
 	wire [7:0] alucontrolE;
 	wire [31:0] pcplus4E;
 	wire [31:0] pcbranchE;
 	wire [1:0] forwardaE,forwardbE;
-	wire [4:0] rsE,rtE,rdE;
+	wire [4:0] rsE,rtE,rdE,saE;
 	wire [4:0] writeregE;
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E,srcaM,srcaW;
@@ -103,7 +106,7 @@ module datapath(
 	
 	//hazard	
     wire stallF, stallD, stallE, stallW;
-    wire flushF, flushD, flushE, flushW;
+    wire flushF, flushD, flushE, flushW;rsD
     wire [1:0] forward_aE, forward_bE;
     
     //predict
@@ -219,10 +222,10 @@ module datapath(
 	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
 	//decode stage
-	// ÈôÇ°Ò»ÌõÎªbranchÇÒÔ¤²â´íÎó£¬ÔòÐèÒªflushD
-    // Èôµ±Ç°Ô¤²âÒªÌø, ÔòflushD
+	// ï¿½ï¿½Ç°Ò»ï¿½ï¿½Îªbranchï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªflushD
+    // ï¿½ï¿½ï¿½ï¿½Ç°Ô¤ï¿½ï¿½Òªï¿½ï¿½, ï¿½ï¿½flushD
     // assign flushD = (branchE & predict_wrong);// | (predictD & branchD);
-    // TODO: ÈôÓÐÑÓ³Ù²Û£¬ÔòÕâÀï²»ÄÜflush
+    // TODO: ï¿½ï¿½ï¿½ï¿½ï¿½Ó³Ù²Û£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï²»ï¿½ï¿½flush
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
 	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);
 	signext se(instrD[15:0],signimmD);
@@ -236,7 +239,8 @@ module datapath(
 	assign rtD = instrD[20:16];
 	assign rdD = instrD[15:11];
 	assign functD = instrD[5:0];
-	
+	assign saD = instrD[10:6];
+
 	//jump
     wire jr, j;
     assign jr = ~(|instrD[31:26]) & ~(|(instrD[5:1] ^ 5'b00100)); //jr, jalr
@@ -284,6 +288,8 @@ module datapath(
 		.rtE(rtE),
 		.rdD(rdD), 
 		.rdE(rdE),
+		.saD(saD),
+		.saE(saE),
 		.memtoregD(memtoregD),
 		.memtoregE(memtoregE),
 		.memwriteD(memwriteD),
@@ -315,7 +321,7 @@ module datapath(
 	         .alu_num2(srcb3E),
 	         .alucontrol(alucontrolE),
 			 .hilo(hilo),
-			 .sa(sa),
+			 .sa(saE),
 			 .flushE(flushE),
 			 
 	         .alu_out(aluoutE),

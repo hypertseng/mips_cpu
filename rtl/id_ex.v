@@ -23,7 +23,8 @@ module id_ex (
     output reg [4:0] rtE,
     input wire [4:0] rdD,
     output reg [4:0] rdE,
-
+    input wire [4:0] saD,
+    output reg [4:0] saE,
 
     input wire [1:0] memtoregD,
     output reg [1:0] memtoregE,
@@ -66,6 +67,7 @@ module id_ex (
             gprtohiE <= 32'b0;
             gprtoloE <= 32'b0;
             pcE <= 32'b0;
+            saE <= 5'b0;
         end 
         else if(~stallE) begin      
             pc_plus4E <= pc_plus4D;
@@ -87,6 +89,7 @@ module id_ex (
             gprtohiE <= gprtohiD;
             gprtoloE <= gprtoloD;
             pcE <= pcD;
+            saE <= saD;
         end
     end
 endmodule
