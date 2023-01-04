@@ -26,9 +26,11 @@ module maindec(
 	input wire [5:0] funct,
 
 	output wire [1:0] memtoreg, //00->aluresult 01->readdata 10->hi 11->lo
-	output wire memwrite,
-	output wire branch,alusrc,
-	output wire regdst,regwrite,
+	output wire memwrite,   // en signal
+	output wire branch,     
+    output wire alusrc,     // 0 -> reg, 1 -> imm 
+	output wire regdst,     // 0 -> rd, 1 -> rt
+    output wire regwrite,   // en signal 
 	output wire gprtohi,   //gprtohi GPR->hi
 	output wire gprtolo,   //gprtolo GPR->lo
     
@@ -59,13 +61,12 @@ module maindec(
 		case(op)
 			`EXE_NOP:
 			case(funct)
-				// 逻辑指令
-				`EXE_AND, `EXE_OR, `EXE_XOR, `EXE_NOR: main_signal <= 9'b11000_00_00; // R-type
-				// 移位指令
-			    `EXE_SLL, `EXE_SRL, `EXE_SRA, `EXE_SLLV, `EXE_SRLV, `EXE_SRAV: main_signal <= 9'b11000_00_00; // R-type
+				// logic instr
+				`EXE_AND, `EXE_OR, `EXE_XOR, `EXE_NOR, 
+			    `EXE_SLL, `EXE_SRL, `EXE_SRA, `EXE_SLLV, `EXE_SRLV, `EXE_SRAV,
 				//TODO `EXE_MFHI `EXE_MTHI `EXE_MFLO `EXE_MTLO
-                // Arithmetic inst
-                `EXE_ADD, `EXE_ADDU, `EXE_SUB, `EXE_SUBU, `EXE_SLT, `EXE_SLTU: main_signal <= 9'b11000_00_00; // R-type
+                `EXE_ADD, `EXE_ADDU, `EXE_SUB, `EXE_SUBU, `EXE_SLT, `EXE_SLTU: main_signal <= 9'b10000_00_00; // R-type
+                
                 `EXE_MULT, `EXE_MULTU, `EXE_DIV, `EXE_DIVU: main_signal <= 9'b11000_00_11;
                 
                 `EXE_MFHI: main_signal <= 9'b11000_10_00;//  hi -> gpr

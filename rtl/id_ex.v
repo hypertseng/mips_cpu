@@ -47,25 +47,25 @@ module id_ex (
 );
     always @(posedge clk) begin
         if(rst | flushE) begin
-            pc_plus4E <= 0;
-            branch_judge_controlE <=0;   
-            jump_conflictE <=0;   
-            pcbranchE <= 0;
+            pc_plus4E <= 32'b0;
+            branch_judge_controlE <= 8'b0;   
+            jump_conflictE <= 0;   
+            pcbranchE <= 32'b0;
             srcaE <= 32'b0;
 			srcbE <= 32'b0;
 			signimmE <= 32'b0;
 			rsE <= 5'b0;
 			rtE <= 5'b0;
 			rdE <= 5'b0;
-            memtoregE <= 0;
+            memtoregE <= 2'b0;
             memwriteE <= 0;
             alusrcE <= 0;
             regdstE <= 0;
             regwriteE <= 0;
-            alucontrolE <= 0;
-            gprtohiE <= 0;
-            gprtoloE <= 0;
-            pcE <= 0;
+            alucontrolE <= 8'b0;
+            gprtohiE <= 32'b0;
+            gprtoloE <= 32'b0;
+            pcE <= 32'b0;
         end 
         else if(~stallE) begin      
             pc_plus4E <= pc_plus4D;

@@ -40,7 +40,6 @@ module alu(
                 ((alu_ans[31] & (~alu_num1[31] & ~num2_reg[31])) || (~alu_ans[31] & (alu_num1[31] & num2_reg[31]))) 
                 );
     assign overflowE = overflow_add || overflow_sub;
-    assign alu_out = (overflowE == 1) ? 0:alu_ans;
 
     // div 
     wire [63:0] div_result;
@@ -124,4 +123,6 @@ module alu(
 			end
 	endcase
 	end
+	assign alu_out = (overflowE == 1) ? 0:alu_ans;
+
 endmodule

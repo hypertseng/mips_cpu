@@ -103,7 +103,8 @@ module hazard(
 	assign #1 stallD = lwstallD | branchstallD;
 	assign #1 stallF = stallD;
 		//stalling D stalls all previous stages
-	assign flushE = ~stall_divE;
+	// assign flushE = ~stall_divE;
+	assign flushE = 0;
 	// assign #1 flushE = stallD;
 	assign #1 stallE = 0;
 
