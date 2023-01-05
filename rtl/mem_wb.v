@@ -15,8 +15,8 @@ module mem_wb (
 
 	input wire [1:0] memtoregM,
     output reg [1:0] memtoregW, 
-	input wire regwriteM,
-    output reg regwriteW, 
+	input wire regwrite_enM,
+    output reg regwrite_enW, 
 	input wire [7:0] alucontrolM,
     output reg [7:0] alucontrolW, 
 	input wire gprtohiM,
@@ -35,7 +35,7 @@ module mem_wb (
 			lo_oW <= 0;
 			srcaW <= 0;
 			memtoregW <= 0;
-			regwriteW <= 0;
+			regwrite_enW <= 0;
 			alucontrolW <= 0;
 			gprtohiW <= 0;
 			gprtoloW <= 0;
@@ -49,7 +49,7 @@ module mem_wb (
 			lo_oW <= lo_oM;
 			srcaW <= srcaM;
 			memtoregW <= memtoregM;
-			regwriteW <= regwriteM;
+			regwrite_enW <= regwrite_enM;
 			alucontrolW <= alucontrolM;
 			gprtohiW <= gprtohiM;
 			gprtoloW <= gprtoloM;

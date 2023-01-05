@@ -26,7 +26,7 @@ module hazard(
 	output wire flushF,
 	//decode stage
 	input wire[4:0] rsD,rtD,
-	input wire branchD,
+	input wire branchD,jumprD,
 	output wire forwardaD,forwardbD,
 	output wire stallD,
 	output wire flushD,
@@ -34,93 +34,91 @@ module hazard(
 	input wire stall_divE,
 	input wire[4:0] rsE,rtE,
 	input wire[4:0] writeregE,
-	input wire regwriteE,
+	input wire regwrite_enE,
 	input wire[1:0] memtoregE,
 	output wire[1:0] forwardaE,forwardbE,
 	output wire flushE,stallE,
 	//mem stage
 	input wire[4:0] writeregM,
-	input wire regwriteM,
+	input wire regwrite_enM,
 	input wire[1:0] memtoregM,
 
 	//write back stage
 	input wire[4:0] writeregW,
-	input wire regwriteW
+	input wire regwrite_enW,
+
+    input wire i_stall,       // 两个访存 stall信号
+    input wire d_stall,
+	output wire longest_stall // 全局stall指令
     );
 
-	wire lwstallD,branchstallD;
+	wire lwstall,branchstallD,jrstall;
 
 	//forwarding sources to D stage (branch equality)
-	assign forwardaD = (rsD != 0 & rsD == writeregM & regwriteM);
-	assign forwardbD = (rtD != 0 & rtD == writeregM & regwriteM);
+	assign forwardaD = (rsD != 0 & rsD == writeregM & regwrite_enM);
+	assign forwardbD = (rtD != 0 & rtD == writeregM & regwrite_enM);
 	
 	//forwarding sources to E stage (ALU)
-	assign forwardaE = rsE !=0 && regwriteM && (rsE == writeregM) ? 2'b01 :
-					   rsE !=0 && regwriteW && (rsE == writeregW) ? 2'b10 : 2'b00;
+	assign forwardaE = rsE !=0 && regwrite_enM && (rsE == writeregM) ? 2'b01 :
+					   rsE !=0 && regwrite_enW && (rsE == writeregW) ? 2'b10 : 2'b00;
 					   
-	assign forwardbE = rtE !=0 && regwriteM && (rtE == writeregM) ? 2'b01 :
-					   rtE !=0 && regwriteW && (rtE == writeregW) ? 2'b10 : 2'b00;
-
-	// always @(*) begin
-	// 	forwardaE = 2'b00;
-	// 	forwardbE = 2'b00;
-	// 	if(rsE != 0) begin
-	// 		/* code */
-	// 		if(rsE == writeregM & regwriteM) begin
-	// 			/* code */
-	// 			forwardaE = 2'b10;
-	// 		end else if(rsE == writeregW & regwriteW) begin
-	// 			/* code */
-	// 			forwardaE = 2'b01;
-	// 		end
-	// 	end
-	// 	if(rtE != 0) begin
-	// 		/* code */
-	// 		if(rtE == writeregM & regwriteM) begin
-	// 			/* code */
-	// 			forwardbE = 2'b10;
-	// 		end else if(rtE == writeregW & regwriteW) begin
-	// 			/* code */
-	// 			forwardbE = 2'b01;
-	// 		end
-	// 	end
-	// end
+	assign forwardbE = rtE !=0 && regwrite_enM && (rtE == writeregM) ? 2'b01 :
+					   rtE !=0 && regwrite_enW && (rtE == writeregW) ? 2'b10 : 2'b00;
 
 	//stalls
-	assign #1 lwstallD = (memtoregE == 2'b01) & (rtE == rsD | rtE == rtD);
+	// assign #1 lwstall = (((rsD == rtE) | (rtD == rtE)) & memtoregE) | ((rsD != 5'b0) & (rsD == writeregM) & memtoregM & jumprD);
+	assign #1 lwstall = (((rsD == rtE) | (rtD == rtE)) & rtE!=0) | ((rsD != 5'b0) & (rsD == writeregM) & memtoregM & jumprD);
+	assign jrstall = jumprD & regwrite_enE & ((writeregE == rsD) | (writeregE == rtD));
 	assign #1 branchstallD = branchD &
-				(regwriteE & 
+				(regwrite_enE & 
 				(writeregE == rsD | writeregE == rtD) |
 				(memtoregM == 2'b01) &
 				(writeregM == rsD | writeregM == rtD));
-// stall by div
-	// assign #1 stallD = lwstallD | branchstallD | stall_divE;
+	// stall by div
+	// assign #1 stallD = lwstall | branchstallD | stall_divE;
 	// assign #1 stallF = stallD | stall_divE;
 	// 	//stalling D stalls all previous stages
 	// assign #1 flushE = stallD;
 	// assign #1 stallE = stall_divE;
 
 	//////// new add by stall_divE, see if can merge ///////
-	assign stallF = stall_divE;
-	assign stallD = stall_divE;
-	assign stallE = stall_divE;
-	assign stallM = 1'b0;
-	assign stallW = 1'b0;
-// test if stall is correct without div
-	assign #1 stallD = lwstallD | branchstallD;
-	assign #1 stallF = stallD;
-		//stalling D stalls all previous stages
+	// assign stallF = stall_divE;
+	// assign stallD = stall_divE;
+	// assign stallE = stall_divE;
+
+	// test if stall is correct without div
+	// assign #1 stallF = stallD;
+	// assign #1 stallD = lwstall | branchstallD;
+	//stalling D stalls all previous stages
 	// assign flushE = ~stall_divE;
 	assign flushE = 0;
 	// assign #1 flushE = stallD;
 	assign #1 stallE = 0;
 
-		//stalling D flushes next stage
+	//stalling D flushes next stage
 	// Note: not necessary to stall D stage on store
   	//       if source comes from load;
   	//       instead, another bypass network could
   	//       be added from W to M
   	assign flushF = 1'b0;
-//    assign flushD = ((branchE & predict_wrong) | exceptionoccur) & (~longest_stall);
+	//    assign flushD = ((branchE & predict_wrong) | exceptionoccur) & (~longest_stall);
     assign flushD = 1'b0;
+
+	assign longest_stall = i_stall | d_stall | stall_divE;
+
+    assign stallF = (lwstall | jrstall);
+    assign stallD = lwstall | jrstall;
+    assign stallE = 0;
+
+    // assign stallF = (longest_stall | lwstall | jrstall) & ~exceptionoccur;
+    // assign stallD = longest_stall | lwstall | jrstall;
+    // assign stallE = longest_stall;
+    // assign stallM = longest_stall;
+    // assign stallW = longest_stall;
+
+    // assign flushF = 1'b0;
+    // assign flushD = ((branchE & predict_wrong) | exceptionoccur) & (~longest_stall);
+    // assign flushE = (lwstall | jrstall         | exceptionoccur) & (~longest_stall); // TODO:exceptionoccur信号用于异常时清除所有的寄存器，还未完全测试
+    // assign flushM = (exceptionoccur                            ) & (~longest_stall);
+    // assign flushW = (exceptionoccur                            ) & (~longest_stall);
 endmodule

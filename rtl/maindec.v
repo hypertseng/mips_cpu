@@ -29,7 +29,7 @@ module maindec(
 	output wire memwrite,   // en signal
 	output wire branch,     
     output wire alusrc,     // 0 -> reg, 1 -> imm 
-	output wire [1:0] regdst,     // 00 -> rd, 01 -> rt, 10 -> $ra
+	output wire regdst,     // 0 -> rd, 1 -> rt,  $ra另外实现
     output wire regwrite,   // en signal 
 	output wire gprtohi,   //gprtohi GPR->hi
 	output wire gprtolo,   //gprtolo GPR->lo
@@ -65,74 +65,74 @@ module maindec(
 				`EXE_AND, `EXE_OR, `EXE_XOR, `EXE_NOR, 
 			    `EXE_SLL, `EXE_SRL, `EXE_SRA, `EXE_SLLV, `EXE_SRLV, `EXE_SRAV,
 				//TODO `EXE_MFHI `EXE_MTHI `EXE_MFLO `EXE_MTLO
-                `EXE_ADD, `EXE_ADDU, `EXE_SUB, `EXE_SUBU, `EXE_SLT, `EXE_SLTU: main_signal <= 9'b1_00_000_00_00; // R-type
+                `EXE_ADD, `EXE_ADDU, `EXE_SUB, `EXE_SUBU, `EXE_SLT, `EXE_SLTU: main_signal <= 9'b10000_00_00; // R-type
                 
-                `EXE_MULT, `EXE_MULTU, `EXE_DIV, `EXE_DIVU: main_signal <= 9'b1_01_000_00_11;
+                `EXE_MULT, `EXE_MULTU, `EXE_DIV, `EXE_DIVU: main_signal <= 9'b11000_00_11;
                 
-                `EXE_MFHI: main_signal <= 9'b1_01_000_10_00;//  hi -> gpr
-                `EXE_MFLO: main_signal <= 9'b1_01_000_11_00;//  lo -> gpr
-                `EXE_MTHI: main_signal <= 9'b0_00_000_00_10;
-                `EXE_MTLO: main_signal <= 9'b0_00_000_00_01;
+                `EXE_MFHI: main_signal <= 9'b11000_10_00;//  hi -> gpr
+                `EXE_MFLO: main_signal <= 9'b11000_11_00;//  lo -> gpr
+                `EXE_MTHI: main_signal <= 9'b00000_00_10;
+                `EXE_MTLO: main_signal <= 9'b00000_00_01;
                 
-                `EXE_SYSCALL,`EXE_BREAK : main_signal <= 9'b0_00_000_00_00;
+                `EXE_SYSCALL,`EXE_BREAK : main_signal <= 9'b00000_00_00;
                 
 
                 // j inst
-                `EXE_JR:  main_signal <= 9'b0_00_000_00_00;
-                `EXE_JALR:main_signal <= 9'b1_01_000_00_00;  // 选择rd作为写寄存器位置
+                `EXE_JR:  main_signal <= 9'b00000_00_00;
+                `EXE_JALR:main_signal <= 9'b11000_00_00;  // 选择rd作为写寄存器位置
 
                 default:begin
-                    main_signal <= 9'b0_00_000_00_00;
+                    main_signal <= 9'b00000_00_00;
                     // invalid = 1;
                 end 
 			endcase
 			// logic inst
-            `EXE_ANDI ,`EXE_XORI, `EXE_LUI, `EXE_ORI: main_signal <= 9'b1_00_100_00_00; // Immediate
+            `EXE_ANDI ,`EXE_XORI, `EXE_LUI, `EXE_ORI: main_signal <= 9'b10100_00_00; // Immediate
             
-            `EXE_ADDI, `EXE_ADDIU ,`EXE_SLTI, `EXE_SLTIU: main_signal <= 9'b1_00_100_00_00; // Immediate
+            `EXE_ADDI, `EXE_ADDIU ,`EXE_SLTI, `EXE_SLTIU: main_signal <= 9'b10100_00_00; // Immediate
             
             // branch inst
-            `EXE_BEQ, `EXE_BGTZ, `EXE_BLEZ, `EXE_BNE    :main_signal <= 9'b0_00_010_00_00    ;
+            `EXE_BEQ, `EXE_BGTZ, `EXE_BLEZ, `EXE_BNE    :main_signal <= 9'b00010_00_00    ;
             
             `EXE_REGIMM_INST: case(rt)
-                `EXE_BLTZ   :main_signal <= 9'b0_00_010_00_00      ;
-                `EXE_BLTZAL :main_signal <= 9'b1_00_010_00_00      ;
-                `EXE_BGEZ   :main_signal <= 9'b0_00_010_00_00      ;
-                `EXE_BGEZAL :main_signal <= 9'b1_00_010_00_00      ;
+                `EXE_BLTZ   :main_signal <= 9'b00010_00_00      ;
+                `EXE_BLTZAL :main_signal <= 9'b10010_00_00      ;
+                `EXE_BGEZ   :main_signal <= 9'b00010_00_00      ;
+                `EXE_BGEZAL :main_signal <= 9'b10010_00_00      ;
                 // default: invalid = 1;
             endcase
             
             // j inst
-            `EXE_J  : main_signal <= 9'b0_00_00_00_00;
-            `EXE_JAL: main_signal <= 9'b1_00_00_00_00;
+            `EXE_J  : main_signal <= 9'b0000_00_00;
+            `EXE_JAL: main_signal <= 9'b1000_00_00;
 
             // memory insts
-            `EXE_LB : main_signal <= 9'b1_00_101_01_00;
-            `EXE_LBU: main_signal <= 9'b1_00_101_01_00;
-            `EXE_LH : main_signal <= 9'b1_00_101_01_00;
-            `EXE_LHU: main_signal <= 9'b1_00_101_01_00;
-            `EXE_LW : main_signal <= 9'b1_00_101_01_00;  // lab4 lw
-            `EXE_SB : main_signal <= 9'b0_00_101_01_00;  
-            `EXE_SH : main_signal <= 9'b0_00_101_01_00;  
-            `EXE_SW : main_signal <= 9'b0_00_101_01_00;  // lab4 sw
+            `EXE_LB : main_signal <= 9'b10101_01_00;
+            `EXE_LBU: main_signal <= 9'b10101_01_00;
+            `EXE_LH : main_signal <= 9'b10101_01_00;
+            `EXE_LHU: main_signal <= 9'b10101_01_00;
+            `EXE_LW : main_signal <= 9'b10101_01_00;  // lab4 lw
+            `EXE_SB : main_signal <= 9'b00101_01_00;  
+            `EXE_SH : main_signal <= 9'b00101_01_00;  
+            `EXE_SW : main_signal <= 9'b00101_01_00;  // lab4 sw
 
             // 特权指令
             6'b010000 : case(rs)
                 5'b00100:begin  // mtc0
                     // cp0write = 1;
-                    main_signal <= 9'b0_00_000_00_00;
+                    main_signal <= 9'b00000_00_00;
                 end 
-                5'b00000: main_signal <= 9'b1_00_000_00_00; // mtfc0
-                5'b10000: main_signal <= 9'b0_00_000_00_00; // eret TODO: 参�?�代码中regwrite�????1，这里不�????1
+                5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
+                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 参�?�代码中regwrite�????1，这里不�????1
                 default: begin
                     // invalid = 1;
-                    main_signal <= 9'b0_00_000_00_00;  // error op
+                    main_signal <= 9'b00000_00_00;  // error op
                 end 
             endcase
 
             default:begin
                 // invalid = 1;
-                main_signal <= 9'b0_00_000_00_00;  // error op
+                main_signal <= 9'b00000_00_00;  // error op
             end 
 		endcase
 	end

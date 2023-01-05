@@ -32,10 +32,10 @@ module id_ex (
     output reg memwriteE,
     input wire alusrcD,
     output reg alusrcE,
-    input wire [1:0] regdstD,
-    output reg [1:0] regdstE,
-    input wire regwriteD,
-    output reg regwriteE,
+    input wire regdstD,
+    output reg regdstE,
+    input wire regwrite_enD,
+    output reg regwrite_enE,
     input wire [7:0] alucontrolD,
     output reg [7:0] alucontrolE,
     input wire gprtohiD,
@@ -62,7 +62,7 @@ module id_ex (
             memwriteE <= 0;
             alusrcE <= 0;
             regdstE <= 0;
-            regwriteE <= 0;
+            regwrite_enE <= 0;
             alucontrolE <= 8'b0;
             gprtohiE <= 32'b0;
             gprtoloE <= 32'b0;
@@ -84,7 +84,7 @@ module id_ex (
             memwriteE <= memwriteD;
             alusrcE <= alusrcD;
             regdstE <= regdstD;
-            regwriteE <= regwriteD;
+            regwrite_enE <= regwrite_enD;
             alucontrolE <= alucontrolD;
             gprtohiE <= gprtohiD;
             gprtoloE <= gprtoloD;

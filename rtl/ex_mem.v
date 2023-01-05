@@ -18,8 +18,8 @@ module ex_mem (
     output reg [1:0] memtoregM,
 	input wire memwriteE,
     output reg memwriteM,
-	input wire regwriteE,
-    output reg regwriteM,
+	input wire regwrite_enE,
+    output reg regwrite_enM,
 	input wire [7:0] alucontrolE,
     output reg [7:0] alucontrolM,
 	input wire gprtohiE,
@@ -42,7 +42,7 @@ module ex_mem (
 			branch_takeM <= 0;
 			memtoregM <= 0;
 			memwriteM <= 0;
-			regwriteM <= 0;
+			regwrite_enM <= 0;
 			alucontrolM <= 0;
 			gprtohiM <= 0;
 			gprtoloM <= 0;
@@ -58,7 +58,7 @@ module ex_mem (
 			branch_takeM <= branch_takeE;
 			memtoregM <= memtoregE;
 			memwriteM <= memwriteE;
-			regwriteM <= regwriteE;
+			regwrite_enM <= regwrite_enE;
 			alucontrolM <= alucontrolE;
 			gprtohiM <= gprtohiE;
 			gprtoloM <= gprtoloE;
