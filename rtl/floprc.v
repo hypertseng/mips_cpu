@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module floprc #(parameter WIDTH = 32)(
+module floprc #(parameter WIDTH = 8)(
 	input wire clk,rst,clear,
 	input wire[WIDTH-1:0] d,
 	output reg[WIDTH-1:0] q

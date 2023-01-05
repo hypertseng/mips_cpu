@@ -65,15 +65,6 @@ module hazard(
 	assign forwardbE = rtE !=0 && regwrite_enM && (rtE == writeregM) ? 2'b01 :
 					   rtE !=0 && regwrite_enW && (rtE == writeregW) ? 2'b10 : 2'b00;
 
-	//stalls
-	// assign #1 lwstall = (((rsD == rtE) | (rtD == rtE)) & memtoregE) | ((rsD != 5'b0) & (rsD == writeregM) & memtoregM & jumprD);
-	assign #1 lwstall = (((rsD == rtE) | (rtD == rtE)) & rtE!=0) | ((rsD != 5'b0) & (rsD == writeregM) & memtoregM & jumprD);
-	assign jrstall = jumprD & regwrite_enE & ((writeregE == rsD) | (writeregE == rtD));
-	assign #1 branchstallD = branchD &
-				(regwrite_enE & 
-				(writeregE == rsD | writeregE == rtD) |
-				(memtoregM == 2'b01) &
-				(writeregM == rsD | writeregM == rtD));
 	// stall by div
 	// assign #1 stallD = lwstall | branchstallD | stall_divE;
 	// assign #1 stallF = stallD | stall_divE;
@@ -91,23 +82,26 @@ module hazard(
 	// assign #1 stallD = lwstall | branchstallD;
 	//stalling D stalls all previous stages
 	// assign flushE = ~stall_divE;
-	assign flushE = 0;
+	// assign flushE = 0;
 	// assign #1 flushE = stallD;
-	assign #1 stallE = 0;
+	// assign #1 stallE = 0;
 
 	//stalling D flushes next stage
 	// Note: not necessary to stall D stage on store
   	//       if source comes from load;
   	//       instead, another bypass network could
   	//       be added from W to M
-  	assign flushF = 1'b0;
-	//    assign flushD = ((branchE & predict_wrong) | exceptionoccur) & (~longest_stall);
-    assign flushD = 1'b0;
-
-	assign longest_stall = i_stall | d_stall | stall_divE;
-
-    assign stallF = (lwstall | jrstall);
-    assign stallD = lwstall | jrstall;
+  	//stalls
+	assign #1 lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
+	assign #1 branchstallD = branchD &
+				(regwrite_enE & 
+				(writeregE == rsD | writeregE == rtD) |
+				memtoregM &
+				(writeregM == rsD | writeregM == rtD));
+	assign #1 stallD = lwstallD | branchstallD;
+	assign #1 stallF = stallD;
+		//stalling D stalls all previous stages
+	assign #1 flushE = stallD;
     assign stallE = 0;
 
     // assign stallF = (longest_stall | lwstall | jrstall) & ~exceptionoccur;
