@@ -193,8 +193,7 @@ module datapath(
     mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD , pc_temp2);
     mux2 #(32) before_pc_predict(pc_temp2,pc_temp1,predict_wrong & branchE, pc_temp3);
     mux2 #(32) before_pc_jump(pc_temp3,{pcplus4D[31:28],instrD[25:0],2'b00},jumpD, pc_temp4);
-    mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   // TODO 注意这里可能有数据冒险 eq1是数据前推
-    // mux2 #(32) before_pc_jumpr(pc_temp4,eq1,jumprD, pc_temp5);   // TODO 注意这里可能有数据冒险 eq1是数据前推
+    mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   // TODO 注意这里可能有数据冒险 srca2D是数据前推
 	// mux2 #(32) before_pc_exception(pc_temp5,pcexceptionM,exceptionoccur, pc_in);
 	
 
@@ -342,7 +341,7 @@ module datapath(
 
 
     // MEM_WB flop
-	flopr#(32) fp5_1(clk,rst,aluoutM,aluoutW);
+	flopr#(32) fp5_1(clk,rst,aluoutM,aluoutW);// fault
 	flopr#(32) fp5_2(clk,rst,readdataM,readdataW);
 	flopr#(5) fp5_3(clk,rst,writeregM,writeregW);
 	flopr#(32) fp5_4(clk,rst,hi_oM,hi_oW);
