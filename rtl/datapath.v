@@ -97,7 +97,6 @@ module datapath(
 	//hazard	
     wire stallF, stallD, stallE, stallW;
     wire flushF, flushD, flushE, flushW;
-    wire [1:0] forward_aE, forward_bE;
     
     //predict
     wire branch_takeM, branch_takeE;
@@ -203,11 +202,11 @@ module datapath(
 	// regfile rf(clk,regwrite_enW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
 	regfile regfile0(
 	.clk(clk),
-	.we3(regwriteM),
+	.we3(regwrite_enW),
 	.ra1(rsD), 
 	.ra2(rtD), 
-	.wa3(writeregM), 
-	.wd3(resultM),
+	.wa3(writeregW), 
+	.wd3(resultW),
 	.rd1(srcaD), 
 	.rd2(srcbD)
     );
@@ -283,11 +282,10 @@ module datapath(
 	
 	//execute stage
 	//mux write reg
-    mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, writeregM);
+    // mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, writeregM);
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
-	// alu alu(srca2E,srcb3E,alucontrolE,hilo,aluoutE);
 	alu alu0(.clk(clk),
 			 .rst(rst),
 			 .alu_num1(srca2E),
@@ -303,7 +301,6 @@ module datapath(
 	         .stall_div(stall_divE)
 	);
 	
-	mux2 #(5) wrmux(rtE,rdE,regdstE,writeregE);
 
     branch_judge branch_judge0(
         .branch_judge_controlE(branch_judge_controlE),
@@ -316,39 +313,21 @@ module datapath(
     
     
     //EX_MEM flop
-	ex_mem ex_mem0(
-		.clk(clk), 
-		.rst(rst),
+	flopr#(32) fp4_1(clk,rst,aluoutE,aluoutM);
+	flopr#(5) fp4_2(clk,rst,writeregE,writeregM);
+	flopr#(64) fp4_3(clk,rst,aluout64E,aluout64M);
+	flopr#(32) fp4_4(clk,rst,srcaE,srcaM);
+	flopr#(32) fp4_5(clk,rst,pcbranchE,pcbranchM);
+	flopr#(1) fp4_6(clk,rst,branch_takeE,branch_takeM);
+	flopr#(2) fp4_7(clk,rst,memtoregE,memtoregM);
+	flopr#(1) fp4_8(clk,rst,memwriteE,memwriteM);
+	flopr#(1) fp4_9(clk,rst,regwrite_enE,regwrite_enM);
+	flopr#(8) fp4_10(clk,rst,alucontrolE,alucontrolM);
+	flopr#(1) fp4_11(clk,rst,gprtohiE,gprtohiM);
+	flopr#(1) fp4_12(clk,rst,gprtoloE,gprtoloM);
+	flopr#(32) fp4_13(clk,rst,WriteDataE_modified,writedataM);
+	flopr#(32) fp4_14(clk,rst,pcE,pcM);
 
-		.aluoutE(aluoutE), 
-		.aluoutM(aluoutM),
-		.writeregE(writeregE), 
-		.writeregM(writeregM),
-		.aluout64E(aluout64E), 
-		.aluout64M(aluout64M),
-		.srcaE(srcaE), 
-		.srcaM(srcaM),
-		.pcbranchE(pcbranchE),
-		.pcbranchM(pcbranchM),
-		.branch_takeE(branch_takeE),
-		.branch_takeM(branch_takeM),
-		.memtoregE(memtoregE),
-		.memtoregM(memtoregM),
-		.memwriteE(memwriteE),
-		.memwriteM(memwriteM),
-		.regwrite_enE(regwrite_enE),
-		.regwrite_enM(regwrite_enM),
-		.alucontrolE(alucontrolE),
-		.alucontrolM(alucontrolM),
-		.gprtohiE(gprtohiE),
-		.gprtohiM(gprtohiM),
-		.gprtoloE(gprtoloE),
-		.gprtoloM(gprtoloM),
-		.WriteDataE_modified(WriteDataE_modified),
-		.writedataM(writedataM),
-		.pcE(pcE),
-		.pcM(pcM)
-	);
     
     
 	//mem stage
@@ -361,34 +340,19 @@ module datapath(
 
 
     // MEM_WB flop
-	mem_wb mem_wb0(
-		.clk(clk), 
-		.rst(rst),
-		.aluoutM(aluoutM), 
-		.aluoutW(aluoutW),
-		.readdataM(readdataM), 
-		.readdataW(readdataW),
-		.writeregM(writeregM), 
-		.writeregW(writeregW),
-		.hi_oM(hi_oM), 
-		.hi_oW(hi_oW),
-		.lo_oM(lo_oM), 
-		.lo_oW(lo_oW),
-		.srcaM(srcaM), 
-		.srcaW(srcaW), 
-		.memtoregM(memtoregM),
-		.memtoregW(memtoregW),
-		.regwrite_enM(regwrite_enM),
-		.regwrite_enW(regwrite_enW),
-		.alucontrolM(alucontrolM),
-		.alucontrolW(alucontrolW),
-		.gprtohiM(gprtohiM),
-		.gprtohiW(gprtohiW),
-		.gprtoloM(gprtoloM),
-		.gprtoloW(gprtoloW),
-		.pcM(pcM),
-		.pcW(pcW)
-	);
+	flopr#(32) fp5_1(clk,rst,aluoutM,aluoutW);
+	flopr#(32) fp5_2(clk,rst,readdataM,readdataW);
+	flopr#(5) fp5_3(clk,rst,writeregM,writeregW);
+	flopr#(32) fp5_4(clk,rst,hi_oM,hi_oW);
+	flopr#(32) fp5_5(clk,rst,lo_oM,lo_oW);
+	flopr#(32) fp5_6(clk,rst,srcaM,srcaW);
+	flopr#(2) fp5_7(clk,rst,memtoregM,memtoregW);
+	flopr#(1) fp5_8(clk,rst,regwrite_enM,regwrite_enW);
+	flopr#(8) fp5_9(clk,rst,alucontrolM,alucontrolW);
+	flopr#(1) fp5_10(clk,rst,gprtohiM,gprtohiW);
+	flopr#(1) fp5_11(clk,rst,gprtoloM,gprtoloW);
+	flopr#(32) fp5_12(clk,rst,pcM,pcW);
+
 
 
 	//writeback stage
