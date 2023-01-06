@@ -64,14 +64,14 @@ module datapath(
 	wire [31:0] instrD;
 	wire forwardaD,forwardbD;
 	wire [5:0] opD,functD;
-	wire [4:0] rsD,rtD,rdD;
+	wire [4:0] rsD,rtD,rdD,saD;
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	//execute stage
 	wire stall_divE;
 	wire [7:0] alucontrolE;
 	wire [1:0] forwardaE,forwardbE;
-	wire [4:0] rsE,rtE,rdE;
+	wire [4:0] rsE,rtE,rdE,saE;
 	wire [4:0] writeregE;
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E,srcaM,srcaW;
@@ -234,6 +234,7 @@ module datapath(
 	assign rtD = instrD[20:16];
 	assign rdD = instrD[15:11];
 	assign functD = instrD[5:0];
+	assign saD = instrD[10:6];
 	
 	//jump
     wire jr, j;
@@ -269,6 +270,7 @@ module datapath(
 	flopenrc #(5)  	fp3_9(clk, rst, ~stallE, flushE, rsD, rsE);
 	flopenrc #(5)  	fp3_10(clk, rst, ~stallE, flushE, rtD, rtE);
 	flopenrc #(5)  	fp3_11(clk, rst, ~stallE, flushE, rdD, rdE);
+	flopenrc #(5)  	fp3_22(clk, rst, ~stallE, flushE, saD, saE);
 	flopenrc #(2)  	fp3_12(clk, rst, ~stallE, flushE, memtoregD, memtoregE);
 	flopenrc #(1)  	fp3_13(clk, rst, ~stallE, flushE, memwriteD, memwriteE);
 	flopenrc #(1)  	fp3_14(clk, rst, ~stallE, flushE, alusrcD, alusrcE);
@@ -292,7 +294,7 @@ module datapath(
 	         .alu_num2(srcb3E),
 	         .alucontrol(alucontrolE),
 			 .hilo(hilo),
-			 .sa(sa),
+			 .sa(saE),
 			 .flushE(flushE),
 	         .alu_out(aluoutE),
 	         .alu_out_64(aluout64E), 
