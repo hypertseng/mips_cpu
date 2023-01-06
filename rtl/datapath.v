@@ -314,20 +314,20 @@ module datapath(
     
     
     //EX_MEM flop
-	flopr#(32) fp4_1(clk,rst,aluoutE,aluoutM);
-	flopr#(5) fp4_2(clk,rst,writeregE,writeregM);
-	flopr#(64) fp4_3(clk,rst,aluout64E,aluout64M);
-	flopr#(32) fp4_4(clk,rst,srcaE,srcaM);
-	flopr#(32) fp4_5(clk,rst,pcbranchE,pcbranchM);
-	flopr#(1) fp4_6(clk,rst,branch_takeE,branch_takeM);
-	flopr#(2) fp4_7(clk,rst,memtoregE,memtoregM);
-	flopr#(1) fp4_8(clk,rst,memwriteE,memwriteM);
-	flopr#(1) fp4_9(clk,rst,regwrite_enE,regwrite_enM);
-	flopr#(8) fp4_10(clk,rst,alucontrolE,alucontrolM);
-	flopr#(1) fp4_11(clk,rst,gprtohiE,gprtohiM);
-	flopr#(1) fp4_12(clk,rst,gprtoloE,gprtoloM);
-	flopr#(32) fp4_13(clk,rst,WriteDataE_modified,writedataM);
-	flopr#(32) fp4_14(clk,rst,pcE,pcM);
+	flopr#(32) 	fp4_1(clk,rst,aluoutE,aluoutM);
+	flopr#(5) 	fp4_2(clk,rst,writeregE,writeregM);
+	flopr#(64) 	fp4_3(clk,rst,aluout64E,aluout64M);
+	flopr#(32) 	fp4_4(clk,rst,srcaE,srcaM);
+	flopr#(32) 	fp4_5(clk,rst,pcbranchE,pcbranchM);
+	flopr#(1) 	fp4_6(clk,rst,branch_takeE,branch_takeM);
+	flopr#(2) 	fp4_7(clk,rst,memtoregE,memtoregM);
+	flopr#(1) 	fp4_8(clk,rst,memwriteE,memwriteM);
+	flopr#(1) 	fp4_9(clk,rst,regwrite_enE,regwrite_enM);
+	flopr#(8) 	fp4_10(clk,rst,alucontrolE,alucontrolM);
+	flopr#(1) 	fp4_11(clk,rst,gprtohiE,gprtohiM);
+	flopr#(1) 	fp4_12(clk,rst,gprtoloE,gprtoloM);
+	flopr#(32) 	fp4_13(clk,rst,WriteDataE_modified,writedataM);
+	flopr#(32) 	fp4_14(clk,rst,pcE,pcM);
 
     
     
