@@ -24,7 +24,9 @@ module mem_wb (
 	input wire gprtoloM,
     output reg gprtoloW,
     input wire [31:0] pcM,
-	output reg [31:0] pcW
+	output reg [31:0] pcW,
+	input wire [31:0] resultM,
+	output reg [31:0] resultW
     );
 		always @(posedge clk,posedge rst) begin
 		if(rst) begin
@@ -40,6 +42,7 @@ module mem_wb (
 			gprtohiW <= 0;
 			gprtoloW <= 0;
 			pcW <= 0;
+			resultW <= 0;
 			
 		end else begin
 			aluoutW <= aluoutM;
@@ -54,6 +57,7 @@ module mem_wb (
 			gprtohiW <= gprtohiM;
 			gprtoloW <= gprtoloM;
 			pcW <= pcM;
+			resultW <= resultM;
 		end
 	end
 endmodule
