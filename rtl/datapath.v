@@ -28,6 +28,11 @@ module datapath(
 	output wire[3:0] sig_write,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
+
+    output wire longest_stall, // 全局stall指令
+    input wire i_stall,       // 两个访存 stall信号
+    input wire d_stall,
+
 	output wire [31:0]  debug_wb_pc,      
     output wire [3:0]   debug_wb_rf_wen,
     output wire [4:0]   debug_wb_rf_wnum, 
@@ -35,46 +40,38 @@ module datapath(
     );
 	
 
-//éćĺé¸ćŽĺ´ŻĺŽ?ĺŤçźéšçť˘ĺ°éîŚćéĄď˝ĺ°¨é¸çˇçéŠĺĺšéĄć°­ćŤéćĺé¸ćŽĺ´ŻĺŽ?ĺŤçźéšçť˘ĺ°éîŚćéĄď˝ĺ°¨é¸çˇçéŠĺĺšéĄć°­ćŤéćĺé¸ćŽĺ´ŻĺŽ?ĺŤçźéšçť˘ĺ°éîŚćéĄď˝ĺ°¨é¸çˇçĺŽăŠĺ´źĺŠľĺŠçŻéĺčžçťçŽntrolleréäžĺéĺ˛ĺ´šć´ăŚĺé¸ć¨ĺçť ĺ§ç´éŻŃć°¨é¸çˇçéŠĺĺšéĄć°­ćŤéćĺé¸ćŽĺ´ŻĺŽ?ĺŤçźéšçť˘ĺ°éîŚćéĄď˝ĺ°¨é¸çˇçéŠĺĺšéĄć°­ćŤéćĺé¸ćŽĺ´ŻĺŽ?ĺŤçźéšçť˘ĺ°éîŚćéĄď˝ĺ°¨é¸çˇçéŠĺĺšéĄć°­ćŤéćĺé¸ćŽĺ´ŻĺŽ?ĺŹć¸éżďż˝?????
 
 	//decode stage
-	wire [1:0] memtoregD;
-	wire memwriteD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD;
+	wire memwriteD,regdstD,alusrcD,regwrite_enD,gprtohiD,gprtoloD;
 	//execute stage
 	wire memwriteE,gprtohiE,gprtoloE;
 	wire gprtohiM,gprtoloM;
 	wire gprtohiW,gprtoloW;
-//éä˝šĺéĺ´ĺ´šéççŽé¸î ĺąéĺĽ¸ćç?ć¨ťçĽéşĺŤĺľéĺśîéĺŻäşśéĺĽĺéćťĺ´şéĄćśçŽŁéşĺĺŻ§ĺ¨ĺżć˘şé°ä˝¸äşé¸ă§ĺĺŽîĺ´źéă§ĺśéç°ç¨éăŠĺź˛éâçć¤¤ćśçľ˝éĺśćééŁĺ˘Śé¸âćŁéŞĺŹŽĺźŹé¸ĺş˘çĄéä˝šĺéĺ´ĺ´šéççŽé¸î ĺąéĺĽ¸ćç?ć¨ťçĽéşĺŤĺľéĺśîéĺŻäşśéĺĽĺéćťĺ´şéĄćśçŽŁéşĺĺŻ§ĺ¨ĺżć˘şé°ä˝¸äşé¸ă§ĺĺŽîĺ´źéă§ĺśéç°ç¨éăŠĺź˛éâçć¤¤ćśçľ˝éĺśćééŁĺ˘Śé¸âćŁéŞĺŹŽĺźŹé¸ĺş˘çĄéä˝šĺéĺ´ĺ´šéççŽé¸î ĺąéĺĽ¸ćç?ć¨ťçĽéşĺŤĺľéĺśîéĺŻäşśéĺĽĺéćťĺ´şéĄćśçŽŁéşĺĺŻ§ĺ¨ĺżć˘şé°ä˝¸äşé¸ă§ĺĺŽîĺ´źéă§ĺśéç°ç¨éăŠĺź˛éâçć¤¤ćśçľ˝éĺśćééŁĺ˘Śé¸âćŁéŞĺŹŽĺźŹé¸ĺş˘çĄéä˝šĺéĺ´ĺ´šéççŽé¸î ĺąéĺĽ¸ćç?ć¨ťçĽéşĺŤĺľéĺśîéĺŻäşśéĺĽĺéćťĺ´şéĄćśçŽŁéşĺĺŻ§ĺ¨ĺżć˘şé°ä˝¸äşé¸ă§ĺĺŽîĺ´źéď¸˝ćŤ˘éďż??????
 
-	// éä˝¸ćĄéšéšĺźľéĄĺľćéťćŹćŤĺŚŤćŠćĄćžśĺŹľĺĽéşĺ¤î§ééťćŹćéŽĺĽ¸ć¨????
 	wire regdstE,alusrcE,pcsrcD;
-	wire [1:0] memtoregE,memtoregM,memtoregW;
+	wire [1:0] memtoregD,memtoregE,memtoregM,memtoregW;
 //	wire [1:0] pcsrcD;
 	wire [63:0] hilo;
  	//FD
-	wire [31:0] pcplus4F;
-	wire [31:0] pcnextbrFD,pcbranchD;
+	wire [31:0] pcD,pcE,pcM,pcW,pcplus4F,pcplus4D,pcplus4E,pcnextbrFD,pcbranchD,pcbranchE,pcbranchM,pcnextFD,pcjumpD;
 	wire pc_ce_reg;
+	wire jump_conflictD;
 	//decode stage
 	wire jumpD,jumprD;
 	wire [7:0] alucontrolD;
 
     wire [7:0] branch_judge_controlD;
 	wire [31:0] instrD;
-	wire [31:0] pcnextFD,pcplus4D,pcjumpD;
 	wire forwardaD,forwardbD;
 	wire [5:0] opD,functD;
-	wire [4:0] rsD,rtD,rdD;
+	wire [4:0] rsD,rtD,rdD,saD;
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
-	wire [31:0] pcD;
 	//execute stage
 	wire stall_divE;
 	wire [7:0] alucontrolE;
-	wire [31:0] pcplus4E;
-	wire [31:0] pcbranchE;
 	wire [1:0] forwardaE,forwardbE;
-	wire [4:0] rsE,rtE,rdE;
+	wire [4:0] rsE,rtE,rdE,saE;
 	wire [4:0] writeregE;
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E,srcaM,srcaW;
@@ -83,53 +80,46 @@ module datapath(
 	wire [63:0] aluout64E;
 	wire [7:0] branch_judge_controlE;
 	wire [31:0] WriteDataE_modified;
-	wire [31:0] pcE;
-	wire regwriteE;
+	wire regwrite_enE;
 	//mem stage
 	wire [4:0] writeregM;
 	wire [31:0] hi_oM,lo_oM;
 	wire [63:0] aluout64M;
-	wire [31:0] pcM;
-	wire [31:0] pcbranchM;
 	wire [7:0] alucontrolM;
-	wire regwriteM;
+	wire regwrite_enM;
 	//writeback stage
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW,hi_oW,lo_oW;
 	wire [31:0] readdataW_modified;
-    wire [31:0] pcW;
     wire [7:0] alucontrolW;
-    wire regwriteW;
+    wire regwrite_enW;
 	
 	//hazard	
     wire stallF, stallD, stallE, stallW;
     wire flushF, flushD, flushE, flushW;
     
     //predict
-//    wire predictF,predictD, predictE, predict_wrong,predict_wrongM;
     wire branch_takeM, branch_takeE;
-//    // assign predictD = 1'b1;
-//    // assign predictD = 1'b0;
 //     assign predict_wrong = (zeroE != predictE);
-
-
+	wire branchD,branchE, predictD, predictE,predict_wrong;
+	wire [31:0] pc_temp1, pc_temp2, pc_temp3, pc_temp4;
 	// decoder
 	maindec md(
 		opD,rsD,rtD,functD,
-		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwriteD,gprtohiD,gprtoloD,jumpD,jumprD
+		memtoregD,memwriteD,branchD,alusrcD,regdstD,regwrite_enD,gprtohiD,gprtoloD,jumpD,jumprD
 		);
 	aludec alu_decoder0(
 		opD,rsD,rtD,functD,
 		alucontrolD,branch_judge_controlD
     );
     
-//    //éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż??éďż˝?ĺ§îç§şç?šćç˛éĄĺźĺžçŁîŁîéä˝¸ćŤéĺ ĺ´éîć¸???(bypass)
+//    
 //    mux4 #(32) mux4_forward_aE(
 //        rd1E,                       
 //        resultM_without_rdata,
 //        resultW,
-//        pc_plus4D,                          // éä˝¸ćšąéć˝ĺ´śéď¸˝îéä˝¸ćŤéĺ ĺ´éďż??ĺ§éłĺalréĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îç´çć§ç¤léä˝¸ćšąćŞćżĺˇŽĺĺŻŽîŚĺšéäžâéťĺşŻçľ˝ćž§ĺş¨çŽéăçéšéŚĺžéłĺŹćĄćľŁč§ĺ°ľéšéŁĺ¨éĄ˘ć˘ĺ§?ééĺ¸?$raéĺćľĺ¨ć˘ĺ´°ĺŽĽĺ¤ĺéźćˇŹĺşçźĺŹćŁé°éĺ˘Žć¤¤ĺżçźĺ§čšćéăŚçžéĺîéĄ­ç˝çŽčšćśĺ?ťéźćĺ˛ĺ¨ă¤ć˘şéĺŤâŹĺ ĺ´éďż˝?ĺ§îç§şéşĺąťĺéŽă¤ĺ´¨ćż ĺŞç´éä˝¸çśéĄĽćťĺ´ĺ§âŹĺŻŽîŚĺšçčŹîéĺĺŻéćĽç˛éŤćçĺŚĺŹŞéŞ¸éćŽćĄćľŁč§ĺ´çľîĺćżĄĺ ĺ´ąĺŚ¤ĺŠç´Śéĺîąéć°ĺ´ĺ§ďż??é¨î˘ĺşéşĺąťĺéŽă¤ĺ´¨ćż ĺŞç´éä˝¸çśéĄĽćťĺ´ĺ§âŹĺŻŽîŚĺšçčŹîééî˝é¨ç¸îĺ¨˛îçéťćŁĺ§¤éčž¨äżéŻîĺŤŽéšĺśććżçŹćŤéşĺŽćéŽčˇşâĺ¨ć¨ťçĺŠľçľĺ§éĄ­ç˝çŽčšćśĺ?ťéźćĺ˛ĺ¨ă¤ć˘şéĺŤâŹĺ ĺ´éďż˝?ĺ§îç§şéşĺąťĺéŽă¤ĺ´¨ćż ĺŞç´éä˝¸ćšąéĺ¤ă?éŚî ĺéšçť˘ĺéăŠćŁéćĺéťĺżŁĺŁéçźćéşăŚć éťĺşĄçĺŽćĺźťéâĺé¸ćśďšŚćľźĺŻć˘şéŚîĺ´ć¤¤ăŚćťéĺ ĺ´źéçşĺéçťć˘šĺŚĺĺźŤć´ăŚçéšĺ­ç??éďż˝?ĺ§îç§şéşĺąťĺéŽă¤ćšéŞĺŽäťC+8éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłç˘éćć?????? //éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéď˝ĺŚ¸éď¸ťćŁĄéĺĽĺéĄ­ç˝çŽčšćśĺŞć¤¤ć ¨ç˛éĄŤĺść˘ťćľŁčĽçĄśé¸çłĺéîžâŹćśÉćľăćŁéâŹĺŚĺĺ´ľç?Łî˝çéťćŁĺ§¤ééćé¨î˘ĺşéşĺąťĺéŽă¤ćšçĺŹĺĺŠľç´ĺśé¸ĺĽç˛č¤°ććéšć§ĺ˘çşžĺĽ¸ćéšćľĺćżčŠîlushéĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż??éďż˝?ĺ§éłĺ§lush_4Déĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż??éîć????
-//        {2{jumpE | branchE}} | forward_aE,  // éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îç´çčäş¤eéĺćľĺ¨ć˘ĺ´°éîŹç¸ćéć¨şîéťç¸çĽçîîéŤćâé ćĺéćŚćĄçŁîçźćĽ ç˛çšçťŽć°śĺšéŽäťć˘ťćľŁčĽçĄśé¸çłĺĺŻŽĺçšĺ§îîéçťĺźćżŽăĺź˛éźä˝šçé¸ĺąžĂ??éďż˝?ĺ§éłĺalréä˝¸ćšąćŞćżĺˇŽĺĺŻŽîŚĺšéäžâéťĺşŻçľ˝ćž§ĺşŁç˛ćžść­âé ćĺéćŚćĄçŁîçźćĽ ç˛çšéŽćťćéď¸˝îéä˝¸ćŤéĺ ĺ´éďż˝?ĺ§éłĺxxzaléä˝¸ćŤéîŚćĽćżç¨żćéšćî§ĺŚŤćŠćéŤćżîć¤¤ĺżîumpE | branchE== 1éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćé´ćŹâŹć ŤâŹďż???éä˝˝ćłé ĺśĺĺ¨ćłćéšćî§ĺŚŤćŠćéŤćżîć¤¤ĺżîc_plus4Déĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłç˘éćć??????
+//        pc_plus4D,                          
+//        {2{jumpE | branchE}} | forward_aE,  
 
 //        src_aE
 //    );
@@ -137,14 +127,14 @@ module datapath(
 //        rd2E,                               //
 //        resultM_without_rdata,                            //
 //        resultW,                            // 
-//        immE,                               //éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż??éďż˝?ĺ§îç§şéşĺąťĺéŽă¤ĺ´¨ćż ĺŞç´éä˝˝ćłéŁďšĺš??
-//        {2{alu_imm_selE}} | forward_bE,     //main_decoderéĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż??éďż˝?ĺ§éłĺlu_imm_selEéĺćľĺ¨ć˘ĺ´°éă ç¤ĺŠľĺÇšé­ćĽćé´ćŹâŹćĽç˛éŤćçĺŚĺŹŞéŞ¸éćŽćĄćľŁč§ĺ´ç?ľîĺćżĄĺ ĺ´ąĺŚ¤ĺŠç´Śéďż?????çźäžç´éĄĽć˛éĺćľĺ¨ć˘ĺ´°éçśçšć¤¤ćśĺ§ľćżŻĺĽ¸ćˇĺ¨ĺżîŠć¤¤ĺżçźĺ§čšćéăŚç?žéĺîéĄ­ç˝çŽčšćśĺ?ťéźćĺ˛ĺ¨ă¤ć˘şéĺŤâŹĺ ĺ´éďż˝?ĺ§îç§şéşĺąťĺéŽă¤ĺ´¨ćż ĺŞç´éä˝¸çśéĄĽćťĺ´ĺ§âŹĺŻŽîŚĺšçĺîééçĺŚŤćĽîçşčĄĄć§éšć§ç¨éćżćĄćľŁč§ĺ´çľîĺćżĄĺ ĺ´ąĺŚ¤ĺŠç´Śéĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż˝?éîć????
+//        immE,                               
+//        {2{alu_imm_selE}} | forward_bE,     
 
 //        src_bE
 //    );
     
-//    mux4 #(32) mux4_rs_valueE(rd1E, resultM_without_rdata, resultW, 32'b0, forward_aE, rs_valueE); //éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż??éďż˝?ĺ§îç§şç?šćç˛éĄĺźĺžçŁîŁîéä˝şç˛ŻéčžŠć§éçąçéľĺ¨žćçť îćŁé´ď˝Đéşĺ­ćçťąćć č¤éĄĺş¨ć˘ťćľŁčĽçĄśé¸ç˛ç§šéłçłćéďźç§śéçťĺŚéćŹîéŤćâé ćĺéćŚćĄç?ŁîçźćĽ ç˛çšéŽćťćéď¸˝îéä˝¸ćŤéĺ ĺ´éďż˝?ĺ§îç§şéşä˝šćéďż˝????
-//    mux4 #(32) mux4_rt_valueE(rd2E, resultM_without_rdata, resultW, 32'b0, forward_bE, rt_valueE); //éĺćľĺ¨ć˘ĺ´°é°ćżĺ ĺŠľçłčžçť îćŁé´ď˝ĐéşĺŽćéďż ĺ´ĺŚŻďż??éďż˝?ĺ§îç§şç?šćç˛éĄĺźĺžçŁîŁîéä˝şç˛ŻéčžŠć§éçąçéľĺ¨žćçť îćŁé´ď˝Đéşĺ­ćçťąćć č¤éĄć°ć˘ťćľŁčĽçĄśé¸ç˛ç§šéłçłćéďźç§śéçťĺŚéćŹîéŤćâé ćĺéćŚćĄç?ŁîçźćĽ ç˛çšéŽćťćéď¸˝îéä˝¸ćŤéĺ ĺ´éďż˝?ĺ§îç§şéşä˝šćéďż˝????
+//    mux4 #(32) mux4_rs_valueE(rd1E, resultM_without_rdata, resultW, 32'b0, forward_aE, rs_valueE); 
+//    mux4 #(32) mux4_rt_valueE(rd2E, resultM_without_rdata, resultW, 32'b0, forward_bE, rt_valueE); 
 
 
 	//hazard detection
@@ -154,7 +144,7 @@ module datapath(
 		.flushF(flushF),
 		//decode stage
 		.rsD(rsD),.rtD(rtD),
-		.branchD(branchD),
+		.branchD(branchD),.jumprD(jumprD),
 		.forwardaD(forwardaD),.forwardbD(forwardbD),
 		.stallD(stallD),
 		.flushD(flushD),
@@ -162,24 +152,26 @@ module datapath(
 		.stall_divE(stall_divE),
 		.rsE(rsE),.rtE(rtE),
 		.writeregE(writeregE),
-		.regwriteE(regwriteE),
+		.regwrite_enE(regwrite_enE),
 		.memtoregE(memtoregE),
 		.forwardaE(forwardaE),.forwardbE(forwardbE),
 		.flushE(flushE),.stallE(stallE),
 		//mem stage
 		.writeregM(writeregM),
-		.regwriteM(regwriteM),
+		.regwrite_enM(regwrite_enM),
 		.memtoregM(memtoregM),
 		//write back stage
 		.writeregW(writeregW),
-		.regwriteW(regwriteW)
+		.regwrite_enW(regwrite_enW),
+
+     	.i_stall(i_stall),       // 两个访存 stall信号
+ 		.d_stall(d_stall),
+		.longest_stall(longest_stall) // 全局stall指令
 		);
 
 
 
 	//next PC logic (operates in fetch an decode)
-//	wire [31:0] pc_next_tmp;
-//    mux4 #(32) mux4_pc(pcplus4F, pcbranchD, pcbranchM, pcplus4E, pc_sel, pc_next_tmp); 
 //    // pc_jumpD <- jumpD & ~jump_conflictD
 
                         
@@ -193,13 +185,21 @@ module datapath(
 	assign pcsrcD = {jumpD,branchD & (srca2D == srcb2D)};
 	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
 	// you can't delete the next code
-	mux2 #(32) pcmux(pcnextbrFD,pcjumpD,jumpD,pcnextFD);
-	// mux2 #(32) pcmux(pcnextbrFD,{pcplus4D[31:28], instrD[25:0], 2'b00},jumpD,pcnextFD);
+	// mux2 #(32) pcmux(pcnextbrFD,pcjumpD,jumpD,pcnextFD);
 
-		
+		// flopr 1
+    mux2 #(32) before_pc_which_wrong(pcbranchE,pcplus4E+4, predictE, pc_temp1);
+    // mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & predictD, pc_temp2);
+    mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD , pc_temp2);
+    mux2 #(32) before_pc_predict(pc_temp2,pc_temp1,predict_wrong & branchE, pc_temp3);
+    mux2 #(32) before_pc_jump(pc_temp3,{pcplus4D[31:28],instrD[25:0],2'b00},jumpD, pc_temp4);
+    mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   // TODO 注意这里可能有数据冒险 eq1是数据前推
+    // mux2 #(32) before_pc_jumpr(pc_temp4,eq1,jumprD, pc_temp5);   // TODO 注意这里可能有数据冒险 eq1是数据前推
+	// mux2 #(32) before_pc_exception(pc_temp5,pcexceptionM,exceptionoccur, pc_in);
+	
 
 	//regfile (operates in decode and writeback)
-	// regfile rf(clk,regwriteW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
+	// regfile rf(clk,regwrite_enW,rsD,rtD,writeregW,resultW,srcaD,srcbD);
 	regfile regfile0(
 	.clk(clk),
 	.we3(regwrite_enW),
@@ -217,29 +217,12 @@ module datapath(
 	adder pcadd1(pcF,32'b100,pcplus4F);
 	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
-//IF_ID flop
-    if_id if_id0(
-        .clk(clk),
-        .rst(rst),
-        .stallD(stallD),
-        .flushD(flushD),
-        .pcF(pcF),
-        .pc_plus4F(pcplus4F),
-        .instrF(instrF),
-        .intD(intD),
-        .pcD(pcD),
-        .pc_plus4D(pcplus4D),
-        .instrD(instrD)
-    );
+	//IF_ID flop
+	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
+	flopenrc #(32) r2D(clk,rst,~stallD,flushD,instrF,instrD);
+	flopenrc #(32) r3D(clk,rst,~stallD,flushD,pcF,pcD);
 
-
-
-	//decode stage
-	// ČôÇ°ŇťĚőÎŞbranchÇŇÔ¤˛â´íÎóŁŹÔňĐčŇŞflushD
-    // ČôľąÇ°Ô¤˛âŇŞĚř, ÔňflushD
-    // assign flushD = (branchE & predict_wrong);// | (predictD & branchD);
-    // TODO: ČôÓĐŃÓłŮ˛ŰŁŹÔňŐâŔď˛ťÄÜflush
-
+	// decode stage 
 	signext se(instrD[15:0],signimmD);
 	sl2 immsh(signimmD,signimmshD);
 	adder pcadd2(pcplus4D,signimmshD,pcbranchD);
@@ -251,6 +234,7 @@ module datapath(
 	assign rtD = instrD[20:16];
 	assign rdD = instrD[15:11];
 	assign functD = instrD[5:0];
+	assign saD = instrD[10:6];
 	
 	//jump
     wire jr, j;
@@ -259,8 +243,8 @@ module datapath(
     assign jumpD = jr | j;
 
     assign jump_conflictD = jr &&
-                            ((regwriteE && rsD == writeregE) ||          
-                            (regwriteM && rsD == writeregM));
+                            ((regwrite_enE && rsD == writeregE) ||          
+                            (regwrite_enM && rsD == writeregM));
     
     wire [31:0] pcjumpimmD;
     assign pcjumpimmD = {pcplus4D[31:28], instrD[25:0], 2'b00};
@@ -268,51 +252,35 @@ module datapath(
     assign pcjumpD = j ?  pcjumpimmD : srcaD;
 	
 	
-	// ID_EX flop
-	id_ex id_ex0(
-        .clk(clk),
-        .rst(rst),
-        .stallE(stallE),
-        .flushE(flushE),
-        .branch_judge_controlD(branch_judge_controlD),
-        .branch_judge_controlE(branch_judge_controlE),
-		.pc_plus4D(pcplus4D),
-		.pc_plus4E(pcplus4E),
-		.jump_conflictD(jump_conflictD),
-		.jump_conflictE(jump_conflictE),
-		.pcbranchD(pcbranchD),
-		.pcbranchE(pcbranchE),
-		.srcaD(srcaD), 
-		.srcaE(srcaE),
-        .srcbD(srcbD), 
-		.srcbE(srcbE),
-		.signimmD(signimmD), 
-		.signimmE(signimmE),
-		.rsD(rsD), 
-		.rsE(rsE),
-		.rtD(rtD), 
-		.rtE(rtE),
-		.rdD(rdD), 
-		.rdE(rdE),
-		.memtoregD(memtoregD),
-		.memtoregE(memtoregE),
-		.memwriteD(memwriteD),
-		.memwriteE(memwriteE),
-		.alusrcD(alusrcD),
-		.alusrcE(alusrcE),
-		.regdstD(regdstD),
-		.regdstE(regdstE),
-		.regwriteD(regwriteD),
-		.regwriteE(regwriteE),
-		.alucontrolD(alucontrolD),
-		.alucontrolE(alucontrolE),
-		.gprtohiD(gprtohiD),
-		.gprtohiE(gprtohiE),
-		.gprtoloD(gprtoloD),
-		.gprtoloE(gprtoloE),
-		.pcD(pcD),
-		.pcE(pcE)
-		);
+	//execute stage
+	//mux write reg
+    // mux4 #(5) mux4_reg_dst(rdE, rtE, 5'b11111, 5'b0, regdstE, writeregE);
+    mux2 #(5) mux2_reg_dst(rdE, rtE, regdstE, writeregE);
+
+
+	// merge flopenrc
+	flopenrc #(1) 	fp3_1(clk, rst, ~stallE, flushE, predictD, predictE);
+	flopenrc #(32)  fp3_2(clk, rst, ~stallE, flushE, pcbranchD, pcbranchE);
+	flopenrc #(8)  	fp3_3(clk, rst, ~stallE, flushE, branch_judge_controlD, branch_judge_controlE);
+	flopenrc #(32)  fp3_4(clk, rst, ~stallE, flushE, pcplus4D, pcplus4E);
+	flopenrc #(1)  	fp3_5(clk, rst, ~stallE, flushE, jump_conflictD, jump_conflictE);
+	flopenrc #(32)  fp3_6(clk, rst, ~stallE, flushE, srcaD, srcaE);
+	flopenrc #(32)  fp3_7(clk, rst, ~stallE, flushE, srcbD, srcbE);
+	flopenrc #(32)  fp3_8(clk, rst, ~stallE, flushE, signimmD, signimmE);
+	flopenrc #(5)  	fp3_9(clk, rst, ~stallE, flushE, rsD, rsE);
+	flopenrc #(5)  	fp3_10(clk, rst, ~stallE, flushE, rtD, rtE);
+	flopenrc #(5)  	fp3_11(clk, rst, ~stallE, flushE, rdD, rdE);
+	flopenrc #(5)  	fp3_22(clk, rst, ~stallE, flushE, saD, saE);
+	flopenrc #(2)  	fp3_12(clk, rst, ~stallE, flushE, memtoregD, memtoregE);
+	flopenrc #(1)  	fp3_13(clk, rst, ~stallE, flushE, memwriteD, memwriteE);
+	flopenrc #(1)  	fp3_14(clk, rst, ~stallE, flushE, alusrcD, alusrcE);
+	flopenrc #(1)  	fp3_15(clk, rst, ~stallE, flushE, regdstD, regdstE);
+	flopenrc #(1)  	fp3_16(clk, rst, ~stallE, flushE, regwrite_enD, regwrite_enE);
+	flopenrc #(8)  	fp3_17(clk, rst, ~stallE, flushE, alucontrolD, alucontrolE);
+	flopenrc #(1)  	fp3_18(clk, rst, ~stallE, flushE, gprtohiD, gprtohiE);
+	flopenrc #(1)  	fp3_19(clk, rst, ~stallE, flushE, gprtoloD, gprtoloE);
+	flopenrc #(32)  fp3_20(clk, rst, ~stallE, flushE, pcD, pcE);
+	flopenrc #(1)  	fp3_21(clk, rst, ~stallE, flushE, branchD, branchE);
 	
 	//execute stage
 	//mux write reg
@@ -326,7 +294,7 @@ module datapath(
 	         .alu_num2(srcb3E),
 	         .alucontrol(alucontrolE),
 			 .hilo(hilo),
-			 .sa(sa),
+			 .sa(saE),
 			 .flushE(flushE),
 	         .alu_out(aluoutE),
 	         .alu_out_64(aluout64E), 
@@ -365,15 +333,13 @@ module datapath(
     
     
 	//mem stage
-	// ĺŠľçŤćéîç˛śćż ćŽżĺéçźĺšéĺŤĺŤç?šĺ˛ĺč˘Šéä˝˝ćłéŁďšĺš??
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
 							.sig_write(sig_write),
 							.WriteDataE_modified(WriteDataE_modified)
 	);
-	//éç¨żçšéćŚĺźŤéžčŻ˛ćŁéľĺ ćŁéĄĺ ć˘şçşăĽćéşĺŹŞîˇéŞĺżç˛ĺŠçŠll
-    assign resultM = aluoutM;
+
 
     // MEM_WB flop
 	flopr#(32) fp5_1(clk,rst,aluoutM,aluoutW);
@@ -392,7 +358,6 @@ module datapath(
 
 
 	//writeback stage
-	// ĺŠľçŤćéîç˛śćż ćŽżĺéăçˇĺŚŻčĄĄćéŤĺˇçľžč˘Šéä˝˝ćłéŁďšĺš???
  	read_data read_data0(	.alucontrolW(alucontrolW),
 							.readdataW(readdataW),
 							.dataadrW(aluoutW),
@@ -400,7 +365,6 @@ module datapath(
 	);
 
 
-    // meméĺćľĺ¨ć˘ĺ´°éîŹç¸ćçťŻćçéç¨żçšé˝ćťîéşćçŁźćżćç˛ ĺ¨źć°ćĺ§îç§şéşĺąťĺéŽă¤ĺ´¨ćż ĺŞç´éä˝¸çśéĄĽćťĺ´ĺ§âŹĺŻŽîŚĺšçĺîééçĺŚŤćĽîéŤćçéšéŚĺžéłĺŹćĄćľŁč§ĺ´çľîĺćżĄĺ ĺ´ąĺŚ¤ĺŠç´Śhi loéĺćľĺ¨ć˘ĺ´°ĺŽĽĺ¤ĺéźćˇŹĺşçźĺŹćŁé°éĺ˘Žć¤¤ĺżçźĺ§čšćéăŚçžéĺîéĄ­ç˝ĺźŤéžçťć¸????
     hilo_reg hilo_reg(clk,rst,{gprtohiM,gprtoloM},aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
 	assign hilo = {hi_oM, lo_oM};
 
@@ -409,7 +373,7 @@ module datapath(
     
     //DEBUG OUTPUT
     assign debug_wb_pc          = pcW;
-    assign debug_wb_rf_wen      = {4{regwriteW & ~stallW}};
+    assign debug_wb_rf_wen      = {4{regwrite_enW & ~stallW}};
     assign debug_wb_rf_wnum     = writeregW;
     assign debug_wb_rf_wdata    = resultW;
 endmodule

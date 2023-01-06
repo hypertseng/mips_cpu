@@ -34,18 +34,18 @@ module hazard(
 	input wire stall_divE,
 	input wire[4:0] rsE,rtE,
 	input wire[4:0] writeregE,
-	input wire regwriteE,
+	input wire regwrite_enE,
 	input wire[1:0] memtoregE,
 	output wire[1:0] forwardaE,forwardbE,
 	output wire flushE,stallE,
 	//mem stage
 	input wire[4:0] writeregM,
-	input wire regwriteM,
+	input wire regwrite_enM,
 	input wire[1:0] memtoregM,
 
 	//write back stage
 	input wire[4:0] writeregW,
-	input wire regwriteW,
+	input wire regwrite_enW,
 
     input wire i_stall,       // 两个访存 stall信号
     input wire d_stall,
@@ -55,15 +55,15 @@ module hazard(
 	wire lwstall,branchstallD,jrstall;
 
 	//forwarding sources to D stage (branch equality)
-	assign forwardaD = (rsD != 0 & rsD == writeregM & regwriteM);
-	assign forwardbD = (rtD != 0 & rtD == writeregM & regwriteM);
+	assign forwardaD = (rsD != 0 & rsD == writeregM & regwrite_enM);
+	assign forwardbD = (rtD != 0 & rtD == writeregM & regwrite_enM);
 	
 	//forwarding sources to E stage (ALU)
-	assign forwardaE = rsE !=0 && regwriteM && (rsE == writeregM) ? 2'b01 :
-					   rsE !=0 && regwriteW && (rsE == writeregW) ? 2'b10 : 2'b00;
+	assign forwardaE = rsE !=0 && regwrite_enM && (rsE == writeregM) ? 2'b01 :
+					   rsE !=0 && regwrite_enW && (rsE == writeregW) ? 2'b10 : 2'b00;
 					   
-	assign forwardbE = rtE !=0 && regwriteM && (rtE == writeregM) ? 2'b01 :
-					   rtE !=0 && regwriteW && (rtE == writeregW) ? 2'b10 : 2'b00;
+	assign forwardbE = rtE !=0 && regwrite_enM && (rtE == writeregM) ? 2'b01 :
+					   rtE !=0 && regwrite_enW && (rtE == writeregW) ? 2'b10 : 2'b00;
 
 	// stall by div
 	// assign #1 stallD = lwstall | branchstallD | stall_divE;
@@ -94,7 +94,7 @@ module hazard(
   	//stalls
 	assign #1 lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
 	assign #1 branchstallD = branchD &
-				(regwriteE & 
+				(regwrite_enE & 
 				(writeregE == rsD | writeregE == rtD) |
 				memtoregM &
 				(writeregM == rsD | writeregM == rtD));
