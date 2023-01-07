@@ -59,11 +59,11 @@ module hazard(
 	assign forwardbD = (rtD != 0 & rtD == writeregM & regwrite_enM);
 	
 	//forwarding sources to E stage (ALU)
-	assign forwardaE = rsE !=0 && regwrite_enM && (rsE == writeregM) ? 2'b01 :
-					   rsE !=0 && regwrite_enW && (rsE == writeregW) ? 2'b10 : 2'b00;
+	assign forwardaE = rsE !=0 && regwrite_enM && (rsE == writeregM) ? 2'b10 :
+					   rsE !=0 && regwrite_enW && (rsE == writeregW) ? 2'b01 : 2'b00;
 					   
-	assign forwardbE = rtE !=0 && regwrite_enM && (rtE == writeregM) ? 2'b01 :
-					   rtE !=0 && regwrite_enW && (rtE == writeregW) ? 2'b10 : 2'b00;
+	assign forwardbE = rtE !=0 && regwrite_enM && (rtE == writeregM) ? 2'b10 :
+					   rtE !=0 && regwrite_enW && (rtE == writeregW) ? 2'b01 : 2'b00;
 
 	// stall by div
 	// assign #1 stallD = lwstall | branchstallD | stall_divE;
