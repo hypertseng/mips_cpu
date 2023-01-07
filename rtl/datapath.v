@@ -25,7 +25,7 @@ module datapath(
 	output wire[31:0] pcF,
 	input wire[31:0] instrF,
 	output wire memwriteM,
-	output wire[3:0] sig_write,
+	output wire[3:0] sig_writeM,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
 
@@ -68,6 +68,7 @@ module datapath(
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	//execute stage
+	wire[3:0] sig_writeE;
 	wire stall_divE;
 	wire [7:0] alucontrolE;
 	wire [1:0] forwardaE,forwardbE;
@@ -328,6 +329,7 @@ module datapath(
 	flopr#(1) 	fp4_12(clk,rst,gprtoloE,gprtoloM);
 	flopr#(32) 	fp4_13(clk,rst,WriteDataE_modified,writedataM);
 	flopr#(32) 	fp4_14(clk,rst,pcE,pcM);
+	flopr#(4) 	fp4_15(clk,rst,sig_writeE,sig_writeM);
 
     
     
@@ -335,7 +337,7 @@ module datapath(
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
-							.sig_write(sig_write),
+							.sig_writeE(sig_writeE),
 							.WriteDataE_modified(WriteDataE_modified)
 	);
 
