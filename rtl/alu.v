@@ -8,7 +8,7 @@ module alu(
 	input  wire			rst,
 	input  wire [31:0] 	alu_num1,alu_num2,
 	input  wire [7:0] 	alucontrol,
-	input  wire [63:0] 	hilo,
+	input  wire [63:0] 	hilo, 
 	input  wire [4:0] 	sa,
 	input  wire  		flushE, // new add flush [input for div]
     input  wire [31:0]  pcplus4E,
@@ -27,12 +27,12 @@ module alu(
                   (alucontrol == `EXE_BLEZ_OP) ? ((alu_num1[31]==1'b1) || (alu_num1==32'b0)): // <= 0
                   (alucontrol == `EXE_BLTZ_OP) ? (alu_num1[31] == 1'b1):                  // < 0
                   (alucontrol == `EXE_BGEZ_OP) ? (alu_num1[31] == 1'b0):                  // >= 0
-                  // 涓嬮潰涓ゆ潯鏄壒娈婃寚锟??? 鏃犺鏄惁璺宠浆 蹇呴』鍐橤HR[31]
+                  // 下面两条是特殊指�??? 无论是否跳转 必须写GHR[31]
                   (alucontrol == `EXE_BLTZAL_OP) ? (alu_num1[31] == 1'b1):                // < 0
                   (alucontrol == `EXE_BGEZAL_OP) ? (alu_num1[31] == 1'b0):                // >= 0
                   (alu_ans == 32'b0);
 	// overflow check
-    wire overflow_add; // 鐢ㄤ簬锟???娴嬫孩鍑轰綅
+    wire overflow_add; // 用于�???测溢出位
     wire overflow_sub;
     assign overflow_add = ( (alu_ans[31] & (~alu_num1[31] & ~alu_num2[31])) 
                 || (~alu_ans[31] & (alu_num1[31] & alu_num2[31]))) &&(alucontrol == `EXE_ADD_OP || alucontrol == `EXE_ADDI_OP );
@@ -46,7 +46,7 @@ module alu(
     wire div_sign,div_valid;
 	assign div_sign  = (alucontrol == `EXE_DIV_OP);
 	assign div_valid = (alucontrol == `EXE_DIV_OP) || (alucontrol == `EXE_DIVU_OP);
-	div div(clk,rst,flushE,alu_num1,alu_num2,div_valid,div_sign,stall_div,div_result);
+	div div(~clk,rst,flushE,alu_num1,alu_num2,div_valid,div_sign,stall_div,div_result);
 
 	always @(*) begin
 		case(alucontrol)
@@ -55,7 +55,7 @@ module alu(
 			`EXE_OR_OP	:	alu_ans <= alu_num1 | alu_num2;
 			`EXE_XOR_OP	:	alu_ans <= alu_num1 ^ alu_num2;
 			`EXE_NOR_OP	:	alu_ans <= ~(alu_num1 | alu_num2);
-			// 閫昏緫绔嬪嵆鏁拌繍锟?????
+			// 逻辑立即数运�?????
 			`EXE_ANDI_OP:	alu_ans <= alu_num1 & {{16{1'b0}}, alu_num2[15:0]};
 			`EXE_ORI_OP:	alu_ans <= alu_num1 | {{16{1'b0}}, alu_num2[15:0]};
 			`EXE_XORI_OP:	alu_ans <= alu_num1 ^ {{16{1'b0}}, alu_num2[15:0]};
@@ -68,11 +68,11 @@ module alu(
 			`EXE_SRLV_OP: 	alu_ans <= alu_num2 >> alu_num1[4:0];
 			`EXE_SRAV_OP: 	alu_ans <= $signed(alu_num2) >>> alu_num1[4:0];
 			
-			// 鏁版嵁绉诲姩鎸囦护
-			`EXE_MFHI_OP:	alu_ans <= hilo[63:32];
-			`EXE_MFLO_OP:	alu_ans <= hilo[31:0];
-			`EXE_MTHI_OP:	alu_out_64 <= {alu_num1,alu_num1};
-			`EXE_MTLO_OP:	alu_out_64 <= {alu_num1,alu_num1};
+			// 数据移动指令
+			`EXE_MFHI_OP:	alu_ans    <= hilo[63:32];
+			`EXE_MFLO_OP:	alu_ans    <= hilo[31:0];
+			`EXE_MTHI_OP:	alu_out_64 <= {alu_num1, hilo[31:0]};
+			`EXE_MTLO_OP:	alu_out_64 <= {hilo[63:32],alu_num1};
 
 			// 绠楁湳杩愮畻鎸囦护
 			`EXE_ADD_OP:	alu_ans <= alu_num1 + alu_num2;

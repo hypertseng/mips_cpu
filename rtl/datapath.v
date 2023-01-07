@@ -25,7 +25,7 @@ module datapath(
 	output wire[31:0] pcF,
 	input wire[31:0] instrF,
 	output wire memwriteM,
-	output wire[3:0] sig_write,
+	output wire[3:0] sig_writeM,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
 
@@ -53,7 +53,7 @@ module datapath(
 	wire alusrcE,pcsrcD;
 	wire [1:0] memtoregD,memtoregE,memtoregM,memtoregW;
 //	wire [1:0] pcsrcD;
-	wire [63:0] hilo;
+	wire [63:0] hiloM;
  	//FD
 	wire [31:0] pcD,pcE,pcM,pcW,pcplus4F,pcplus4D,pcplus4E,pcnextbrFD,pcbranchD,pcbranchE,pcbranchM,pcnextFD,pcjumpD;
 	wire pc_ce_reg;
@@ -70,6 +70,7 @@ module datapath(
 	wire [31:0] signimmD,signimmshD;
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	//execute stage
+	wire[3:0] sig_writeE;
 	wire stall_divE;
 	wire [7:0] alucontrolE;
 	wire [1:0] forwardaE,forwardbE;
@@ -297,7 +298,7 @@ module datapath(
 			 .alu_num1(srca2E),
 	         .alu_num2(srcb3E),
 	         .alucontrol(alucontrolE),
-			 .hilo(hilo),
+			 .hilo(hiloM),
 			 .sa(saE),
 			 .flushE(flushE),
 			 .pcplus4E(pcplus4E),
@@ -325,20 +326,21 @@ module datapath(
     
     
     //EX_MEM flop
-	flopr#(32) fp4_1(clk,rst,aluoutE,aluoutM);
-	flopr#(5) fp4_2(clk,rst,writeregE,writeregM);
-	flopr#(64) fp4_3(clk,rst,aluout64E,aluout64M);
-	flopr#(32) fp4_4(clk,rst,srcaE,srcaM);
-	flopr#(32) fp4_5(clk,rst,pcbranchE,pcbranchM);
-	flopr#(1) fp4_6(clk,rst,branch_takeE,branch_takeM);
-	flopr#(2) fp4_7(clk,rst,memtoregE,memtoregM);
-	flopr#(1) fp4_8(clk,rst,memwriteE,memwriteM);
-	flopr#(1) fp4_9(clk,rst,regwrite_enE,regwrite_enM);
-	flopr#(8) fp4_10(clk,rst,alucontrolE,alucontrolM);
-	flopr#(1) fp4_11(clk,rst,gprtohiE,gprtohiM);
-	flopr#(1) fp4_12(clk,rst,gprtoloE,gprtoloM);
-	flopr#(32) fp4_13(clk,rst,WriteDataE_modified,writedataM);
-	flopr#(32) fp4_14(clk,rst,pcE,pcM);
+	flopr#(32) 	fp4_1(clk,rst,aluoutE,aluoutM);
+	flopr#(5) 	fp4_2(clk,rst,writeregE,writeregM);
+	flopr#(64) 	fp4_3(clk,rst,aluout64E,aluout64M);
+	flopr#(32) 	fp4_4(clk,rst,srcaE,srcaM);
+	flopr#(32) 	fp4_5(clk,rst,pcbranchE,pcbranchM);
+	flopr#(1) 	fp4_6(clk,rst,branch_takeE,branch_takeM);
+	flopr#(2) 	fp4_7(clk,rst,memtoregE,memtoregM);
+	flopr#(1) 	fp4_8(clk,rst,memwriteE,memwriteM);
+	flopr#(1) 	fp4_9(clk,rst,regwrite_enE,regwrite_enM);
+	flopr#(8) 	fp4_10(clk,rst,alucontrolE,alucontrolM);
+	flopr#(1) 	fp4_11(clk,rst,gprtohiE,gprtohiM);
+	flopr#(1) 	fp4_12(clk,rst,gprtoloE,gprtoloM);
+	flopr#(32) 	fp4_13(clk,rst,WriteDataE_modified,writedataM);
+	flopr#(32) 	fp4_14(clk,rst,pcE,pcM);
+	flopr#(4) 	fp4_15(clk,rst,sig_writeE,sig_writeM);
 
     
     
@@ -346,7 +348,7 @@ module datapath(
 	write_data write_data0(	.alucontrolE(alucontrolE),
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
-							.sig_write(sig_write),
+							.sig_writeE(sig_writeE),
 							.WriteDataE_modified(WriteDataE_modified)
 	);
 
@@ -375,8 +377,8 @@ module datapath(
 	);
 
 
-    hilo_reg hilo_reg(clk,rst,{gprtohiM,gprtoloM},aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
-	assign hilo = {hi_oM, lo_oM};
+    hilo_reg hilo_reg(clk,rst,{gprtohiE,gprtoloE},aluout64E[63:32],aluout64E[31:0],hi_oM,lo_oM);
+	assign hiloM = {hi_oM, lo_oM};
 
 	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
 //	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
