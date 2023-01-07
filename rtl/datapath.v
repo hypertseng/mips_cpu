@@ -380,7 +380,7 @@ module datapath(
     hilo_reg hilo_reg(clk,rst,{gprtohiE,gprtoloE},aluout64E[63:32],aluout64E[31:0],hi_oM,lo_oM);
 	assign hiloM = {hi_oM, lo_oM};
 
-	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
+	mux4 #(32) resmux_new(aluoutW,readdataW_modified,hi_oW,lo_oW,memtoregW,resultW);
 //	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
     
     //DEBUG OUTPUT
