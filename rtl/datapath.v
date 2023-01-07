@@ -28,9 +28,10 @@ module datapath(
 	output wire[3:0] sig_writeM,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
+	output wire sig_enM,
 
-    output wire longest_stall, // 鍏ㄥ眬stall鎸囦�?
-    input wire i_stall,       // 涓や釜璁垮瓨 stall淇�?�彿
+    output wire longest_stall, // 鍏ㄥ眬stall鎸囦�?
+    input wire i_stall,       // 涓や釜璁垮瓨 stall淇�?�彿
     input wire d_stall,
 
 	output wire [31:0]  debug_wb_pc,      
@@ -71,6 +72,7 @@ module datapath(
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	//execute stage
 	wire[3:0] sig_writeE;
+	wire sig_enE;
 	wire stall_divE;
 	wire [7:0] alucontrolE;
 	wire [1:0] forwardaE,forwardbE;
@@ -109,7 +111,7 @@ module datapath(
 	wire branchD,branchE, predictD, predictE,predict_wrong;
 	wire [31:0] pc_temp1, pc_temp2, pc_temp3, pc_temp4;
 
-    // 閽堝al鍨嬫寚浠ょ殑PC�?? 渚嬪jal bltzal�??
+    // 閽堝al鍨嬫寚浠ょ殑PC�?? 渚嬪jal bltzal�??
     wire [4:0] pc_dst_al;
     assign pc_dst_al = 5'b11111;
     wire write_alD,write_alE;
@@ -175,9 +177,9 @@ module datapath(
 		.writeregW(writeregW),
 		.regwrite_enW(regwrite_enW),
 
-     	.i_stall(i_stall),       // 涓や釜璁垮瓨 stall淇�?�彿
+     	.i_stall(i_stall),       // 涓や釜璁垮瓨 stall淇�?�彿
  		.d_stall(d_stall),
-		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�?
+		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�?
 		);
 
 
@@ -204,7 +206,7 @@ module datapath(
     mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD , pc_temp2);
     mux2 #(32) before_pc_predict(pc_temp2,pc_temp1,predict_wrong & branchE, pc_temp3);
     mux2 #(32) before_pc_jump(pc_temp3,{pcplus4D[31:28],instrD[25:0],2'b00},jumpD, pc_temp4);
-    mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   // TODO 娉ㄦ剰杩欓噷鍙兘鏈夋暟鎹啋闄? srca2D鏄暟鎹墠�??
+    mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   // TODO 娉ㄦ剰杩欓噷鍙兘鏈夋暟鎹啋闄? srca2D鏄暟鎹墠�??
 	// mux2 #(32) before_pc_exception(pc_temp5,pcexceptionM,exceptionoccur, pc_in);
 	
 
@@ -281,7 +283,7 @@ module datapath(
 	flopenrc #(1)  	fp3_19(clk, rst, ~stallE, flushE, gprtoloD, gprtoloE);
 	flopenrc #(32)  fp3_20(clk, rst, ~stallE, flushE, pcD, pcE);
 	flopenrc #(1)  	fp3_21(clk, rst, ~stallE, flushE, branchD, branchE);
-	flopenrc #(1)  fp3_23(clk, rst, ~stallE, 1'b0  , write_alD, write_alE); // 涓嶅彈flush褰卞�?
+	flopenrc #(1)  fp3_23(clk, rst, ~stallE, 1'b0  , write_alD, write_alE); // 涓嶅彈flush褰卞�?
 	
 	//execute stage
 	//mux write reg
@@ -317,7 +319,7 @@ module datapath(
     
     //mux write reg
     mux2 #(5) mux_regfile(rdE,rtE,regdstE,writeregE_temp);
-	// 澶勭悊al鍨嬫寚浠ょ殑閫夋�?
+	// 澶勭悊al鍨嬫寚浠ょ殑閫夋嫨
     mux2 #(5) mux_al(writeregE_temp,pc_dst_al,write_alE,writeregE);
     
     
@@ -337,6 +339,7 @@ module datapath(
 	flopr#(32) 	fp4_13(clk,rst,WriteDataE_modified,writedataM);
 	flopr#(32) 	fp4_14(clk,rst,pcE,pcM);
 	flopr#(4) 	fp4_15(clk,rst,sig_writeE,sig_writeM);
+	flopr#(1) 	fp4_16(clk,rst,sig_enE,sig_enM);
 
     
     
@@ -345,7 +348,8 @@ module datapath(
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
 							.sig_writeE(sig_writeE),
-							.WriteDataE_modified(WriteDataE_modified)
+							.WriteDataE_modified(WriteDataE_modified),
+							.sig_enE(sig_enE)
 	);
 
 	mux4 #(32) resmux_new(aluoutM,readdataM,hi_oM,lo_oM,memtoregM,resultM);
