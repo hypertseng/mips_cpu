@@ -51,7 +51,7 @@ module datapath(
 	wire regdstE,alusrcE,pcsrcD;
 	wire [1:0] memtoregD,memtoregE,memtoregM,memtoregW;
 //	wire [1:0] pcsrcD;
-	wire [63:0] hilo;
+	wire [63:0] hiloM;
  	//FD
 	wire [31:0] pcD,pcE,pcM,pcW,pcplus4F,pcplus4D,pcplus4E,pcnextbrFD,pcbranchD,pcbranchE,pcbranchM,pcnextFD,pcjumpD;
 	wire pc_ce_reg;
@@ -292,7 +292,7 @@ module datapath(
 			 .alu_num1(srca2E),
 	         .alu_num2(srcb3E),
 	         .alucontrol(alucontrolE),
-			 .hilo(hilo),
+			 .hilo(hiloM),
 			 .sa(saE),
 			 .flushE(flushE),
 	         .alu_out(aluoutE),
@@ -364,8 +364,8 @@ module datapath(
 	);
 
 
-    hilo_reg hilo_reg(clk,rst,{gprtohiM,gprtoloM},aluout64M[63:32],aluout64M[31:0],hi_oM,lo_oM);
-	assign hilo = {hi_oM, lo_oM};
+    hilo_reg hilo_reg(clk,rst,{gprtohiE,gprtoloE},aluout64E[63:32],aluout64E[31:0],hi_oM,lo_oM);
+	assign hiloM = {hi_oM, lo_oM};
 
 	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
 //	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
