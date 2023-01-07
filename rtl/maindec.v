@@ -29,7 +29,7 @@ module maindec(
 	output wire memwrite,   // en signal
 	output wire branch,     
     output wire alusrc,     // 0 -> reg, 1 -> imm 
-	output wire regdst,     // 0 -> rd, 1 -> rt,  $ra另外实现
+    output wire regdst,   
     output wire regwrite,   // en signal 
 	output wire gprtohi,   //gprtohi GPR->hi
 	output wire gprtolo,   //gprtolo GPR->lo
@@ -40,21 +40,21 @@ module maindec(
     // input wire[4:0] rt,
     // output wire regwrite,regdst,alusrc,branch,
     // output wire memwrite,memtoreg,
-    // output wire al_regdst,
-	 output wire jump,jumpr     // 地址jump和寄存器值jump
-    // output reg invalid, // 保留地址异常
-    // output reg cp0write // 写入cp0
+    output wire write_al,
+	 output wire jump,jumpr     // 閸︽澘娼僯ump閸滃苯鐦庣�涙ê娅掗崐绯簎mp
+    // output reg invalid, // 娣囨繄鏆�閸︽澘娼冨鍌氱埗
+    // output reg cp0write // 閸愭瑥鍙哻p0
     );
 
 	reg [8:0] main_signal;
-    //����hilowrite�ź�
+    //閿熸枻鎷烽敓鏂ゆ嫹hilowrite閿熻剼鐚存嫹
     assign {regwrite,regdst,alusrc,branch,memwrite,memtoreg,gprtohi,gprtolo} = main_signal;
-    // ����jump�ź�
+    // 閿熸枻鎷烽敓鏂ゆ嫹jump閿熻剼鐚存嫹
     assign jump = ((op == `EXE_J) || (op == `EXE_JAL)) ? 1 : 0;
     assign jumpr = ((op == `EXE_NOP) && ((funct == `EXE_JR) || (funct == `EXE_JALR))) ? 1 : 0;
 
-    assign al_regdst = (((op == `EXE_REGIMM_INST) && (rt == `EXE_BLTZAL || rt == `EXE_BGEZAL)) // ����bzalָ��
-                        || (op == `EXE_JAL)) ? 1 : 0;  // jalָ��
+    assign write_al = (((op == `EXE_REGIMM_INST) && (rt == `EXE_BLTZAL || rt == `EXE_BGEZAL)) // 閿熸枻鎷烽敓鏂ゆ嫹bzal鎸囬敓鏂ゆ嫹
+                        || (op == `EXE_JAL)) ? 1 : 0;  // jal鎸囬敓鏂ゆ嫹
     
     
     always @(*) begin
@@ -79,7 +79,7 @@ module maindec(
 
                 // j inst
                 `EXE_JR:  main_signal <= 9'b00000_00_00;
-                `EXE_JALR:main_signal <= 9'b11000_00_00;  // 选择rd作为写寄存器位置
+                `EXE_JALR:main_signal <= 9'b11000_00_00;  // 闁瀚╮d娴ｆ粈璐熼崘娆忕槑鐎涙ê娅掓担宥囩枂
 
                 default:begin
                     main_signal <= 9'b00000_00_00;
@@ -116,14 +116,14 @@ module maindec(
             `EXE_SH : main_signal <= 9'b00101_01_00;  
             `EXE_SW : main_signal <= 9'b00101_01_00;  // lab4 sw
 
-            // 特权指令
+            // 閻楄娼堥幐鍥︽姢
             6'b010000 : case(rs)
                 5'b00100:begin  // mtc0
                     // cp0write = 1;
                     main_signal <= 9'b00000_00_00;
                 end 
                 5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
-                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 参�?�代码中regwrite�????1，这里不�????1
+                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 閸欏偊鎷�?閿熸垝鍞惍浣疯厬regwrite閿燂拷????1閿涘矁绻栭柌灞肩瑝閿燂拷????1
                 default: begin
                     // invalid = 1;
                     main_signal <= 9'b00000_00_00;  // error op
