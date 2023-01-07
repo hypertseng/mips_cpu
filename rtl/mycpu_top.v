@@ -30,6 +30,7 @@ module mycpu_top(
 
     // 婢х偛濮為崘娆庡▏閼虫垝淇婇崣锟?
     wire [3:0] sig_writeM;
+    wire sig_enM;
 
 	wire [31:0] aluout, writedata, readdata;
     datapath datapath(
@@ -44,6 +45,7 @@ module mycpu_top(
         .memwriteM(memwrite),
         // 婢х偛濮為崘娆庡▏閼虫垝淇婇崣锟?
         .sig_writeM(sig_writeM),
+        .sig_enM(sig_enM),
         .aluoutM(aluout),
         .writedataM(writedata),
         .readdataM(readdata),
@@ -108,7 +110,7 @@ module mycpu_top(
     assign inst_sram_wdata = 32'b0;
     assign instr = inst_sram_rdata;
 
-    assign data_sram_en = 1'b1;     //濠碘?冲?归悘澶愬嫉婵夌寴ta_en闁挎稑鑻銊╂偨閳虹嚰ta_en
+    assign data_sram_en = sig_enM;     //濠碘?冲?归悘澶愬嫉婵夌寴ta_en闁挎稑鑻銊╂偨閳虹嚰ta_en
     assign data_sram_wen = sig_writeM;
     assign data_sram_addr = aluout;
     assign data_sram_wdata = writedata;

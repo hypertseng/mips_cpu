@@ -28,6 +28,7 @@ module datapath(
 	output wire[3:0] sig_writeM,
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
+	output wire sig_enM,
 
     output wire longest_stall, // 鍏ㄥ眬stall鎸囦护
     input wire i_stall,       // 涓や釜璁垮瓨 stall淇″彿
@@ -71,6 +72,7 @@ module datapath(
 	wire [31:0] srcaD,srca2D,srcbD,srcb2D;
 	//execute stage
 	wire[3:0] sig_writeE;
+	wire sig_enE;
 	wire stall_divE;
 	wire [7:0] alucontrolE;
 	wire [1:0] forwardaE,forwardbE;
@@ -341,6 +343,7 @@ module datapath(
 	flopr#(32) 	fp4_13(clk,rst,WriteDataE_modified,writedataM);
 	flopr#(32) 	fp4_14(clk,rst,pcE,pcM);
 	flopr#(4) 	fp4_15(clk,rst,sig_writeE,sig_writeM);
+	flopr#(1) 	fp4_16(clk,rst,sig_enE,sig_enM);
 
     
     
@@ -349,7 +352,8 @@ module datapath(
 							.aluoutE(aluoutE),
 							.WriteDataE(srcb2E),
 							.sig_writeE(sig_writeE),
-							.WriteDataE_modified(WriteDataE_modified)
+							.WriteDataE_modified(WriteDataE_modified),
+							.sig_enE(sig_enE)
 	);
 
 
