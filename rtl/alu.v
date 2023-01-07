@@ -46,7 +46,7 @@ module alu(
     wire div_sign,div_valid;
 	assign div_sign  = (alucontrol == `EXE_DIV_OP);
 	assign div_valid = (alucontrol == `EXE_DIV_OP) || (alucontrol == `EXE_DIVU_OP);
-	div div(~clk,rst,flushE,alu_num1,alu_num2,div_valid,div_sign,stall_div,div_result);
+	// div div(~clk,rst,flushE,alu_num1,alu_num2,div_valid,div_sign,stall_div,div_result);
 
 	always @(*) begin
 		case(alucontrol)
@@ -88,7 +88,10 @@ module alu(
 			
 			`EXE_MULTU_OP:  alu_out_64 <= {32'b0, alu_num1} * {32'b0, alu_num2};
             `EXE_MULT_OP:   alu_out_64 <= $signed(alu_num1) * $signed(alu_num2);
-            `EXE_DIV_OP,`EXE_DIVU_OP: alu_out_64 <= div_result;
+            `EXE_DIV_OP:	alu_out_64 <= {$signed(alu_num1) % $signed(alu_num2), $signed(alu_num1) / $signed(alu_num2)};
+			`EXE_DIVU_OP: 	alu_out_64 <= {alu_num1 % alu_num2, alu_num1 / alu_num2};
+			// `EXE_DIV_OP:	alu_out_64 <= div_result;
+			// `EXE_DIVU_OP:   alu_out_64 <= div_result;
 			// 鍒嗘敮璺宠浆鎸囦护
 			`EXE_J_OP:		alu_ans <= alu_num1 + alu_num2;
 			`EXE_JR_OP:		alu_ans <= alu_num1 + alu_num2;
