@@ -320,7 +320,7 @@ module datapath(
     assign branch_takeE = zeroE;
     
     //mux write reg
-    mux2 #(5) mux_regfile(rtE,rdE,regdstE,writeregE_temp);
+    mux2 #(5) mux_regfile(rdE,rtE,regdstE,writeregE_temp);
 	// 澶勭悊al鍨嬫寚浠ょ殑閫夋嫨
     mux2 #(5) mux_al(writeregE_temp,pc_dst_al,write_alE,writeregE);
     
