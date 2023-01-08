@@ -314,7 +314,7 @@ module datapath(
 	         .alu_out(aluoutE),
 	         .alu_out_64(aluout64E), 
 	         .overflowE(),
-	         .zeroE(),
+	         .zeroE(zeroE),
 	         .stall_div(stall_divE)
 	);
 	

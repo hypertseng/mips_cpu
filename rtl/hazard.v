@@ -57,7 +57,7 @@ module hazard(
 	output wire longest_stall // 全局stall指令
     );
 
-	wire lwstall,branchstallD,jrstall;
+	wire lwstallD,branchstallD,jrstall;
 
 	//forwarding sources to D stage (branch equality)
 	assign forwardaD = (rsD != 0 & rsD == writeregM & regwrite_enM);
