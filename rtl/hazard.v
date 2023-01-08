@@ -31,7 +31,7 @@ module hazard(
 	output wire stallD,
 	output wire flushD,
 	//execute stage
-	input wire stall_divE,
+	// input wire stall_divE,
 	input wire[4:0] rsE,rtE,
 	input wire[4:0] writeregE,
 	input wire regwrite_enE,

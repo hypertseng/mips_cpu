@@ -162,7 +162,7 @@ module datapath(
 		.stallD(stallD),
 		.flushD(flushD),
 		//execute stage
-		.stall_divE(stall_divE),
+		// .stall_divE(stall_divE),
 		.rsE(rsE),.rtE(rtE),
 		.writeregE(writeregE),
 		.regwrite_enE(regwrite_enE),
