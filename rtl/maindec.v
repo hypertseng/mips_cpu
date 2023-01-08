@@ -41,7 +41,7 @@ module maindec(
     // output wire regwrite,regdst,alusrc,branch,
     // output wire memwrite,memtoreg,
     output wire write_al,
-	 output wire jump,jumpr     // 閸︽澘娼僯ump閸滃苯鐦庣�涙ê娅掗崐绯簎mp
+	output wire jump,jumpr     // 閸︽澘娼僯ump閸滃苯鐦庣�涙ê娅掗崐绯簎mp
     // output reg invalid, // 娣囨繄鏆�閸︽澘娼冨鍌氱埗
     // output reg cp0write // 閸愭瑥鍙哻p0
     );

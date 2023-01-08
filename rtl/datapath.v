@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2017/11/02 15:12:22
-// Design Name: 
-// Module Name: datapath
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module datapath(
 	input wire clk,rst,
@@ -116,6 +96,9 @@ module datapath(
 	assign predict_wrong = (zeroE != predictE);
     assign actual_takeE = zeroE;
 
+    compete_predict branch_predict(clk, rst, flushD, stallD, pcF, pcM,
+    branchD, branchM, actual_takeM, actual_takeE,
+    predict_wrongM, predictD, predictF);
 
 	wire [31:0] pc_temp1, pc_temp2, pc_temp3, pc_temp4;
 
@@ -133,6 +116,7 @@ module datapath(
 		opD,rsD,rtD,functD,
 		alucontrolD,branch_judge_controlD
     );
+
     
 //    
 //    mux4 #(32) mux4_forward_aE(
@@ -193,7 +177,7 @@ module datapath(
 
      	.i_stall(i_stall),       // 涓や釜璁垮瓨 stall淇�?�彿
  		.d_stall(d_stall),
-		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�??
+		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�???
 		);
 
 
@@ -405,13 +389,5 @@ module datapath(
     assign debug_wb_rf_wen      = {4{regwrite_enW & ~stallW}};
     assign debug_wb_rf_wnum     = writeregW;
     assign debug_wb_rf_wdata    = resultW;
-
-
-
-
-	compete_predict branch_predict(clk, rst, flushD, stallD, pcF, pcM,
-    branchD, branchM, actual_takeM, actual_takeE,
-    predict_wrongM, predictD, predictF);
-
 
 endmodule
