@@ -98,8 +98,10 @@ module hazard(
 				(writeregE == rsD | writeregE == rtD) |
 				memtoregM &
 				(writeregM == rsD | writeregM == rtD));
-	assign jrstall = jumprD & regwrite_enE & ((writeregE == rsD) | (writeregE == rtD)); //|
-	assign #1 stallD = lwstallD | jrstall;
+//    assign jrstall = (jumprD & regwrite_enE & ((writeregE == rsD) | (writeregE == rtD)))|
+//                     (jumprD & memtoregM & ((writeregM == rsD) | (writeregM == rtD)));
+//	assign #1 stallD = lwstallD | jrstall;
+    assign #1 stallD = lwstallD;
 	assign #1 stallF = stallD;
 		//stalling D stalls all previous stages
 	assign #1 flushE = stallD;
