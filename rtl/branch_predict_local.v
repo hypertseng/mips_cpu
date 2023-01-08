@@ -29,18 +29,18 @@ module branch_predict_local (
     input wire [31:0] pcF, pcM,
 
     input wire branchD,
-    input wire branchM,         // M½×¶ÎÊÇ·ñÊÇ·ÖÖ§Ö¸Áî
-    input wire actual_takeM,    // Êµ¼ÊÊÇ·ñÌø×ª
+    input wire branchM,         // Mï¿½×¶ï¿½ï¿½Ç·ï¿½ï¿½Ç·ï¿½Ö§Ö¸ï¿½ï¿½
+    input wire actual_takeM,    // Êµï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½×ª
     input wire actual_takeE,
     input wire pred_wrong,
-    output wire pred_takeD,      // Ô¤²âÊÇ·ñÌø×ª
+    output wire pred_takeD,      // Ô¤ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½×ª
     output wire pred_takeF
 );
 
-    reg pred_takeF_r; //°Ñ½á¹û´æÏÂÀ´
-    // assign branchD = //ÅÐ¶ÏÒëÂë½×¶ÎÊÇ·ñÊÇ·ÖÖ§Ö¸Áî
+    reg pred_takeF_r; //ï¿½Ñ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?
+    // assign branchD = //ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½×¶ï¿½ï¿½Ç·ï¿½ï¿½Ç·ï¿½Ö§Ö¸ï¿½ï¿?
 
-// ¶¨Òå²ÎÊý
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?
     parameter Strongly_not_taken = 2'b00, Weakly_not_taken = 2'b01, Weakly_taken = 2'b11, Strongly_taken = 2'b10;
     parameter PHT_DEPTH = 6;
     parameter BHT_DEPTH = 10;
@@ -54,13 +54,13 @@ module branch_predict_local (
     wire [(BHT_DEPTH-1):0] BHT_index;
     wire [(PHT_DEPTH-1):0] BHR_value;
 
-// ---------------------------------------Ô¤²âÂß¼­£¬Fetch½×¶Î---------------------------------------
+// ---------------------------------------Ô¤ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½Fetchï¿½×¶ï¿½---------------------------------------
 
     assign BHT_index = pcF[11:2];     
     assign BHR_value = BHT[BHT_index];  
-    assign PHT_index = BHR_value ^ pcF[7:2]; // Ê¹ÓÃXOR±ÜÃâ³åÍ»£¬ºóÃæÍ¬²½
+    assign PHT_index = BHR_value ^ pcF[7:2]; // Ê¹ï¿½ï¿½XORï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿?
  
-    assign pred_takeF = PHT[PHT_index][1];      // ÔÚÈ¡Ö¸½×¶ÎÔ¤²âÊÇ·ñ»áÌø×ª£¬²¢¾­¹ýÁ÷Ë®Ïß´«µÝ¸øÒëÂë½×¶Î¡£
+    assign pred_takeF = PHT[PHT_index][1];      // ï¿½ï¿½È¡Ö¸ï¿½×¶ï¿½Ô¤ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë®ï¿½ß´ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½ï¿½ï¿½×¶Î¡ï¿½
 
         // --------------------------pipeline------------------------------
             always @(posedge clk) begin
@@ -73,9 +73,9 @@ module branch_predict_local (
             end
         // --------------------------pipeline------------------------------
 
-// ---------------------------------------Ô¤²âÂß¼­½áÊø---------------------------------------
+// ---------------------------------------Ô¤ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½---------------------------------------
 
-// ---------------------------------------BHT³õÊ¼»¯ÒÔ¼°¸üÐÂ£¬Memory½×¶Î---------------------------------------
+// ---------------------------------------BHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Â£ï¿½Memoryï¿½×¶ï¿½---------------------------------------
     wire [(PHT_DEPTH-1):0] update_PHT_index;
     wire [(BHT_DEPTH-1):0] update_BHT_index;
     wire [(PHT_DEPTH-1):0] update_BHR_value;
@@ -86,19 +86,20 @@ module branch_predict_local (
 
     always@(posedge clk) begin
         if(rst) begin
-            for(j = 0; j < (1<<BHT_DEPTH); j=j+1) begin
-                BHT[j] <= 0;
-            end
+             for(j = 0; j < (1<<BHT_DEPTH); j=j+1) begin
+                 BHT[j] <= 0;
+             end
+//            BHT[(1<<BHT_DEPTH-1):0] <= '{default: '0};
         end
         else if(branchM) begin
-            // ´Ë´¦Ó¦¸ÃÌí¼ÓÄãµÄ¸üÐÂÂß¼­µÄ´úÂë
+            // ï¿½Ë´ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½Ä´ï¿½ï¿½ï¿?
             BHT[update_BHT_index] <= {(BHT[update_BHT_index] << 1), actual_takeM};
         end
     end
-// ---------------------------------------BHT³õÊ¼»¯ÒÔ¼°¸üÐÂ½áÊø---------------------------------------
+// ---------------------------------------BHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½---------------------------------------
 
 
-// ---------------------------------------PHT³õÊ¼»¯ÒÔ¼°¸üÐÂ---------------------------------------
+// ---------------------------------------PHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½---------------------------------------
     always @(posedge clk) begin
         if(rst) begin
             for(i = 0; i < (1<<PHT_DEPTH); i=i+1) begin
@@ -107,7 +108,7 @@ module branch_predict_local (
         end
         else if(branchM) begin
             case(PHT[update_PHT_index])
-                // ´Ë´¦Ó¦¸ÃÌí¼ÓÄãµÄ¸üÐÂÂß¼­µÄ´úÂë
+                // ï¿½Ë´ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½Ä´ï¿½ï¿½ï¿?
                 Strongly_not_taken: begin
                     if(actual_takeM) begin
                         PHT[update_PHT_index] <= Weakly_not_taken;
@@ -151,8 +152,8 @@ module branch_predict_local (
             endcase 
         end
     end
-// ---------------------------------------PHT³õÊ¼»¯ÒÔ¼°¸üÐÂ½áÊø---------------------------------------
+// ---------------------------------------PHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½---------------------------------------
 
-    // ÒëÂë½×¶ÎÊä³ö×îÖÕµÄÔ¤²â½á¹û
+    // ï¿½ï¿½ï¿½ï¿½×¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½Ô¤ï¿½ï¿½ï¿½ï¿½
     assign pred_takeD = branchD & pred_takeF_r;  
 endmodule

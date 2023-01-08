@@ -27,6 +27,7 @@ module hazard(
 	//decode stage
 	input wire[4:0] rsD,rtD,
 	input wire branchD,jumprD,
+	input wire predict_wrong,
 	output wire forwardaD,forwardbD,
 	output wire stallD,
 	output wire flushD,
@@ -34,6 +35,7 @@ module hazard(
 	// input wire stall_divE,
 	input wire[4:0] rsE,rtE,
 	input wire[4:0] writeregE,
+	input wire branchE,
 	input wire regwrite_enE,
 	input wire[1:0] memtoregE,
 	output wire[1:0] forwardaE,forwardbE,
@@ -42,10 +44,13 @@ module hazard(
 	input wire[4:0] writeregM,
 	input wire regwrite_enM,
 	input wire[1:0] memtoregM,
-
+	output wire stallM,
+	output wire flushM,
 	//write back stage
 	input wire[4:0] writeregW,
 	input wire regwrite_enW,
+	output wire stallW,
+	output wire flushW,
 
     input wire i_stall,       // 两个访存 stall信号
     input wire d_stall,
@@ -92,18 +97,25 @@ module hazard(
   	//       instead, another bypass network could
   	//       be added from W to M
   	//stalls
-	assign #1 lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
-	assign #1 branchstallD = branchD &
+	assign lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
+	assign branchstallD = branchD &
 				(regwrite_enE & 
 				(writeregE == rsD | writeregE == rtD) |
 				memtoregM &
 				(writeregM == rsD | writeregM == rtD));
 	assign jrstall = jumprD & regwrite_enE & ((writeregE == rsD) | (writeregE == rtD)); //|
-	assign #1 stallD = lwstallD | jrstall;
-	assign #1 stallF = stallD;
-		//stalling D stalls all previous stages
-	assign #1 flushE = stallD;
+	
+	assign stallF = stallD;
+	assign stallD = lwstallD | jrstall;
     assign stallE = 0;
+    assign stallM = 0;
+    assign stallW = 0;
+
+	assign flushF = 0;
+	assign flushD = (branchE & predict_wrong) ;
+	assign flushE = stallD;
+	assign flushM = 0;
+	assign flushW = 0;
 
     // assign stallF = (longest_stall | lwstall | jrstall) & ~exceptionoccur;
     // assign stallD = longest_stall | lwstall | jrstall;

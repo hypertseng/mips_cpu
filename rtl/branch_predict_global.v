@@ -28,18 +28,18 @@ module branch_predict_global (
     input wire [31:0] pcF, pcM,
 
     input wire branchD,
-    input wire branchM,         // M½×¶ÎÊÇ·ñÊÇ·ÖÖ§Ö¸Áî
-    input wire actual_takeM,    // Êµ¼ÊÊÇ·ñÌø×ª
+    input wire branchM,         // Mï¿½×¶ï¿½ï¿½Ç·ï¿½ï¿½Ç·ï¿½Ö§Ö¸ï¿½ï¿½
+    input wire actual_takeM,    // Êµï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½×ª
     input wire actual_takeE,
-    input wire pred_wrong, // Ô¤²â½á¹ûÊÇ·ñÕýÈ·£¬memory½×¶ÎÐèÒª
-    output wire pred_takeD,      // Ô¤²âÊÇ·ñÌø×ª
+    input wire pred_wrong, // Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½È·ï¿½ï¿½memoryï¿½×¶ï¿½ï¿½ï¿½Òª
+    output wire pred_takeD,      // Ô¤ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½×ª
     output wire pred_takeF
 );
 
-    // wire pred_takeF;   //Ô¤²â
-    reg pred_takeF_r; //°Ñ½á¹û´æÏÂÀ´
+    // wire pred_takeF;   //Ô¤ï¿½ï¿½
+    reg pred_takeF_r; //ï¿½Ñ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?
 
-// ¶¨Òå²ÎÊý
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?
     parameter Strongly_not_taken = 2'b00, Weakly_not_taken = 2'b01, Weakly_taken = 2'b11, Strongly_taken = 2'b10;
     parameter GHR_LENGTH = 8;
 
@@ -55,12 +55,12 @@ module branch_predict_global (
 
     wire [(GHR_LENGTH-1):0] PHT_index;
 
-// ---------------------------------------Ô¤²âÂß¼­£¬Fetch½×¶Î---------------------------------------
+// ---------------------------------------Ô¤ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½Fetchï¿½×¶ï¿½---------------------------------------
 
-    assign PHT_index = pcF[9:2] ^ GHR_value; // Ê¹ÓÃXOR±ÜÃâ³åÍ»
+    assign PHT_index = pcF[9:2] ^ GHR_value; // Ê¹ï¿½ï¿½XORï¿½ï¿½ï¿½ï¿½ï¿½Í?
 
 
-    assign pred_takeF = PHT[PHT_index][1];      // ÔÚÈ¡Ö¸½×¶ÎÔ¤²âÊÇ·ñ»áÌø×ª£¬²¢¾­¹ýÁ÷Ë®Ïß´«µÝ¸øÒëÂë½×¶Î¡£
+    assign pred_takeF = PHT[PHT_index][1];      // ï¿½ï¿½È¡Ö¸ï¿½×¶ï¿½Ô¤ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë®ï¿½ß´ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½ï¿½ï¿½×¶Î¡ï¿½
 
         // --------------------------pipeline------------------------------
             always @(posedge clk) begin
@@ -73,22 +73,22 @@ module branch_predict_global (
             end
         // --------------------------pipeline------------------------------
 
-// ---------------------------------------Ô¤²âÂß¼­½áÊø---------------------------------------
+// ---------------------------------------Ô¤ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½---------------------------------------
 
-// ---------------------------------------BHT³õÊ¼»¯ÒÔ¼°¸üÐÂ£¬Memory½×¶Î---------------------------------------
+// ---------------------------------------BHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Â£ï¿½Memoryï¿½×¶ï¿½---------------------------------------
     wire [(GHR_LENGTH-1):0] update_PHT_index;
 
 
     always@(posedge clk) begin
         if(rst) begin
             GHR_value <= 0; 
-            GHR_value_old <= 0; // ÎªÁËÔÚfetch½×¶ÎµÃµ½ghrµÄÖµ
+            GHR_value_old <= 0; // Îªï¿½ï¿½ï¿½ï¿½fetchï¿½×¶ÎµÃµï¿½ghrï¿½ï¿½Öµ
         end
-        else if(!stallD & branchD) begin // ÕâÌõÖ¸ÁîÊÇbranchÇÒÃ»ÓÐ±»×èÈû¾Í¿ÉÒÔ¸üÐÂghrÖµ£¬ÊÇdecode½×¶Î
+        else if(!stallD & branchD) begin // ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½branchï¿½ï¿½Ã»ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½Ô¸ï¿½ï¿½ï¿½ghrÖµï¿½ï¿½ï¿½ï¿½decodeï¿½×¶ï¿½
             GHR_value_old <= GHR_value;
             GHR_value <= {GHR_value << 1, pred_takeD};
             
-        end else if(pred_wrong && branchM) begin // µÃµ½Ô¤²â¼ì²é½á¹ûºó£¬Èç¹ûÔ¤²âÊÇ´íµÄ(memory ½×¶Î)
+        end else if(pred_wrong && branchM) begin // ï¿½Ãµï¿½Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½ï¿½Ç´ï¿½ï¿½ï¿?(memory ï¿½×¶ï¿½)
             GHR_value <= {GHR_value_old <<1, actual_takeM};
             GHR_value_old <= GHR_value;
         end
@@ -107,19 +107,20 @@ module branch_predict_global (
         end
     end
 
-// ---------------------------------------BHT³õÊ¼»¯ÒÔ¼°¸üÐÂ½áÊø
+// ---------------------------------------BHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½
 
     assign update_PHT_index = GHR_value_old_M ^ pcM[9:2];
-// ---------------------------------------PHT³õÊ¼»¯ÒÔ¼°¸üÐÂ---------------------------------------
+// ---------------------------------------PHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½---------------------------------------
     always @(posedge clk) begin
         if(rst) begin
-            for(i = 0; i < (1<<GHR_LENGTH); i=i+1) begin
-                PHT[i] <= Weakly_taken;
-            end
+             for(i = 0; i < (1<<GHR_LENGTH); i=i+1) begin
+                 PHT[i] <= Weakly_taken;
+             end
+//            PHT[(1<<GHR_LENGTH)-1:0] <= '{default: 2'b11};
         end
         else if(branchM) begin
             case(PHT[update_PHT_index])
-                // ´Ë´¦Ó¦¸ÃÌí¼ÓÄãµÄ¸üÐÂÂß¼­µÄ´úÂë
+                // ï¿½Ë´ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½Ä´ï¿½ï¿½ï¿?
                 Strongly_not_taken: begin
                     if(actual_takeM) begin
                         PHT[update_PHT_index] <= Weakly_not_taken;
@@ -163,8 +164,8 @@ module branch_predict_global (
             endcase 
         end
     end
-// ---------------------------------------PHT³õÊ¼»¯ÒÔ¼°¸üÐÂ½áÊø---------------------------------------
+// ---------------------------------------PHTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½---------------------------------------
 
-    // ÒëÂë½×¶ÎÊä³ö×îÖÕµÄÔ¤²â½á¹û
+    // ï¿½ï¿½ï¿½ï¿½×¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½Ô¤ï¿½ï¿½ï¿½ï¿½
     assign pred_takeD = branchD & pred_takeF_r;  
 endmodule
