@@ -30,8 +30,8 @@ module datapath(
 	input wire[31:0] readdataM,
 	output wire sig_enM,
 
-    output wire longest_stall, // 鍏ㄥ眬stall鎸囦�??
-    input wire i_stall,       // 涓や釜璁垮瓨 stall淇�?�彿
+    output wire longest_stall, 
+    input wire i_stall,       
     input wire d_stall,
 
 	output wire [31:0]  debug_wb_pc,      
@@ -119,7 +119,7 @@ module datapath(
 
 	wire [31:0] pc_temp1, pc_temp2, pc_temp3, pc_temp4;
 
-    // 閽堝al鍨嬫寚浠ょ殑PC�??? 渚嬪jal bltzal�???
+
     wire [4:0] pc_dst_al;
     wire write_alD,write_alE;
     assign pc_dst_al = 5'b11111;
@@ -218,7 +218,7 @@ module datapath(
     mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & predictD, pc_temp2);
     mux2 #(32) before_pc_predict(pc_temp2,pc_temp1,predict_wrong & branchE, pc_temp3);
     mux2 #(32) before_pc_jump(pc_temp3,{pcplus4D[31:28],instrD[25:0],2'b00},jumpD, pc_temp4);
-    mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   // TODO 娉ㄦ剰杩欓噷鍙兘鏈夋暟鎹啋闄? srca2D鏄暟鎹墠�???
+    mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   
 	// mux2 #(32) before_pc_exception(pc_temp5,pcexceptionM,exceptionoccur, pc_in);
 	
 
@@ -295,11 +295,10 @@ module datapath(
 	flopenrc #(1)  	fp3_19(clk, rst, ~stallE, flushE, gprtoloD, gprtoloE);
 	flopenrc #(32)  fp3_20(clk, rst, ~stallE, flushE, pcD, pcE);
 	flopenrc #(1)  	fp3_21(clk, rst, ~stallE, flushE, branchD, branchE);
-	flopenrc #(1)  fp3_23(clk, rst, ~stallE, 1'b0  , write_alD, write_alE); // 涓嶅彈flush褰卞�??
+	flopenrc #(1)  fp3_23(clk, rst, ~stallE, 1'b0  , write_alD, write_alE);
 	
 	//execute stage
 	//mux write reg
-    // mux4 #(5) mux4_reg_dst(rdE, rtE, 5'd31, 5'b0, regdstE, writeregM);
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
 	mux3 #(32) forwardbemux(srcbE,resultW,aluoutM,forwardbE,srcb2E);
 	mux2 #(32) srcbmux(srcb2E,signimmE,alusrcE,srcb3E);
@@ -331,7 +330,7 @@ module datapath(
     
     //mux write reg
     mux2 #(5) mux_regfile(rdE,rtE,regdstE,writeregE_temp);
-	// 澶勭悊al鍨嬫寚浠ょ殑閫夋�?
+
     mux2 #(5) mux_al(writeregE_temp,pc_dst_al,write_alE,writeregE);
     
     

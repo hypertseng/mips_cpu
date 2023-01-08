@@ -29,7 +29,7 @@ module maindec(
 	output wire memwrite,   // en signal
 	output wire branch,     
     output wire alusrc,     // 0 -> reg, 1 -> imm 
-    output wire regdst,   
+    output wire regdst,    // 1->rt 0->rd
     output wire regwrite,   // en signal 
 	output wire gprtohi,   //gprtohi GPR->hi
 	output wire gprtolo,   //gprtolo GPR->lo
@@ -79,7 +79,7 @@ module maindec(
 
                 // j inst
                 `EXE_JR:  main_signal <= 9'b00000_00_00;
-                `EXE_JALR:main_signal <= 9'b11000_00_00;  // 闁�?�╮d娴ｆ粈璐熼崘娆忕槑鐎涙ê娅掓担宥囩�?
+                `EXE_JALR:main_signal <= 9'b10000_00_00;  // 闁�?�╮d娴ｆ粈璐熼崘娆忕槑鐎涙ê娅掓担宥囩�?
 
                 default:begin
                     main_signal <= 9'b00000_00_00;
