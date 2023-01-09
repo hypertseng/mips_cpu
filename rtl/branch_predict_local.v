@@ -89,7 +89,7 @@ module branch_predict_local (
               for(j = 0; j < (1<<BHT_DEPTH); j=j+1) begin
                   BHT[j] <= 0;
               end
-//           BHT[(1<<BHT_DEPTH-1):0] <= '{default: '0};
+          // BHT[(1<<BHT_DEPTH-1):0] <= '{default: '0};
         end
         else if(branchM) begin
             // �˴�Ӧ��������ĸ����߼��Ĵ���??

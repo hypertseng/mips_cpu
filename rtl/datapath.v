@@ -62,7 +62,7 @@ module datapath(
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E,srcaM,srcaW;
 	wire [31:0] aluoutE;
-	wire zeroE;
+	wire branch_takeE;
 	wire [63:0] aluout64E;
 	wire [7:0] branch_judge_controlE;
 	wire [31:0] WriteDataE_modified;
@@ -86,14 +86,13 @@ module datapath(
     wire flushF, flushD, flushE, flushM, flushW;
     
     //predict
-    wire branch_takeM, branch_takeE;
 	wire branchD,branchE;
 	// 预测模块
     wire predictF,predictD, predictE, predict_wrong,predict_wrongM;
     wire actual_takeM, actual_takeE;
     
-	assign predict_wrong = (zeroE != predictE);
-    assign actual_takeE = zeroE;
+	assign predict_wrong = (branch_takeE != predictE);
+    assign actual_takeE = branch_takeE;
 
     compete_predict branch_predict(clk, rst, flushD, stallD, pcF, pcM,
     branchD, branchM, actual_takeM, actual_takeE,
@@ -180,10 +179,7 @@ module datapath(
 		);
 
 
-
-//    // pc_jumpD <- jumpD & ~jump_conflictD
-
-                        
+              
 //    assign pc_sel = (branchM & ~succM & branch_takeM) ? 2'b10:
 //                    (branchM & ~succM & ~branch_takeM) ? 2'b11:
 //                    (branchD & ~branchM & pred_takeD ||
@@ -191,16 +187,18 @@ module datapath(
 //                     2'b00;
 
 
-
 		// flopr 1
-    mux2 #(32) before_pc_which_wrong(pcbranchE,pcplus4E+4, predictE, pc_temp1);
+    // mux2 #(32) before_pc_which_wrong(pcbranchE,pcplus4E+4, predictE, pc_temp1);
+    mux2 #(32) before_pc_which_wrong(pcbranchE,pcplus4E+4, branch_takeE, pc_temp1);
     // mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & predictD, pc_temp2);
-    mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & zeroE, pc_temp2);
+    mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & branch_takeE, pc_temp2);
     mux2 #(32) before_pc_predict(pc_temp2,pc_temp1,predict_wrong & branchE, pc_temp3);
     mux2 #(32) before_pc_jump(pc_temp3,{pcplus4D[31:28],instrD[25:0],2'b00},jumpD, pc_temp4);
     mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   
 	// mux2 #(32) before_pc_exception(pc_temp5,pcexceptionM,exceptionoccur, pc_in);
-	
+	assign pcnextFD = 	jumprD ? srca2D :
+						jumpD ? {pcplus4D[31:28],instrD[25:0],2'b00} :
+						(predict_wrong & branchE) ? pc_temp1:
 
     //remove stallW temporarily 
 	//regfile (operates in decode and writeback)
@@ -295,20 +293,13 @@ module datapath(
 	         .alu_out(aluoutE),
 	         .alu_out_64(aluout64E), 
 	         .overflowE(),
-	         .zeroE(zeroE),
+	         .branch_takeE(branch_takeE),
 	         .stall_div(stall_divE)
 	);
 	
 
-    branch_judge branch_judge0(
-        .branch_judge_controlE(branch_judge_controlE),
-        .srcaE(srca2E),
-        .srcbE(srcb2E),
-        .branch_takeE(branch_takeE)
-    );
-    
-    assign branch_takeE = zeroE;
-    
+
+        
     //mux write reg
     mux2 #(5) mux_regfile(rdE,rtE,regdstE,writeregE_temp);
 
@@ -321,7 +312,6 @@ module datapath(
 	flopr#(64) 	fp4_3(clk,rst,aluout64E,aluout64M);
 	flopr#(32) 	fp4_4(clk,rst,srcaE,srcaM);
 	flopr#(32) 	fp4_5(clk,rst,pcbranchE,pcbranchM);
-	flopr#(1) 	fp4_6(clk,rst,branch_takeE,branch_takeM);
 	flopr#(2) 	fp4_7(clk,rst,memtoregE,memtoregM);
 	flopr#(1) 	fp4_8(clk,rst,memwriteE,memwriteM);
 	flopr#(1) 	fp4_9(clk,rst,regwrite_enE,regwrite_enM);
