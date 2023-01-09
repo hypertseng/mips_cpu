@@ -69,8 +69,8 @@ module maindec(
                 
                 `EXE_MULT, `EXE_MULTU, `EXE_DIV, `EXE_DIVU: main_signal <= 9'b11000_00_11;
                 
-                `EXE_MFHI: main_signal <= 9'b11000_10_00;//  hi -> gpr
-                `EXE_MFLO: main_signal <= 9'b11000_11_00;//  lo -> gpr
+                `EXE_MFHI: main_signal <= 9'b10000_10_00;//  hi -> gpr
+                `EXE_MFLO: main_signal <= 9'b10000_11_00;//  lo -> gpr
                 `EXE_MTHI: main_signal <= 9'b00000_00_10;
                 `EXE_MTLO: main_signal <= 9'b00000_00_01;
                 
@@ -79,7 +79,7 @@ module maindec(
 
                 // j inst
                 `EXE_JR:  main_signal <= 9'b00000_00_00;
-                `EXE_JALR:main_signal <= 9'b10000_00_00;  // 闁�?�╮d娴ｆ粈璐熼崘娆忕槑鐎涙ê娅掓担宥囩�?
+                `EXE_JALR:main_signal <= 9'b10000_00_00;  // 闁�?�╮d娴ｆ粈璐熼崘娆忕槑鐎涙ê娅掓担宥囩�?
 
                 default:begin
                     main_signal <= 9'b00000_00_00;
@@ -116,14 +116,14 @@ module maindec(
             `EXE_SH : main_signal <= 9'b00101_01_00;  
             `EXE_SW : main_signal <= 9'b00101_01_00;  // lab4 sw
 
-            // 閻楄娼堥幐鍥︽�?
+            // 閻楄娼堥幐鍥︽�?
             6'b010000 : case(rs)
                 5'b00100:begin  // mtc0
                     // cp0write = 1;
                     main_signal <= 9'b00000_00_00;
                 end 
                 5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
-                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 閸欏偊鎷�??閿熸垝鍞惍浣疯厬regwrite閿燂�?????1閿涘矁绻栭柌灞肩瑝閿燂拷????1
+                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 閸欏偊鎷�??閿熸垝鍞惍浣疯厬regwrite閿燂�?????1閿涘矁绻栭柌灞肩瑝閿燂拷????1
                 default: begin
                     // invalid = 1;
                     main_signal <= 9'b00000_00_00;  // error op

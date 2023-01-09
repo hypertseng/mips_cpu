@@ -1,7 +1,7 @@
 module mycpu_top(
     input clk,
     input resetn,  //low active
-
+    input  [5:0] ext_int,
     //cpu inst sram
     output        inst_sram_en   ,
     output [3 :0] inst_sram_wen  ,
@@ -28,7 +28,7 @@ module mycpu_top(
 	wire [39:0] ascii;
 	wire memwrite;
 
-    // 婢х偛濮為崘娆庡▏閼虫垝淇婇崣锟?
+    // 婢х偛濮為崘娆庡▏閼虫垝淇婇崣�??
     wire [3:0] sig_writeM;
     wire sig_enM;
 
@@ -43,7 +43,7 @@ module mycpu_top(
         //data
         // .data_en(data_en),
         .memwriteM(memwrite),
-        // 婢х偛濮為崘娆庡▏閼虫垝淇婇崣锟?
+        // 婢х偛濮為崘娆庡▏閼虫垝淇婇崣�??
         .sig_writeM(sig_writeM),
         .sig_enM(sig_enM),
         .aluoutM(aluout),
@@ -104,13 +104,13 @@ module mycpu_top(
     //     .data_data_ok(data_data_ok),
     //     .data_rdata(data_rdata)
     // );
-    assign inst_sram_en = 1'b1;     //濠碘?冲?归悘澶愬嫉婵夌湏st_en闁挎稑鑻銊╂偨閳侯櫞st_en
+    assign inst_sram_en = 1'b1;     //濠碘?�??归悘澶愬嫉婵夌湏st_en闁挎稑鑻銊╂偨閳侯櫞st_en
     assign inst_sram_wen = 4'b0;
     assign inst_sram_addr = pc;
     assign inst_sram_wdata = 32'b0;
     assign instr = inst_sram_rdata;
 
-    assign data_sram_en = sig_enM;     //濠碘?冲?归悘澶愬嫉婵夌寴ta_en闁挎稑鑻銊╂偨閳虹嚰ta_en
+    assign data_sram_en = sig_enM;     //濠碘?�??归悘澶愬嫉婵夌寴ta_en闁挎稑鑻銊╂偨閳虹嚰ta_en
     assign data_sram_wen = sig_writeM;
     assign data_sram_addr = aluout;
     assign data_sram_wdata = writedata;
