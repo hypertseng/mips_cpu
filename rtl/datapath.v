@@ -68,6 +68,7 @@ module datapath(
 	wire [7:0] branch_judge_controlE;
 	wire [31:0] WriteDataE_modified;
 	wire regwrite_enE;
+	wire res_validE;
 	//mem stage
 	wire [4:0] writeregM;
 	wire [31:0] hi_oM,lo_oM;
@@ -75,6 +76,7 @@ module datapath(
 	wire [7:0] alucontrolM;
 	wire regwrite_enM;
 	wire [31:0] resultM;
+	wire res_validM;
 	//writeback stage
 	wire [4:0] writeregW;
 	wire [31:0] aluoutW,readdataW,resultW,hi_oW,lo_oW;
@@ -301,7 +303,8 @@ module datapath(
 	         .alu_out_64(aluout64E), 
 	         .overflowE(),
 	         .zeroE(zeroE),
-	         .div_stallE(div_stallE)
+	         .div_stallE(div_stallE),
+			 .res_validE(res_validE)
 	);
 	
 
@@ -340,7 +343,7 @@ module datapath(
 
 	flopenrc #(1)  fp4_17(clk,  rst, ~stallM, flushM,  actual_takeE, actual_takeM);
     flopenrc #(1)  fp4_18(clk,  rst, ~stallM, flushM,  predict_wrong,predict_wrongM);
-    
+
     
 	//mem stage
 	write_data write_data0(	.alucontrolE(alucontrolE),
@@ -352,7 +355,7 @@ module datapath(
 	);
 
 	mux4 #(32) resmux_new(aluoutM,readdataM,hi_oM,lo_oM,memtoregM,resultM);
-    hilo_reg hilo_reg(clk,rst,{gprtohiE,gprtoloE},aluout64E[63:32],aluout64E[31:0],hi_oM,lo_oM);
+    hilo_reg hilo_reg(clk,rst,{gprtohiE,gprtoloE},aluout64E[63:32],aluout64E[31:0],res_validE,hi_oM,lo_oM);
 	assign hiloM = {hi_oM, lo_oM};
 
     // MEM_WB flop
