@@ -71,18 +71,18 @@ module maindec(
                 
                 `EXE_MFHI: main_signal <= 9'b10000_10_00;//  hi -> gpr
                 `EXE_MFLO: main_signal <= 9'b10000_11_00;//  lo -> gpr
-                `EXE_MTHI: main_signal <= 9'b00000_00_10;
-                `EXE_MTLO: main_signal <= 9'b00000_00_01;
+                `EXE_MTHI: main_signal <= 9'b01000_00_10;
+                `EXE_MTLO: main_signal <= 9'b01000_00_01;
                 
-                `EXE_SYSCALL,`EXE_BREAK : main_signal <= 9'b00000_00_00;
+                `EXE_SYSCALL,`EXE_BREAK : main_signal <= 9'b01000_00_00;
                 
 
                 // j inst
-                `EXE_JR:  main_signal <= 9'b00000_00_00;
+                `EXE_JR:  main_signal <= 9'b01000_00_00;
                 `EXE_JALR:main_signal <= 9'b10000_00_00;  // 闁�?�╮d娴ｆ粈璐熼崘娆忕槑鐎涙ê娅掓担宥囩�?
 
                 default:begin
-                    main_signal <= 9'b00000_00_00;
+                    main_signal <= 9'b01000_00_00;
                     // invalid = 1;
                 end 
 			endcase
@@ -92,47 +92,47 @@ module maindec(
             `EXE_ADDI, `EXE_ADDIU ,`EXE_SLTI, `EXE_SLTIU: main_signal <= 9'b11100_00_00; // Immediate
             
             // branch inst
-            `EXE_BEQ, `EXE_BGTZ, `EXE_BLEZ, `EXE_BNE    :main_signal <= 9'b00010_00_00    ;
+            `EXE_BEQ, `EXE_BGTZ, `EXE_BLEZ, `EXE_BNE    :main_signal <= 9'b01010_00_00    ;
             
             `EXE_REGIMM_INST: case(rt)
-                `EXE_BLTZ   :main_signal <= 9'b00010_00_00      ;
-                `EXE_BLTZAL :main_signal <= 9'b10010_00_00      ;
-                `EXE_BGEZ   :main_signal <= 9'b00010_00_00      ;
-                `EXE_BGEZAL :main_signal <= 9'b10010_00_00      ;
+                `EXE_BLTZ   :main_signal <= 9'b01010_00_00      ;
+                `EXE_BLTZAL :main_signal <= 9'b11010_00_00      ;
+                `EXE_BGEZ   :main_signal <= 9'b01010_00_00      ;
+                `EXE_BGEZAL :main_signal <= 9'b11010_00_00      ;
                 // default: invalid = 1;
             endcase
             
             // j inst
-            `EXE_J  : main_signal <= 9'b00000_00_00;
-            `EXE_JAL: main_signal <= 9'b10000_00_00;
+            `EXE_J  : main_signal <= 9'b01000_00_00;
+            `EXE_JAL: main_signal <= 9'b11000_00_00;
 
             // memory insts
-            `EXE_LB : main_signal <= 9'b10101_01_00;
-            `EXE_LBU: main_signal <= 9'b10101_01_00;
-            `EXE_LH : main_signal <= 9'b10101_01_00;
-            `EXE_LHU: main_signal <= 9'b10101_01_00;
-            `EXE_LW : main_signal <= 9'b10101_01_00;  // lab4 lw
-            `EXE_SB : main_signal <= 9'b00101_01_00;  
-            `EXE_SH : main_signal <= 9'b00101_01_00;  
-            `EXE_SW : main_signal <= 9'b00101_01_00;  // lab4 sw
+            `EXE_LBU: main_signal <= 9'b11101_01_00;
+            `EXE_LH : main_signal <= 9'b11101_01_00;
+            `EXE_LB : main_signal <= 9'b11101_01_00;
+            `EXE_LHU: main_signal <= 9'b11101_01_00;
+            `EXE_LW : main_signal <= 9'b11101_01_00;  // lab4 lw
+            `EXE_SB : main_signal <= 9'b01101_01_00;  
+            `EXE_SH : main_signal <= 9'b01101_01_00;  
+            `EXE_SW : main_signal <= 9'b01101_01_00;  // lab4 sw
 
             // 閻楄娼堥幐鍥︽�?
             6'b010000 : case(rs)
                 5'b00100:begin  // mtc0
                     // cp0write = 1;
-                    main_signal <= 9'b00000_00_00;
+                    main_signal <= 9'b01000_00_00;
                 end 
-                5'b00000: main_signal <= 9'b10000_00_00; // mtfc0
-                5'b10000: main_signal <= 9'b00000_00_00; // eret TODO: 閸欏偊鎷�??閿熸垝鍞惍浣疯厬regwrite閿燂�?????1閿涘矁绻栭柌灞肩瑝閿燂拷????1
+                5'b00000: main_signal <= 9'b11000_00_00; // mtfc0
+                5'b10000: main_signal <= 9'b01000_00_00; // eret TODO: 閸欏偊鎷�??閿熸垝鍞惍浣疯厬regwrite閿燂�?????1閿涘矁绻栭柌灞肩瑝閿燂拷????1
                 default: begin
                     // invalid = 1;
-                    main_signal <= 9'b00000_00_00;  // error op
+                    main_signal <= 9'b01000_00_00;  // error op
                 end 
             endcase
 
             default:begin
                 // invalid = 1;
-                main_signal <= 9'b00000_00_00;  // error op
+                main_signal <= 9'b01000_00_00;  // error op
             end 
 		endcase
 	end

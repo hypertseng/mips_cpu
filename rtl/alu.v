@@ -22,16 +22,16 @@ module alu(
 	reg [31:0] alu_ans;
     reg [31:0] num2_reg;
 	// branch :  jump check
-    assign zeroE = (alucontrol == `EXE_BEQ_OP) ? (alu_num1 == alu_num2):                       // == 0
-                  (alucontrol == `EXE_BNE_OP) ? (alu_num1 != alu_num2):                       // != 0
-                  (alucontrol == `EXE_BGTZ_OP) ? ((alu_num1[31]==1'b0) && (alu_num1!=32'b0)): // > 0 
-                  (alucontrol == `EXE_BLEZ_OP) ? ((alu_num1[31]==1'b1) || (alu_num1==32'b0)): // = 0
-                  (alucontrol == `EXE_BLTZ_OP) ? (alu_num1[31] == 1'b1):                  // < 0
-                  (alucontrol == `EXE_BGEZ_OP) ? (alu_num1[31] == 1'b0):                  // >= 0
-                  // 下面两条是特殊指�???? 无论是否跳转 必须写GHR[31]
-                  (alucontrol == `EXE_BLTZAL_OP) ? (alu_num1[31] == 1'b1):                // < 0
-                  (alucontrol == `EXE_BGEZAL_OP) ? (alu_num1[31] == 1'b0):                // >= 0
-                  (alu_ans == 32'b0);
+    assign zeroE = ((alucontrol == `EXE_BEQ_OP) & (alu_num1 == alu_num2))                      // == 0
+                  |((alucontrol == `EXE_BNE_OP) & (alu_num1 != alu_num2))                       // != 0
+                  |((alucontrol == `EXE_BGTZ_OP) & ((alu_num1[31]==1'b0) && (alu_num1!=32'b0))) // > 0 
+                  |((alucontrol == `EXE_BLEZ_OP) & ((alu_num1[31]==1'b1) || (alu_num1==32'b0)))  // = 0
+                  |((alucontrol == `EXE_BLTZ_OP) & (alu_num1[31] == 1'b1))                   // < 0
+                  |((alucontrol == `EXE_BGEZ_OP) & (alu_num1[31] == 1'b0))                   // >= 0
+                  // 下面两条是特殊指�&&&& 无论是否跳转 必须写GHR[31]
+                  |((alucontrol == `EXE_BLTZAL_OP) & (alu_num1[31] == 1'b1))                 // < 0
+                  |((alucontrol == `EXE_BGEZAL_OP) & (alu_num1[31] == 1'b0))                 // >= 0
+                  |(alu_ans == 32'b0);
 	// overflow check
     wire overflow_add; // 用于�????测溢出位
     wire overflow_sub;
