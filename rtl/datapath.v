@@ -9,7 +9,7 @@ module datapath(
 	output wire[31:0] aluoutM,writedataM,
 	input wire[31:0] readdataM,
 	output wire sig_enM,
-
+	output wire inst_en,
     output wire longest_stall, 
     input wire i_stall,       
     input wire d_stall,
@@ -31,8 +31,9 @@ module datapath(
 	wire gprtohiW,gprtoloW;
 
 	wire regdstE;
-	wire alusrcE;
+	wire alusrcE,pcsrcD;
 	wire [1:0] memtoregD,memtoregE,memtoregM,memtoregW;
+//	wire [1:0] pcsrcD;
 	wire [63:0] hiloM;
  	//FD
 	wire [31:0] pcD,pcE,pcM,pcW,pcplus4F,pcplus4D,pcplus4E,pcbranchD,pcbranchE,pcbranchM,pcnextFD,pcjumpD;
@@ -53,7 +54,7 @@ module datapath(
 	//execute stage
 	wire[3:0] sig_writeE;
 	wire sig_enE;
-	wire stall_divE;
+	wire div_stallE;
 	wire [7:0] alucontrolE;
 	wire [1:0] forwardaE,forwardbE;
 	wire [4:0] rsE,rtE,rdE,saE;
@@ -62,7 +63,7 @@ module datapath(
 	wire [31:0] signimmE;
 	wire [31:0] srcaE,srca2E,srcbE,srcb2E,srcb3E,srcaM,srcaW;
 	wire [31:0] aluoutE;
-	wire branch_takeE;
+	wire zeroE;
 	wire [63:0] aluout64E;
 	wire [7:0] branch_judge_controlE;
 	wire [31:0] WriteDataE_modified;
@@ -86,13 +87,14 @@ module datapath(
     wire flushF, flushD, flushE, flushM, flushW;
     
     //predict
+    wire branch_takeM, branch_takeE;
 	wire branchD,branchE;
 	// 预测模块
     wire predictF,predictD, predictE, predict_wrong,predict_wrongM;
     wire actual_takeM, actual_takeE;
     
-	assign predict_wrong = (branch_takeE != predictE);
-    assign actual_takeE = branch_takeE;
+	assign predict_wrong = (zeroE != predictE);
+    assign actual_takeE = zeroE;
 
     compete_predict branch_predict(clk, rst, flushD, stallD, pcF, pcM,
     branchD, branchM, actual_takeM, actual_takeE,
@@ -153,12 +155,12 @@ module datapath(
 		.stallD(stallD),
 		.flushD(flushD),
 		//execute stage
-		// .stall_divE(stall_divE),
 		.rsE(rsE),.rtE(rtE),
 		.writeregE(writeregE),
 		.regwrite_enE(regwrite_enE),
 		.branchE(branchE),
 		.memtoregE(memtoregE),
+		.div_stallE(div_stallE),
 		.forwardaE(forwardaE),.forwardbE(forwardbE),
 		.flushE(flushE),.stallE(stallE),
 		//mem stage
@@ -175,45 +177,55 @@ module datapath(
 
      	.i_stall(i_stall),       // 涓や釜璁垮瓨 stall淇�?�彿
  		.d_stall(d_stall),
-		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�???
+		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�????
 		);
 
 
-              
+
+//    // pc_jumpD <- jumpD & ~jump_conflictD
+
+                        
 //    assign pc_sel = (branchM & ~succM & branch_takeM) ? 2'b10:
 //                    (branchM & ~succM & ~branch_takeM) ? 2'b11:
 //                    (branchD & ~branchM & pred_takeD ||
 //                     branchD & branchM & succM & pred_takeD) ? 2'b01:
 //                     2'b00;
 
+	//  you can't delete the next line  
+	assign pcsrcD = {jumpD,branchD & (srca2D == srcb2D)};
+	mux2 #(32) pcbrmux(pcplus4F,pcbranchD,pcsrcD,pcnextbrFD);
+	// you can't delete the next code
+	// mux2 #(32) pcmux(pcnextbrFD,pcjumpD,jumpD,pcnextFD);
 
 		// flopr 1
-    mux2 #(32) before_pc_which_wrong(pcplus4E+4,pcbranchE, predictE, pc_temp1);
+    mux2 #(32) before_pc_which_wrong(pcbranchE,pcplus4E+4, predictE, pc_temp1);
     mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & predictD, pc_temp2);
     mux2 #(32) before_pc_predict(pc_temp2,pc_temp1,predict_wrong & branchE, pc_temp3);
     mux2 #(32) before_pc_jump(pc_temp3,{pcplus4D[31:28],instrD[25:0],2'b00},jumpD, pc_temp4);
     mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   
 	// mux2 #(32) before_pc_exception(pc_temp5,pcexceptionM,exceptionoccur, pc_in);
-
+	
 
     //remove stallW temporarily 
 	//regfile (operates in decode and writeback)
 	regfile regfile0(
-	.clk(clk),
-//	.stallW(stallW),
-	.we3(regwrite_enM),
-	.ra1(rsD), 
-	.ra2(rtD), 
-	.wa3(writeregM), 
-	.wd3(resultM),
-	.rd1(srcaD), 
-	.rd2(srcbD)
+		.clk(clk),
+	//	.stallW(stallW),
+		.we3(regwrite_enM),
+		.ra1(rsD), 
+		.ra2(rtD), 
+		.wa3(writeregM), 
+		.wd3(resultM),
+		.rd1(srcaD), 
+		.rd2(srcbD)
     );
 
 	//fetch stage logic
 	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_ce_reg);
+	assign inst_en = pc_ce_reg & ~stallF;
 //	assign pcplus4F = pcF + 4;
 	adder pcadd1(pcF,32'b100,pcplus4F);
+	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
 	//IF_ID flop
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
@@ -227,12 +239,12 @@ module datapath(
 	mux2 #(32) forwardamux(srcaD,aluoutM,forwardaD,srca2D);
 	mux2 #(32) forwardbmux(srcbD,aluoutM,forwardbD,srcb2D);
 
-	assign opD 		= 	instrD[31:26];
-	assign rsD 		= 	instrD[25:21];
-	assign rtD 		= 	instrD[20:16];
-	assign rdD 		= 	instrD[15:11];
-	assign functD 	= 	instrD[5 : 0];
-	assign saD 		= 	instrD[10: 6];
+	assign opD = instrD[31:26];
+	assign rsD = instrD[25:21];
+	assign rtD = instrD[20:16];
+	assign rdD = instrD[15:11];
+	assign functD = instrD[5:0];
+	assign saD = instrD[10:6];
 
     assign jump_conflictD = jumprD &&
                             ((regwrite_enE && rsD == writeregE) ||          
@@ -268,9 +280,8 @@ module datapath(
 	flopenrc #(1)  	fp3_19(clk, rst, ~stallE, flushE, gprtoloD, gprtoloE);
 	flopenrc #(32)  fp3_20(clk, rst, ~stallE, flushE, pcD, pcE);
 	flopenrc #(1)  	fp3_21(clk, rst, ~stallE, flushE, branchD, branchE);
-	flopenrc #(1)   fp3_23(clk, rst, ~stallE, 1'b0  , write_alD, write_alE);
-	// flopenrc #(1)   fp3_24(clk, rst, ~stallE, flushE, cp0writeD, cp0writeE);
-
+	flopenrc #(1)  fp3_23(clk, rst, ~stallE, 1'b0  , write_alD, write_alE);
+	
 	//execute stage
 	//mux write reg
 	mux3 #(32) forwardaemux(srcaE,resultW,aluoutM,forwardaE,srca2E);
@@ -284,18 +295,25 @@ module datapath(
 			 .hilo(hiloM),
 			 .sa(saE),
 			 .flushE(flushE),
+			 .stallM(stallM),
 			 .pcplus4E(pcplus4E),
-			 .cp0aluin(cp0aluin),
 	         .alu_out(aluoutE),
 	         .alu_out_64(aluout64E), 
 	         .overflowE(),
-	         .branch_takeE(branch_takeE),
-	         .stall_div(stall_divE)
+	         .zeroE(zeroE),
+	         .div_stallE(div_stallE)
 	);
 	
 
-
-        
+    branch_judge branch_judge0(
+        .branch_judge_controlE(branch_judge_controlE),
+        .srcaE(srca2E),
+        .srcbE(srcb2E),
+        .branch_takeE(branch_takeE)
+    );
+    
+    assign branch_takeE = zeroE;
+    
     //mux write reg
     mux2 #(5) mux_regfile(rdE,rtE,regdstE,writeregE_temp);
 
@@ -308,6 +326,7 @@ module datapath(
 	flopr#(64) 	fp4_3(clk,rst,aluout64E,aluout64M);
 	flopr#(32) 	fp4_4(clk,rst,srcaE,srcaM);
 	flopr#(32) 	fp4_5(clk,rst,pcbranchE,pcbranchM);
+	flopr#(1) 	fp4_6(clk,rst,branch_takeE,branch_takeM);
 	flopr#(2) 	fp4_7(clk,rst,memtoregE,memtoregM);
 	flopr#(1) 	fp4_8(clk,rst,memwriteE,memwriteM);
 	flopr#(1) 	fp4_9(clk,rst,regwrite_enE,regwrite_enM);
@@ -319,10 +338,8 @@ module datapath(
 	flopr#(4) 	fp4_15(clk,rst,sig_writeE,sig_writeM);
 	flopr#(1) 	fp4_16(clk,rst,sig_enE,sig_enM);
 
-
 	flopenrc #(1)  fp4_17(clk,  rst, ~stallM, flushM,  actual_takeE, actual_takeM);
     flopenrc #(1)  fp4_18(clk,  rst, ~stallM, flushM,  predict_wrong,predict_wrongM);
-	// flopenrc #(1)  fp4_19(clk,  rst, ~stallM, flushM,  cp0writeE,cp0writeM);
     
     
 	//mem stage
@@ -361,47 +378,16 @@ module datapath(
 							.dataadrW(aluoutW),
 							.readdataW_modified(readdataW_modified)
 	);
-	// // exception
-	// assign real_causeout = (RdM == 5'b01101 && cp0writeM) ? cause_o:causeout;
-    // assign real_pcM = (RdM == 5'b01101 && cp0writeM) ? pcE : pcM;
 
-	// // 异常处理模块
-    // exceptiondec exceptiondec (rst,exceptM,exceptM[1],exceptM[0],statusout,
-    //             real_causeout,epcout, exceptionoccur,exceptiontypeM,pcexceptionM);
+// move to MEM stage already
+//    hilo_reg hilo_reg(clk,rst,{gprtohiE,gprtoloE},aluout64E[63:32],aluout64E[31:0],hi_oM,lo_oM);
+//	assign hiloM = {hi_oM, lo_oM};
+
+//	mux4 #(32) resmux_new(aluoutW,readdataW,hi_oW,lo_oW,memtoregW,resultW);
+//	mux2 #(32) resmux(aluoutW,readdataW,memtoregW,resultW);
     
-    // wire [31:0]countout,compareout,configout,pridout,badvaddrout,bad_addr;
-    // wire timerintout;
-    // assign bad_addr = (exceptM[7])? pcM : aluoutM; // pc错误时，bad_addr_i为pcM，否则为计算出来的load store地址
-    
-    // cp0_reg cp0 (
-    //     // input
-	// 	.clk 				(clk 			    ),
-	// 	.rst 				(rst 			    ),
-	// 	.we_i 				(cp0writeM 		    ),  // 写cp0，maindec中判断
-	// 	.waddr_i 			(RdM 			    ),
-	// 	.raddr_i 			(RdE 			    ),
-	// 	.data_i 			(aluoutM 		    ),
-	// 	.int_i 				(int 			    ),
-	// 	.excepttype_i 		(exceptiontypeM	    ),
-	// 	.current_inst_addr_i(real_pcM 			),
-	// 	.is_in_delayslot_i	(is_in_delayslotM   ),
-	// 	.bad_addr_i			(bad_addr		    ), // 出错的虚地址（load store)均为alu计算出的结果
-    //     // output
-	// 	.data_o				(cp0dataoutE 	    ),
-	// 	.count_o			(countout 	),//	    
-	// 	.compare_o			(compareout ),//	    
-        
-	// 	.status_o			(statusout 		    ),    	
-	// 	.cause_o			(causeout 		    ),
-	// 	.epc_o				(epcout 		    ),
-
-	// 	.config_o			(configout 		),//    
-	// 	.prid_o				(pridout 		),//    
-	// 	.badvaddr			(badvaddrout 	),//    
-	// 	.timer_int_o		(timerintout	)//    
-	// );
-
     //DEBUG OUTPUT
+	
     assign debug_wb_pc          = pcW;
     assign debug_wb_rf_wen      = {4{regwrite_enW & ~stallW}};
     assign debug_wb_rf_wnum     = writeregW;

@@ -30,10 +30,11 @@ module regfile(
     );
 
 	reg [31:0] rf[31:0];
-	
+	initial begin
+		rf[0] <= 32'b0;
+	end
 	always @(negedge clk) begin
 //		if(we3 & ~stallW) begin
-		rf[0] <= 0;
         if(we3 & |wa3) begin
 			 rf[wa3] <= wd3;
 		end
