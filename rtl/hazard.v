@@ -38,6 +38,7 @@ module hazard(
 	input wire branchE,
 	input wire regwrite_enE,
 	input wire[1:0] memtoregE,
+	input wire div_stallE,
 	output wire[1:0] forwardaE,forwardbE,
 	output wire flushE,stallE,
 	//mem stage
@@ -60,42 +61,17 @@ module hazard(
 	wire lwstallD,branchstallD,jrstall;
 
 	//forwarding sources to D stage (branch equality)
-	assign forwardaD = (rsD != 0 & rsD == writeregM & regwrite_enM);
-	assign forwardbD = (rtD != 0 & rtD == writeregM & regwrite_enM);
+	assign forwardaD = (rsD != 5'b0 & (rsD == writeregM) & regwrite_enM);
+	assign forwardbD = (rtD != 5'b0 & (rtD == writeregM) & regwrite_enM);
 	
 	//forwarding sources to E stage (ALU)
-	assign forwardaE = rsE !=0 && regwrite_enM && (rsE == writeregM) ? 2'b10 :
-					   rsE !=0 && regwrite_enW && (rsE == writeregW) ? 2'b01 : 2'b00;
+	assign forwardaE = ((rsE != 5'b0) && regwrite_enM && (rsE == writeregM)) ? 2'b10 :
+					   ((rsE != 5'b0) && regwrite_enW && (rsE == writeregW)) ? 2'b01 : 2'b00;
 					   
-	assign forwardbE = rtE !=0 && regwrite_enM && (rtE == writeregM) ? 2'b10 :
-					   rtE !=0 && regwrite_enW && (rtE == writeregW) ? 2'b01 : 2'b00;
+	assign forwardbE = ((rtE != 5'b0) && regwrite_enM && (rtE == writeregM)) ? 2'b10 :
+					   ((rtE != 5'b0) && regwrite_enW && (rtE == writeregW)) ? 2'b01 : 2'b00;
 
-	// stall by div
-	// assign #1 stallD = lwstall | branchstallD | stall_divE;
-	// assign #1 stallF = stallD | stall_divE;
-	// 	//stalling D stalls all previous stages
-	// assign #1 flushE = stallD;
-	// assign #1 stallE = stall_divE;
 
-	//////// new add by stall_divE, see if can merge ///////
-	// assign stallF = stall_divE;
-	// assign stallD = stall_divE;
-	// assign stallE = stall_divE;
-
-	// test if stall is correct without div
-	// assign #1 stallF = stallD;
-	// assign #1 stallD = lwstall | branchstallD;
-	//stalling D stalls all previous stages
-	// assign flushE = ~stall_divE;
-	// assign flushE = 0;
-	// assign #1 flushE = stallD;
-	// assign #1 stallE = 0;
-
-	//stalling D flushes next stage
-	// Note: not necessary to stall D stage on store
-  	//       if source comes from load;
-  	//       instead, another bypass network could
-  	//       be added from W to M
   	//stalls
 	assign lwstallD = memtoregE & (rtE == rsD | rtE == rtD);
 	assign branchstallD = branchD &
@@ -105,27 +81,27 @@ module hazard(
 				(writeregM == rsD | writeregM == rtD));
 	assign jrstall = jumprD & regwrite_enE & ((writeregE == rsD) | (writeregE == rtD)); //|
 	
-	assign stallF = stallD;
-	assign stallD = lwstallD | jrstall;
-    assign stallE = 0;
-    assign stallM = 0;
-    assign stallW = 0;
+	// assign stallF = stallD;
+	// assign stallD = lwstallD | jrstall;
+    // assign stallE = 0;
+    // assign stallM = 0;
+    // assign stallW = 0;
 
-	assign flushF = 0;
-	assign flushD = (branchE & predict_wrong) ;
-	assign flushE = stallD;
-	assign flushM = 0;
-	assign flushW = 0;
+	// assign flushF = 0;
+	// assign flushD = (branchE & predict_wrong) ;
+	// assign flushE = stallD;
+	// assign flushM = 0;
+	// assign flushW = 0;
+	assign longest_stall = div_stallE;
+    assign stallF = div_stallE | lwstallD | jrstall;
+    assign stallD = div_stallE | lwstallD | jrstall;
+    assign stallE = div_stallE;
+    assign stallM = 1'b0;
+    assign stallW = 1'b0;
 
-    // assign stallF = (longest_stall | lwstall | jrstall) & ~exceptionoccur;
-    // assign stallD = longest_stall | lwstall | jrstall;
-    // assign stallE = longest_stall;
-    // assign stallM = longest_stall;
-    // assign stallW = longest_stall;
-
-    // assign flushF = 1'b0;
-    // assign flushD = ((branchE & predict_wrong) | exceptionoccur) & (~longest_stall);
-    // assign flushE = (lwstall | jrstall         | exceptionoccur) & (~longest_stall); // TODO:exceptionoccur信号用于异常时清除所有的寄存器，还未完全测试
-    // assign flushM = (exceptionoccur                            ) & (~longest_stall);
-    // assign flushW = (exceptionoccur                            ) & (~longest_stall);
+    assign flushF = 1'b0;
+    assign flushD = (branchE & predict_wrong) & (~div_stallE);
+    assign flushE = (lwstallD | jrstall) & (~div_stallE);
+    assign flushM = 1'b0;
+    assign flushW = 1'b0;
 endmodule
