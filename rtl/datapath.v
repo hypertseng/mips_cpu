@@ -35,7 +35,7 @@ module datapath(
 	wire [1:0] memtoregD,memtoregE,memtoregM,memtoregW;
 	wire [63:0] hiloM;
  	//FD
-	wire [31:0] pcD,pcE,pcM,pcW,pcplus4F,pcplus4D,pcplus4E,pcnextbrFD,pcbranchD,pcbranchE,pcbranchM,pcnextFD,pcjumpD;
+	wire [31:0] pcD,pcE,pcM,pcW,pcplus4F,pcplus4D,pcplus4E,pcbranchD,pcbranchE,pcbranchM,pcnextFD,pcjumpD;
 	wire [31:0] inst_ce;
 	wire pc_ce_reg;
 	wire jump_conflictD;
