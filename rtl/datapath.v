@@ -223,10 +223,10 @@ module datapath(
     );
 
 	//fetch stage logic
-	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_ce_reg);
+	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,inst_ce,pc_ce_reg);
 	assign inst_en = pc_ce_reg & ~stallF;
 //	assign pcplus4F = pcF + 4;
-	adder pcadd1(pcF,32'b100,pcplus4F);
+	adder pcadd1(inst_ce,32'b100,pcplus4F);
 	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
 	//IF_ID flop

@@ -37,9 +37,9 @@ module branch_predict_global (
 );
 
     // wire pred_takeF;   //Ԥ��
-    reg pred_takeF_r; //�ѽ��������??
+    reg pred_takeF_r; //�ѽ��������???
 
-// �������??
+// �������???
     parameter Strongly_not_taken = 2'b00, Weakly_not_taken = 2'b01, Weakly_taken = 2'b11, Strongly_taken = 2'b10;
     parameter GHR_LENGTH = 8;
 
@@ -88,7 +88,7 @@ module branch_predict_global (
             GHR_value_old <= GHR_value;
             GHR_value <= {GHR_value << 1, pred_takeD};
             
-        end else if(pred_wrong && branchM) begin // �õ�Ԥ�����������Ԥ���Ǵ���??(memory �׶�)
+        end else if(pred_wrong && branchM) begin // �õ�Ԥ�����������Ԥ���Ǵ���???(memory �׶�)
             GHR_value <= {GHR_value_old <<1, actual_takeM};
             GHR_value_old <= GHR_value;
         end
@@ -113,14 +113,14 @@ module branch_predict_global (
 // ---------------------------------------PHT��ʼ���Լ�����---------------------------------------
     always @(posedge clk) begin
         if(rst) begin
-            //   for(i = 0; i < (1<<GHR_LENGTH); i=i+1) begin
-            //       PHT[i] <= Weakly_taken;
-            //   end
-          PHT[(1<<GHR_LENGTH)-1:0] <= '{default: 2'b11};
+               for(i = 0; i < (1<<GHR_LENGTH); i=i+1) begin
+                   PHT[i] <= Weakly_taken;
+               end
+//          PHT[(1<<GHR_LENGTH)-1:0] <= '{default: 2'b11};
         end
         else if(branchM) begin
             case(PHT[update_PHT_index])
-                // �˴�Ӧ��������ĸ����߼��Ĵ���??
+                // �˴�Ӧ��������ĸ����߼��Ĵ���???
                 Strongly_not_taken: begin
                     if(actual_takeM) begin
                         PHT[update_PHT_index] <= Weakly_not_taken;

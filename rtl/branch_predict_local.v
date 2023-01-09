@@ -37,10 +37,10 @@ module branch_predict_local (
     output wire pred_takeF
 );
 
-    reg pred_takeF_r; //�ѽ��������??
-    // assign branchD = //�ж�����׶��Ƿ��Ƿ�ָ֧��??
+    reg pred_takeF_r; //�ѽ��������???
+    // assign branchD = //�ж�����׶��Ƿ��Ƿ�ָ֧��???
 
-// �������??
+// �������???
     parameter Strongly_not_taken = 2'b00, Weakly_not_taken = 2'b01, Weakly_taken = 2'b11, Strongly_taken = 2'b10;
     parameter PHT_DEPTH = 6;
     parameter BHT_DEPTH = 10;
@@ -58,7 +58,7 @@ module branch_predict_local (
 
     assign BHT_index = pcF[11:2];     
     assign BHR_value = BHT[BHT_index];  
-    assign PHT_index = BHR_value ^ pcF[7:2]; // ʹ��XOR�����ͻ������ͬ��??
+    assign PHT_index = BHR_value ^ pcF[7:2]; // ʹ��XOR�����ͻ������ͬ��???
  
     assign pred_takeF = PHT[PHT_index][1];      // ��ȡָ�׶�Ԥ���Ƿ����ת����������ˮ�ߴ��ݸ�����׶Ρ�
 
@@ -86,13 +86,13 @@ module branch_predict_local (
 
     always@(posedge clk) begin
         if(rst) begin
-            //   for(j = 0; j < (1<<BHT_DEPTH); j=j+1) begin
-            //       BHT[j] <= 0;
-            //   end
-          BHT[(1<<BHT_DEPTH-1):0] <= '{default: '0};
+               for(j = 0; j < (1<<BHT_DEPTH); j=j+1) begin
+                   BHT[j] <= 0;
+               end
+//          BHT[(1<<BHT_DEPTH-1):0] <= '{default: '0};
         end
         else if(branchM) begin
-            // �˴�Ӧ��������ĸ����߼��Ĵ���??
+            // �˴�Ӧ��������ĸ����߼��Ĵ���???
             BHT[update_BHT_index] <= {(BHT[update_BHT_index] << 1), actual_takeM};
         end
     end
@@ -108,7 +108,7 @@ module branch_predict_local (
         end
         else if(branchM) begin
             case(PHT[update_PHT_index])
-                // �˴�Ӧ��������ĸ����߼��Ĵ���??
+                // �˴�Ӧ��������ĸ����߼��Ĵ���???
                 Strongly_not_taken: begin
                     if(actual_takeM) begin
                         PHT[update_PHT_index] <= Weakly_not_taken;
