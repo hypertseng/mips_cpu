@@ -12,6 +12,8 @@ module alu(
 	input  wire [4:0] 	sa,
 	input  wire  		flushE, // new add flush [input for div]
     input  wire [31:0]  pcplus4E,
+    input  wire [31:0]  cp0aluin,
+
 	output wire [31:0] 	alu_out,
 	output reg  [63:0] 	alu_out_64,
 	output wire 		overflowE,
@@ -118,7 +120,7 @@ module alu(
 
             // 鐗规潈鎸囦护
             `EXE_MTC0_OP: alu_ans <= alu_num2;
-            // `EXE_MFC0_OP: alu_ans <= ;
+            `EXE_MFC0_OP: alu_ans <= cp0aluin;
             `EXE_ERET_OP: alu_ans <= 32'b0;
             default: begin
 				alu_ans <= 32'b0;
