@@ -188,17 +188,13 @@ module datapath(
 
 
 		// flopr 1
-    // mux2 #(32) before_pc_which_wrong(pcbranchE,pcplus4E+4, predictE, pc_temp1);
-    mux2 #(32) before_pc_which_wrong(pcbranchE,pcplus4E+4, branch_takeE, pc_temp1);
-    // mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & predictD, pc_temp2);
-    mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & branch_takeE, pc_temp2);
+    mux2 #(32) before_pc_which_wrong(pcplus4E+4,pcbranchE, predictE, pc_temp1);
+    mux2 #(32) before_pc_wrong(pcplus4F,pcbranchD, branchD & predictD, pc_temp2);
     mux2 #(32) before_pc_predict(pc_temp2,pc_temp1,predict_wrong & branchE, pc_temp3);
     mux2 #(32) before_pc_jump(pc_temp3,{pcplus4D[31:28],instrD[25:0],2'b00},jumpD, pc_temp4);
     mux2 #(32) before_pc_jumpr(pc_temp4,srca2D,jumprD, pcnextFD);   
 	// mux2 #(32) before_pc_exception(pc_temp5,pcexceptionM,exceptionoccur, pc_in);
-	assign pcnextFD = 	jumprD ? srca2D :
-						jumpD ? {pcplus4D[31:28],instrD[25:0],2'b00} :
-						(predict_wrong & branchE) ? pc_temp1:
+
 
     //remove stallW temporarily 
 	//regfile (operates in decode and writeback)
