@@ -177,7 +177,7 @@ module datapath(
 
      	.i_stall(i_stall),       // 涓や釜璁垮瓨 stall淇�?�彿
  		.d_stall(d_stall),
-		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�???
+		.longest_stall(longest_stall) // 鍏ㄥ眬stall鎸囦�???
 		);
 
 
@@ -224,7 +224,6 @@ module datapath(
 	pc #(32) pcreg(clk,rst,~stallF,pcnextFD,pcF,pc_ce_reg);
 //	assign pcplus4F = pcF + 4;
 	adder pcadd1(pcF,32'b100,pcplus4F);
-	// hilo_reg hilo_regD(clk,rst,{gprtohiW,gprtoloW},srcaW,srcaW,hi_oD,lo_oD);
 
 	//IF_ID flop
 	flopenr #(32) r1D(clk,rst,~stallD,pcplus4F,pcplus4D);
@@ -238,12 +237,12 @@ module datapath(
 	mux2 #(32) forwardamux(srcaD,aluoutM,forwardaD,srca2D);
 	mux2 #(32) forwardbmux(srcbD,aluoutM,forwardbD,srcb2D);
 
-	assign opD = instrD[31:26];
-	assign rsD = instrD[25:21];
-	assign rtD = instrD[20:16];
-	assign rdD = instrD[15:11];
-	assign functD = instrD[5:0];
-	assign saD = instrD[10:6];
+	assign opD 		= 	instrD[31:26];
+	assign rsD 		= 	instrD[25:21];
+	assign rtD 		= 	instrD[20:16];
+	assign rdD 		= 	instrD[15:11];
+	assign functD 	= 	instrD[5 : 0];
+	assign saD 		= 	instrD[10: 6];
 
     assign jump_conflictD = jumprD &&
                             ((regwrite_enE && rsD == writeregE) ||          
