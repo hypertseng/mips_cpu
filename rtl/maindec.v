@@ -112,9 +112,9 @@ module maindec(
             `EXE_LH : main_signal <= 9'b10101_01_00;
             `EXE_LHU: main_signal <= 9'b10101_01_00;
             `EXE_LW : main_signal <= 9'b10101_01_00;  // lab4 lw
-            `EXE_SB : main_signal <= 9'b00101_01_00;  
-            `EXE_SH : main_signal <= 9'b00101_01_00;  
-            `EXE_SW : main_signal <= 9'b00101_01_00;  // lab4 sw
+            `EXE_SB : main_signal <= 9'b00101_00_00;  
+            `EXE_SH : main_signal <= 9'b00101_00_00;  
+            `EXE_SW : main_signal <= 9'b00101_00_00;  // lab4 sw
 
             // 閻楄娼堥幐鍥︽�?
             6'b010000 : case(rs)
